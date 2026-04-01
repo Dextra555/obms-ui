@@ -1,0 +1,113 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>Professional Tax Calculator</h2>
+    <button mat-icon-button (click)="onClose()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="calculatorForm" (ngSubmit)="calculateTax()">
+    <mat-dialog-content class="dialog-content">
+      <div class="row">
+        <div class="col-md-12">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Gross Monthly Salary *</mat-label>
+            <input matInput type="number" formControlName="grossSalary" 
+                   placeholder="Enter gross monthly salary">
+            <mat-icon matSuffix>currency_rupee</mat-icon>
+            <mat-error *ngIf="calculatorForm.get('grossSalary')?.invalid && 
+                          calculatorForm.get('grossSalary')?.touched">
+              {{ getErrorMessage('grossSalary') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>State *</mat-label>
+            <mat-select formControlName="state">
+              <mat-option value="">Select State</mat-option>
+              <mat-option *ngFor="let state of states" [value]="state">
+                {{ state }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="calculatorForm.get('state')?.invalid && 
+                          calculatorForm.get('state')?.touched">
+              {{ getErrorMessage('state') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Calculation Date *</mat-label>
+            <input matInput type="date" formControlName="calculationDate">
+            <mat-error *ngIf="calculatorForm.get('calculationDate')?.invalid && 
+                          calculatorForm.get('calculationDate')?.touched">
+              {{ getErrorMessage('calculationDate') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Calculation Result -->
+      <div class="calculation-result" *ngIf="calculationResult">
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title>Calculation Result</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="result-item">
+                  <label>Gross Salary:</label>
+                  <span>{{ formatCurrency(calculationResult.grossSalary) }}</span>
+                </div>
+                <div class="result-item">
+                  <label>State:</label>
+                  <span>{{ calculationResult.state }}</span>
+                </div>
+                <div class="result-item">
+                  <label>Applicable:</label>
+                  <span class="badge" 
+                        [class]="calculationResult.isApplicable ? 'badge-success' : 'badge-warning'">
+                    {{ calculationResult.isApplicable ? 'Yes' : 'No' }}
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="result-item">
+                  <label>Tax Slab:</label>
+                  <span>{{ calculationResult.taxSlab }}</span>
+                </div>
+                <div class="result-item tax-amount">
+                  <label>Professional Tax:</label>
+                  <span class="tax-value">{{ formatCurrency(calculationResult.taxAmount) }}</span>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button mat-button type="button" (click)="onClose()">Close</button>
+      <button mat-raised-button color="primary" type="submit" 
+              [disabled]="calculatorForm.invalid || showLoadingSpinner">
+        <span *ngIf="!showLoadingSpinner">
+          <mat-icon>calculate</mat-icon>
+          Calculate Tax
+        </span>
+        <span *ngIf="showLoadingSpinner">
+          <mat-spinner diameter="20"></mat-spinner>
+          Calculating...
+        </span>
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>

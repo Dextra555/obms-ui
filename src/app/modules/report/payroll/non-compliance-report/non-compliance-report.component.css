@@ -1,0 +1,291 @@
+.card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 10px;
+}
+
+.card-header {
+  border-radius: 10px 10px 0 0 !important;
+  padding: 1rem 1.5rem;
+}
+
+.form-control:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+.bg-success {
+  background-color: #28a745 !important;
+}
+
+.bg-warning {
+  background-color: #ffc107 !important;
+}
+
+.bg-info {
+  background-color: #17a2b8 !important;
+}
+
+.bg-dark {
+  background-color: #343a40 !important;
+}
+
+.text-white {
+  color: #fff !important;
+}
+
+.card-title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-control-sm {
+  font-size: 0.875rem;
+}
+
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-check {
+  padding-left: 0;
+}
+
+.form-check-input {
+  margin-left: 0;
+  margin-right: 0.5rem;
+}
+
+.form-check-label {
+  font-size: 0.875rem;
+  color: #495057;
+}
+
+.fa,
+.fas {
+  margin-right: 0.5rem;
+}
+
+/* Quick Stats Cards */
+.row .col-md-3 .card {
+  transition: transform 0.3s ease;
+}
+
+.row .col-md-3 .card:hover {
+  transform: translateY(-5px);
+}
+
+.row .col-md-3 .card .card-body h3 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.row .col-md-3 .card .card-body p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+/* Severity Legend */
+.card .card-body .row .col-md-3 {
+  margin-bottom: 1rem;
+}
+
+.card .card-body .d-flex {
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.card .card-body .d-flex:hover {
+  background-color: #f8f9fa;
+}
+
+/* Table styling for embedded reports */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.875rem;
+}
+
+table th,
+table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+
+table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Grid layouts for summary reports */
+div[style*="grid"] {
+  gap: 1rem;
+}
+
+div[style*="grid"] > div {
+  transition: transform 0.3s ease;
+}
+
+div[style*="grid"] > div:hover {
+  transform: translateY(-2px);
+}
+
+/* Loading animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-body {
+  animation: fadeIn 0.5s ease-in;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .row .col-md-3 {
+    margin-bottom: 1rem;
+  }
+  
+  .card .card-body .row .col-md-3 {
+    margin-bottom: 1rem;
+  }
+  
+  table {
+    font-size: 0.75rem;
+  }
+  
+  table th,
+  table td {
+    padding: 0.5rem;
+  }
+}
+
+/* Status indicators */
+.status-critical {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.status-high {
+  color: #fd7e14;
+  font-weight: bold;
+}
+
+.status-medium {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.status-low {
+  color: #28a745;
+  font-weight: bold;
+}
+
+/* Custom scrollbar for report containers */
+.card-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.card-body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.card-body::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.card-body::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

@@ -1,0 +1,119 @@
+<div class="form-header">
+    <div style="text-align: center; margin-bottom: 10px;">
+        <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">FreightWatch G Security Services India Pvt. Ltd</div>
+        <h1 style="margin: 0; font-size: 18px; font-weight: bold;">FORM XXVII</h1>
+        <p style="margin: 2px 0; font-size: 11px;">[See Rule 78 (1)(a)(ii)]</p>
+        <div style="font-weight: bold; font-size: 14px; margin-top: 8px;">REGISTER OF WAGES</div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-top: 1px solid #000; padding-top: 10px;">
+        <div style="font-size: 11px; width: 50%;">
+            <div><strong>Name & Address of the Principal Employer:</strong></div>
+            <div>{{PrincipalEmployer}}</div>
+        </div>
+        <div style="font-size: 11px; width: 50%; text-align: right;">
+            <div><strong>Year:</strong> {{Year}} &nbsp; <strong>Period:</strong> {{Period}}</div>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; border-top: 1px solid #000; padding-top: 10px;">
+        <div style="font-size: 11px; width: 50%;">
+            <div><strong>Name & Address of the Contractor:</strong></div>
+            <div>{{ContractorName}}</div>
+            <div>{{CompanyAddress}}</div>
+        </div>
+        <div style="font-size: 11px; width: 50%; text-align: right;">
+            <div><strong>Name & Address of the Establishment:</strong></div>
+            <div>{{WorkSite}}</div>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 20px; font-size: 11px; border-top: 1px solid #000; padding-top: 10px; flex-wrap: wrap;">
+        <div><strong>Branch:</strong> {{BranchName}}</div>
+        <div><strong>Client:</strong> {{ClientName}}</div>
+    </div>
+</div>
+
+<table class="report-table register-wages-xxvii">
+    <thead>
+        <tr>
+            <th rowspan="2">S.No</th>
+            <th rowspan="2">Name</th>
+            <th rowspan="2">Sex</th>
+            <th rowspan="2">UAN No.</th>
+            <th rowspan="2">ESI No.</th>
+            <th rowspan="2">Designation</th>
+            <th rowspan="2">Pay Type</th>
+            <th rowspan="2">Wage Period</th>
+            <th rowspan="2">Total Days</th>
+            <th rowspan="2">Days Worked</th>
+            <th colspan="6">Earnings</th>
+            <th rowspan="2">Basic+DA</th>
+            <th rowspan="2">Gross</th>
+            <th colspan="5" style="background: #fff3cd;">Deductions</th>
+            <th rowspan="2">Net</th>
+            <th rowspan="2">Signature</th>
+        </tr>
+        <tr>
+            <th>Basic</th>
+            <th>DA</th>
+            <th>HRA</th>
+            <th>Others</th>
+            <th>Adv/Bonus</th>
+            <th>Leave Wages</th>
+            <th style="background: #fff3cd;">PF</th>
+            <th style="background: #fff3cd;">ESI</th>
+            <th style="background: #fff3cd;">PT</th>
+            <th style="background: #fff3cd;">Advance</th>
+            <th style="background: #fff3cd;">Fines</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{DataRows}}
+    </tbody>
+    <tfoot>
+        <tr class="total-row">
+            <td colspan="10">TOTAL</td>
+            <td>{{TotalBasic || 0}}</td>
+            <td>{{TotalDA || 0}}</td>
+            <td>{{TotalHRA || 0}}</td>
+            <td>{{TotalOther || 0}}</td>
+            <td>{{TotalBonus || 0}}</td>
+            <td>{{TotalLeave || 0}}</td>
+            <td>{{TotalBasicDA || 0}}</td>
+            <td>{{TotalGross || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalPF || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalESI || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalPT || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalAdvance || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalFines || 0}}</td>
+            <td>{{TotalNet || 0}}</td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
+
+<div style="margin-top: 30px; font-size: 11px;">
+    <div style="display: flex; justify-content: space-between;">
+        <div>Signature of Contractor: _________________</div>
+        <div>Signature of Principal Employer: _________________</div>
+    </div>
+    <div style="margin-top: 10px; text-align: center; color: #666;">
+        Generated on: {{GeneratedDate}}
+    </div>
+</div>
+
+<style>
+    body { font-family: 'Poppins', sans-serif; font-size: 11px; line-height: 1.2; margin: 10px; }
+    .form-header { border: 2px solid #000; padding: 15px; margin-bottom: 15px; }
+    .report-table.register-wages-xxvii { border-collapse: collapse; width: 100%; font-size: 10px; margin-bottom: 15px; }
+    .report-table.register-wages-xxvii th, .report-table.register-wages-xxvii td { border: 1px solid #000; padding: 4px 6px; vertical-align: middle; text-align: center; }
+    .report-table.register-wages-xxvii th { background: #f0f0f0; font-weight: bold; font-size: 9px; }
+    .report-table.register-wages-xxvii td.left-text { text-align: left; }
+    .total-row td { background: #f0f0f0; font-weight: bold; }
+    @media print {
+        body { margin: 0; font-size: 10px; }
+        .form-header { page-break-inside: avoid; }
+        th, td { font-size: 8px; padding: 3px 4px; }
+    }
+</style>

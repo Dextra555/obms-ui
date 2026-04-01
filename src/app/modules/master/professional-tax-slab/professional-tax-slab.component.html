@@ -1,0 +1,139 @@
+<div class="wlt-c-furg-content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+        <h1 class="mb-1">Professional Tax Slab Management</h1>
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 my-1">
+        <ol class="breadcrumb float-md-right">
+          <li class="breadcrumb-item"><a routerLink="/dashboard">Master</a></li>
+          <li class="breadcrumb-item active">Professional Tax Slab</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+<mat-card>
+  <mat-card-content>
+    <div class="row" *ngIf="errorMessage === ''">
+      <div class="col-12 col-sm-12 col-md-4 col-lg-4 order-2 order-md-1">
+        <div class="text-right">
+          <mat-form-field appearance="outline">
+            <mat-label>Search</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="" #input>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-12 col-sm-12 col-md-8 col-lg-8 order-1 order-md-2">
+        <div class="text-right pt-2">
+          <button *ngIf="userAccessModel.createAccess"
+                  class="btn wlt-c-furg-btn-primary mr-2" (click)="calculateTax()">
+            <mat-icon>calculate</mat-icon>
+            <span>Calculate Tax</span>
+          </button>
+          <button *ngIf="userAccessModel.createAccess"
+                  class="btn wlt-c-furg-btn-primary" (click)="openAddDialog()">
+            <mat-icon>add</mat-icon>
+            <span>Add New</span>
+          </button>
+        </div>
+      </div>
+    </div>
+          
+    <div class="table-responsive" *ngIf="!showLoadingSpinner && !errorMessage">
+      <table mat-table [dataSource]="dataSource" class="wlt-table table-striped" matSort
+              (matSortChange)="announceSortChange($event)">
+        <!-- State Column -->
+        <ng-container matColumnDef="state">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>State</th>
+          <td mat-cell *matCellDef="let row">{{ row.state }}</td>
+        </ng-container>
+        
+        <!-- Min Salary Column -->
+        <ng-container matColumnDef="minSalary">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Min Salary</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge badge-info">{{ formatCurrency(row.minSalary) }}</span>
+          </td>
+        </ng-container>
+        
+        <!-- Max Salary Column -->
+        <ng-container matColumnDef="maxSalary">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Max Salary</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge badge-info">
+              {{ row.maxSalary ? formatCurrency(row.maxSalary) : 'No Limit' }}
+            </span>
+          </td>
+        </ng-container>
+        
+        <!-- Tax Amount Column -->
+        <ng-container matColumnDef="taxAmount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Tax Amount</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge badge-success">{{ formatCurrency(row.taxAmount) }}</span>
+          </td>
+        </ng-container>
+        
+        <!-- Effective Date Column -->
+        <ng-container matColumnDef="effectiveDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Effective Date</th>
+          <td mat-cell *matCellDef="let row">{{ formatDate(row.effectiveDate) }}</td>
+        </ng-container>
+        
+        <!-- Status Column -->
+        <ng-container matColumnDef="isActive">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge badge-success" *ngIf="row.isActive">Active</span>
+            <span class="badge badge-secondary" *ngIf="!row.isActive">Inactive</span>
+          </td>
+        </ng-container>
+        
+        <!-- Actions Column -->
+        <ng-container matColumnDef="action" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef style="text-align:center; width: 120px;">Actions</th>
+          <td mat-cell *matCellDef="let row" style="text-align:center;">
+            <a *ngIf="userAccessModel.updateAccess"
+               style="cursor:pointer;" class="wlt-c-furg-text-primary mr-2" matTooltip="Edit"
+               (click)="openEditDialog(row)">
+              <mat-icon aria-hidden="false" aria-label="edit icon">edit</mat-icon>
+            </a>
+            <a *ngIf="userAccessModel.deleteAccess"
+               style="cursor:pointer;" class="wlt-c-furg-text-danger" matTooltip="Delete"
+               (click)="deleteItem(row)">
+              <mat-icon aria-hidden="false" aria-label="trash icon">delete_outline</mat-icon>
+            </a>
+          </td>
+        </ng-container>
+        
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+    
+    <div *ngIf="errorMessage !==''">
+      <mat-label style="color:red" [innerHTML]="errorMessage"></mat-label>
+    </div>
+    
+    <div class="alert alert-info mt-3" *ngIf="dataSource?.data?.length === 0">
+      <i class="fas fa-info-circle"></i> No professional tax slabs found. 
+      <button class="btn wlt-c-furg-btn-primary ml-2" (click)="openAddDialog()" 
+              *ngIf="userAccessModel.createAccess">
+        <mat-icon>add</mat-icon>
+        <span>Add New Slab</span>
+      </button>
+    </div>
+    
+    <mat-paginator *ngIf="!showLoadingSpinner && !errorMessage" [pageSizeOptions]="[10, 20, 30]" showFirstLastButtons
+              aria-label="Select page of professional tax configurations">
+    </mat-paginator>
+  </mat-card-content>
+</mat-card>
+
+<!-- Loading Spinner -->
+<div class="loading-spinner" *ngIf="showLoadingSpinner">
+  <div class="spinner-border text-primary" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>

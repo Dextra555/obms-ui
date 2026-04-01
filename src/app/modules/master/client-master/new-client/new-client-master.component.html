@@ -1,0 +1,365 @@
+<div class="wlt-c-furg-content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                <h1 class="mb-1">{{clientCodeStatus == 'new'?'New Client': 'Edit Client'}}</h1>
+            </div><!-- /.col -->
+            <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
+                <ol class="breadcrumb float-md-right">
+                    <li class="breadcrumb-item"><a routerLink="/dashboard">Master</a></li>
+                    <li class="breadcrumb-item"><a routerLink="/master/client-master">Client</a></li>
+                    <li class="breadcrumb-item active">{{clientCodeStatus == 'new'?'New Client': 'Edit Client'}}</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<mat-card>
+    <mat-card-content>
+        <form [formGroup]="clientForm">
+            <div class="row">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Branch Code</mat-label>
+                        <mat-select formControlName="Branch">
+                            <mat-option *ngFor="let branch of branchModel" [value]="branch.Code">
+                                {{ branch.Code }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Client Code</mat-label>
+                        <input type="text" formControlName="Code" matInput placeholder="" autocomplete="off"
+                            [readonly]="true">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Client Name</mat-label>
+                        <input type="text" formControlName="Name" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Short Name</mat-label>
+                        <input type="text" formControlName="ShortName" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>person Incharge </mat-label>
+                        <input type="text" formControlName="PersonIncharge" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
+                    <h2><span>Indian Compliance Details</span></h2>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>GST Registration Status</mat-label>
+                        <mat-select formControlName="GSTRegistrationStatus" (selectionChange)="onGSTRegistrationStatusChange($event)">
+                            <mat-option value="registered">Registered</mat-option>
+                            <mat-option value="unregistered">Unregistered</mat-option>
+                            <mat-option value="composition">Composition</mat-option>
+                            <mat-option value="no_gst">No GST</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>GSTIN</mat-label>
+                        <input type="text" formControlName="GSTIN" matInput placeholder="29ABCDE1234F1ZV" autocomplete="off" (input)="onGSTINChange($event)">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>PAN Number</mat-label>
+                        <input type="text" formControlName="PANNumber" matInput placeholder="ABCDE1234F" autocomplete="off" (input)="onPANChange($event)">
+                        <mat-error *ngIf="clientForm.get('PANNumber')?.invalid && clientForm.get('PANNumber')?.touched">
+                            Invalid PAN format (5 letters + 4 digits + 1 letter)
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>TAN Number</mat-label>
+                        <input type="text" formControlName="TANNumber" matInput placeholder="ABCD12345B" autocomplete="off" (input)="onTANChange($event)">
+                        <mat-error *ngIf="clientForm.get('TANNumber')?.invalid && clientForm.get('TANNumber')?.touched">
+                            Invalid TAN format (4 letters + 5 digits + 1 letter)
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>CIN Number</mat-label>
+                        <input type="text" formControlName="CINNumber" matInput placeholder="L12345MH2016PLC123456" autocomplete="off" (input)="onCINChange($event)">
+                        <mat-error *ngIf="clientForm.get('CINNumber')?.invalid && clientForm.get('CINNumber')?.touched">
+                            Invalid CIN format
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="alert alert-info" role="alert">
+                        <strong>Compliance Status:</strong> {{ getOverallComplianceStatus() }}
+                        <div class="mt-2">
+                            <small>
+                                <span class="badge" [ngClass]="clientForm.get('IsGSTCompliant')?.value ? 'badge-success' : 'badge-danger'">
+                                    GST: {{ clientForm.get('IsGSTCompliant')?.value ? 'Compliant' : 'Non-Compliant' }}
+                                </span>
+                                <span class="badge ml-2" [ngClass]="clientForm.get('IsPANCompliant')?.value ? 'badge-success' : 'badge-danger'">
+                                    PAN: {{ clientForm.get('IsPANCompliant')?.value ? 'Compliant' : 'Non-Compliant' }}
+                                </span>
+                                <span class="badge ml-2" [ngClass]="clientForm.get('IsTANCompliant')?.value ? 'badge-success' : 'badge-danger'">
+                                    TAN: {{ clientForm.get('IsTANCompliant')?.value ? 'Compliant' : 'Non-Compliant' }}
+                                </span>
+                                <span class="badge ml-2" [ngClass]="clientForm.get('IsCINCompliant')?.value ? 'badge-success' : 'badge-danger'">
+                                    CIN: {{ clientForm.get('IsCINCompliant')?.value ? 'Compliant' : 'Non-Compliant' }}
+                                </span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
+                    <h2><span>Address</span></h2>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Address Line1</mat-label>
+                        <input type="text" formControlName="Address1" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Address Line2</mat-label>
+                        <input type="text" formControlName="Address2" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>PIN Code</mat-label>
+                        <input type="text" formControlName="PostCode" matInput placeholder="6-digit PIN code" autocomplete="off" maxlength="6">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>City</mat-label>
+                        <input type="text" formControlName="City" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>State</mat-label>
+                        <mat-select formControlName="IndianState">
+                            <mat-option *ngFor="let state of indianStates" [value]="state">{{state}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
+                    <h2><span>Shipping Address</span></h2>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Shipping Address Line1</mat-label>
+                        <input type="text" formControlName="ShippingAddress1" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Shipping Address Line2</mat-label>
+                        <input type="text" formControlName="ShippingAddress2" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Shipping PIN Code</mat-label>
+                        <input type="text" formControlName="ShippingPINCode" matInput placeholder="6-digit PIN code" autocomplete="off" maxlength="6">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Shipping City</mat-label>
+                        <input type="text" formControlName="ShippingCity" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Shipping State</mat-label>
+                        <mat-select formControlName="ShippingState">
+                            <mat-option *ngFor="let state of indianStates" [value]="state">{{state}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
+                    <h2><span>Billing Address</span></h2>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Billing Address Line1</mat-label>
+                        <input type="text" formControlName="BillingAddress1" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Billing Address Line2</mat-label>
+                        <input type="text" formControlName="BillingAddress2" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Billing PIN Code</mat-label>
+                        <input type="text" formControlName="BillingPINCode" matInput placeholder="6-digit PIN code" autocomplete="off" maxlength="6">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Billing City</mat-label>
+                        <input type="text" formControlName="BillingCity" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Billing State</mat-label>
+                        <mat-select formControlName="BillingState">
+                            <mat-option *ngFor="let state of indianStates" [value]="state">{{state}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
+                    <h2><span>Contact Info</span></h2>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Phone No</mat-label>
+                        <input type="text" formControlName="Phone" matInput placeholder="+91-XXXXXXXXXX" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Fax</mat-label>
+                        <input type="text" formControlName="Fax" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Email</mat-label>
+                        <input type="text" formControlName="UserEmail" matInput placeholder="" autocomplete="off">
+                    </mat-form-field>
+                </div>
+            </div>
+                                                            <div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
+                    <h2><span>Compliance Details</span></h2>
+                </div>
+                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Compliance Check Date</mat-label>
+                        <input 
+                            matInput 
+                            [matDatepicker]="compliancePicker" 
+                            formControlName="ComplianceCheckDate"
+                            (dateChange)="updateComplianceCheckDate()">
+                        <mat-datepicker-toggle matSuffix [for]="compliancePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #compliancePicker></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Compliance Remarks</mat-label>
+                        <textarea matInput formControlName="ComplianceRemarks" placeholder="Enter any compliance-related remarks..." rows="3"></textarea>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
+                    <h2><span>Other Details</span></h2>
+                </div>
+                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Date of Agreement Start</mat-label>
+                        <input 
+                            matInput 
+                            [matDatepicker]="picker" 
+                            formControlName="AgreementStart"
+                            (dateChange)="changeAgreementStart('change', $event)">
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Date of Agreement End</mat-label>
+                        <input 
+                            matInput 
+                            [matDatepicker]="picker1" 
+                            formControlName="AgreementEnd"
+                            (dateChange)="changeAgreementEnd('change', $event)"> <!-- Ensure no required attribute is present -->
+                        <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
+                        <mat-datepicker #picker1></mat-datepicker>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row pt-3">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2 wlt-c-furg-profile">
+                    <mat-label>Master Client</mat-label>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-6">
+                    <mat-checkbox formControlName="IsClientHeadQuarters"
+                        (change)="onCheckboxChange($event)">
+                    </mat-checkbox>
+                    <mat-form-field appearance="outline" [ngClass]="{'w-100' : !clientForm.get('IsClientHeadQuarters')?.value}">
+                        <mat-label>Super Client Code</mat-label>
+                        <mat-select formControlName="SuperClientCode">
+                            <mat-option *ngFor="let client of clientModelDropdown" [value]="client.Code">
+                                {{ client.Code }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="row pt-3">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2 wlt-c-furg-profile">
+                    <mat-label>Status</mat-label>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-6">
+                    <mat-radio-group aria-label="Select an option" formControlName="Status">
+                        <mat-radio-button value="Active">Active</mat-radio-button>&nbsp;
+                        <mat-radio-button value="Inactive">InActive</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="text-right">
+                        <button class="btn wlt-c-furg-btn-gray mr-3" mat-dialog-close (click)="clearClientDetails()">
+                            Clear</button>
+                        <button *ngIf="this.userAccessModel.createAccess == true || this.userAccessModel.updateAccess == true 
+                        || currentUser == 'superadmin'" 
+                        class="btn wlt-c-furg-btn-primary" (click)="savebuttonClick()"
+                            [disabled]="clientForm.invalid"> {{clientForm.get('Id')?.value === 0 ? 'Save' : 'Update' }}</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </mat-card-content>
+</mat-card>
+
+<!-- model pop up for logic started -->
+<div [style.display]="showLoadingSpinner ? 'block' : 'none'"
+    style="margin-top: -20.5rem; display: block; margin-left: -6.5rem;">
+    <div class="d-flex justify-content-center">
+        <span class="loader"></span>
+    </div>
+</div>
+<!-- model pop up for logic ended -->

@@ -1,0 +1,96 @@
+<div class="form-header">
+    <div style="text-align: center; margin-bottom: 10px;">
+        <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">FreightWatch G Security Services India Pvt. Ltd</div>
+        <h1 style="margin: 0; font-size: 16px; font-weight: bold;">FORM XXVI - MUSTER ROLL COMPLIANCE REPORT</h1>
+        <p style="margin: 2px 0; font-size: 11px;">(See Rule 75)</p>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+        <div style="font-size: 11px;">
+            <div style="font-weight: bold;">{{CompanyName}}</div>
+            <div>{{CompanyAddress}}</div>
+            <div>Tel: {{CompanyPhone}} | E-mail: {{CompanyEmail}}</div>
+            <div>{{CompanyCIN}}</div>
+        </div>
+        <div style="text-align: right;">
+            <img src="assets/img/logo-white.png" alt="Logo" style="width: 80px; height: auto;">
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 20px; font-size: 11px; border-top: 1px solid #000; padding-top: 10px; flex-wrap: wrap;">
+        <div><strong>Branch:</strong> {{BranchName || Branch || 'N/A'}}</div>
+        <div><strong>Client:</strong> {{ClientName || Client || 'N/A'}}</div>
+        <div><strong>Period:</strong> {{Period || 'N/A'}}</div>
+    </div>
+</div>
+
+
+
+<table class="report-table muster-roll">
+    <thead>
+        <tr>
+            <th rowspan="2">S.No</th>
+            <th rowspan="2">Employee Code</th>
+            <th rowspan="2">Employee Name</th>
+            <th rowspan="2">Branch</th>
+            <th rowspan="2">Client</th>
+            <th rowspan="2">Total Days</th>
+            <th rowspan="2">Days Worked</th>
+            <th rowspan="2">Attendance %</th>
+            <th rowspan="2">Issue Type</th>
+            <th rowspan="2">Description</th>
+            <th rowspan="2">Severity</th>
+            <th rowspan="2">Status</th>
+            <th rowspan="2">Assigned To</th>
+            <th rowspan="2">Due Date</th>
+            <th rowspan="2">Penalty (₹)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{DataRows}}
+    </tbody>
+    <tfoot>
+        <tr class="total-row">
+            <td colspan="14" style="text-align: right; font-weight: bold;">Total Penalties:</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalPenalties}}</td>
+        </tr>
+    </tfoot>
+</table>
+
+<div style="margin-top: 30px; text-align: center; font-size: 11px;">
+    <p><strong>Generated on:</strong> {{GeneratedDate}}</p>
+    <p><strong>Report ID:</strong> {{ReportId}}</p>
+</div>
+
+<style>
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 10px;
+    }
+    .report-table th, .report-table td {
+        border: 1px solid #000;
+        padding: 4px;
+        text-align: left;
+        vertical-align: top;
+    }
+    .report-table th {
+        background-color: #f0f0f0;
+        font-weight: bold;
+        text-align: center;
+    }
+    .severity-critical { background-color: #dc3545; color: white; font-weight: bold; }
+    .severity-high { background-color: #fd7e14; color: white; font-weight: bold; }
+    .severity-medium { background-color: #ffc107; color: black; font-weight: bold; }
+    .severity-low { background-color: #28a745; color: white; font-weight: bold; }
+    .attendance-low { color: #dc3545; font-weight: bold; }
+    .attendance-good { color: #28a745; font-weight: bold; }
+    .status-overdue { background-color: #dc3545; color: white; font-weight: bold; }
+    .status-pending { background-color: #ffc107; color: black; font-weight: bold; }
+    .status-resolved { background-color: #28a745; color: white; font-weight: bold; }
+    .total-row { background-color: #f8f9fa; font-weight: bold; }
+    @media print {
+        .report-table th, .report-table td { padding: 2px; font-size: 8px; }
+    }
+</style>

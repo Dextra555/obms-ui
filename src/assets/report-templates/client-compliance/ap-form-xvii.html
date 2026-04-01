@@ -1,0 +1,98 @@
+<style>
+  body { font-family: Arial, sans-serif; font-size: 10px; }
+  .report-table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 9px; }
+  .report-table th, .report-table td { border: 1px solid #000; padding: 3px 4px; text-align: center; }
+  .report-table th { background-color: #d9d9d9; font-weight: bold; }
+  .left-text { text-align: left !important; }
+  .header-block { display: flex; justify-content: space-between; font-size: 10px; margin-bottom: 6px; }
+  .header-block div { width: 48%; }
+  .title-row { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 4px; }
+  .sub-rule { text-align: center; font-size: 9px; margin-bottom: 10px; }
+  .footer-sig { text-align: right; margin-top: 16px; font-size: 10px; }
+  @media print { .report-table th, .report-table td { padding: 2px; font-size: 7.5px; } }
+</style>
+
+<div style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 5px;">FreightWatch G Security Services India Pvt. Ltd</div>
+<div class="title-row">FORM - XVII REGISTER OF WAGES</div>
+<div class="sub-rule">[Vide rule 78(1)(a)(i) of Contract Labour (Reg. &amp; Abolition) Central &amp; A.P.Rules]</div>
+
+<div class="header-block">
+  <div>
+    <strong>Name and address of Contractor:</strong><br/>{{ContractorName}}
+  </div>
+  <div>
+    <strong>Name and address of Establishment in/under which contract is carried on:</strong><br/>{{PrincipalEmployer}}
+  </div>
+</div>
+<div class="header-block">
+  <div><strong>Nature and location of work:</strong> {{WorkSite}}</div>
+  <div><strong>Name and address of Principal Employer:</strong> {{PrincipalEmployer}}</div>
+</div>
+<div class="header-block">
+  <div></div>
+  <div><strong>For the Month of:</strong> {{Period}}</div>
+</div>
+
+<table class="report-table">
+  <thead>
+    <tr>
+      <th rowspan="3">Sl No.</th>
+      <th rowspan="3">Emp Id</th>
+      <th rowspan="3" class="left-text">Name of Workman</th>
+      <th rowspan="3">Designation / Nature of work done</th>
+      <th rowspan="3">No. of Days Worked</th>
+      <th rowspan="3">Unit of work done</th>
+      <th rowspan="3">Daily rate of wages / piece rate</th>
+      <th colspan="5">Amount of wages earned</th>
+      <th rowspan="3">PF Wages</th>
+      <th rowspan="3">ESI Wages</th>
+      <th colspan="2">Deduction, if any</th>
+      <th rowspan="3">Net Amount Paid</th>
+      <th rowspan="3">Signature / Thumb Impression of Workman</th>
+      <th rowspan="3">Initial of Contractor or his representative</th>
+    </tr>
+    <tr>
+      <th rowspan="2">Basic Wages</th>
+      <th rowspan="2">Dearness Allowances</th>
+      <th rowspan="2">Others</th>
+      <th rowspan="2">Bonus</th>
+      <th rowspan="2">Total</th>
+      <th>PF</th>
+      <th>ESIC</th>
+    </tr>
+    <tr>
+      <th>(incl. P.T.)</th>
+      <th></th>
+    </tr>
+    <tr>
+      <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th>
+      <th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th></th><th></th>
+      <th>PF</th><th>ESIC</th><th>14</th><th>15</th><th>16</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{DataRows}}
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4" style="font-weight:bold;text-align:right;">Total</td>
+      <td style="font-weight:bold;">{{totalDays}}</td>
+      <td></td>
+      <td></td>
+      <td style="font-weight:bold;">{{totalBasic}}</td>
+      <td style="font-weight:bold;">{{totalDA}}</td>
+      <td style="font-weight:bold;">{{totalOthers}}</td>
+      <td style="font-weight:bold;">{{totalBonus}}</td>
+      <td style="font-weight:bold;">{{totalGross}}</td>
+      <td style="font-weight:bold;">{{totalPFWages}}</td>
+      <td style="font-weight:bold;">{{totalESIWages}}</td>
+      <td style="font-weight:bold;">{{totalPF}}</td>
+      <td style="font-weight:bold;">{{totalESI}}</td>
+      <td style="font-weight:bold;">{{totalNet}}</td>
+      <td></td>
+      <td></td>
+    </tr>
+  </tfoot>
+</table>
+
+<div class="footer-sig">Authorized Signatory or Contractor Signature</div>

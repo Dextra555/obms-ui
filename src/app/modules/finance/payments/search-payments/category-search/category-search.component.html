@@ -1,0 +1,117 @@
+<p class="close" [mat-dialog-close]="true">
+    <mat-icon class="close-icon">close</mat-icon>
+</p>
+<h1 mat-dialog-title>Search Category</h1>
+<form [formGroup]="frm">
+    <mat-dialog-content>
+        <div class="row">
+            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                <mat-form-field appearance="outline">
+                    <mat-label>Period From</mat-label>
+                    <input type="text" formControlName="StartDate" matInput [matDatepicker]="picker1"
+                        placeholder="" autocomplete="off">
+                    <mat-datepicker-toggle matSuffix [for]="picker1">
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #picker1></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                <mat-form-field appearance="outline">
+                    <mat-label>Period To</mat-label>
+                    <input type="text" formControlName="EndDate" matInput [matDatepicker]="picker2"
+                        placeholder="" autocomplete="off">
+                    <mat-datepicker-toggle matSuffix [for]="picker2">
+                    </mat-datepicker-toggle>
+                    <mat-datepicker #picker2></mat-datepicker>
+                </mat-form-field>
+            </div>
+             <div class="col-12 col-sm-12 col-md-4 col-lg-3">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Category</mat-label>
+                        <mat-select formControlName="Category">
+                          <mat-option *ngFor="let d of categoryList" value="{{d.ID}}">{{d.Name}}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+               <strong>Total Amount(RM): 0.00</strong>
+            </div>
+        </div>
+       
+        <!-- <div class="row">
+            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                <div class="text-right">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Search</mat-label>
+                        <input matInput (keyup)="applyFilter($event)" placeholder="" #input>
+                      </mat-form-field>
+                </div>
+            </div>
+            <div class="col-12 co-sm-12 col-md-8 col-lg-8">
+                <mat-paginator [pageSizeOptions]="[10, 20, 30]"
+                showFirstLastButtons 
+                    aria-label="Select page of periodic elements">
+        </mat-paginator>
+            </div>
+        </div> -->
+            <div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="table-responsive my-3">
+                        <table mat-table [dataSource]="dataSource" class="wlt-table table-striped" matSort (matSortChange)="announceSortChange($event)">
+                          <ng-container matColumnDef="voucher_no">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Voucher No</th>
+                            <td mat-cell *matCellDef="let element" class="text-left"> {{element.voucher_no}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="payment_date">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header>Payment Date</th>
+                            <td mat-cell *matCellDef="let element" class="text-left"> {{element.payment_date}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="supplier_name">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Supplier Name </th>
+                            <td mat-cell *matCellDef="let element" class="text-left"> {{element.supplier_name}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="bank_code">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Bank Code	 </th>
+                            <td mat-cell *matCellDef="let element" class="text-left"> {{element.bank_code}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="cheque_no">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Cheque No </th>
+                            <td mat-cell *matCellDef="let element" class="text-left"> {{element.cheque_no}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="pay_to">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Payment To </th>
+                            <td mat-cell *matCellDef="let element" class="text-left"> {{element.pay_to}} </td>
+                          </ng-container>
+                          <ng-container matColumnDef="particulars">
+                            <th mat-header-cell *matHeaderCellDef mat-sort-header> Particulars </th>
+                            <td mat-cell *matCellDef="let element" class="text-left"> {{element.particulars}} </td>
+                          </ng-container>
+                            <ng-container matColumnDef="amount">
+                              <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount </th>
+                              <td mat-cell *matCellDef="let element" class="text-left"> {{element.amount}} </td>
+                            </ng-container>
+                            <ng-container matColumnDef="category_name">
+                                <th mat-header-cell *matHeaderCellDef mat-sort-header> Category Name </th>
+                                <td mat-cell *matCellDef="let element" class="text-left"> {{element.category_name}} </td>
+                              </ng-container>
+                          
+                          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                        </table>
+                      </div>
+                      
+                </div>
+            </div>
+           
+    </mat-dialog-content>
+    <mat-dialog-actions>
+        <div class="row">
+            <div class="col-12">
+                <div class="text-right">
+                    <button type="submit" class="btn wlt-c-furg-btn-gray mr-3" mat-dialog-close> Cancel</button>
+                    <button type="submit" class="btn wlt-c-furg-btn-primary"> Search</button>
+                </div>
+            </div>
+        </div>
+    </mat-dialog-actions>
+</form>

@@ -1,0 +1,658 @@
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { EmployeeService } from "../../../../service/employee.service";
+import { ActivatedRoute, Router } from "@angular/router";
+import Swal from "sweetalert2";
+import { DatasharingService } from "../../../../service/datasharing.service";
+import { UserAccessModel } from 'src/app/model/userAccesModel';
+import { MastermoduleService } from 'src/app/service/mastermodule.service';
+import { IndianComplianceService } from 'src/app/service/indian-compliance.service';
+import { INDIAN_STATES, SALARY_GROUPS, INDIAN_BANKS } from 'src/app/model/indian-employee.model';
+
+@Component({
+  selector: 'app-new-employee',
+  templateUrl: './new-employee.component.html',
+  styleUrls: ['./new-employee.component.css']
+})
+export class NewEmployeeComponent implements OnInit {
+
+  frm!: FormGroup;
+  isForeigner: boolean = false;
+  isIndianCitizen: boolean = false;
+  isBank: boolean = true;
+  data: any;
+  branchList: any;
+  bankList: any;
+  stateList: any;
+  icColorList: any;
+  nationalityList: any;
+  raceList: any;
+  clientList: any;
+  salaryStructureList: any;
+  employeeCheckInfoValidation: boolean = true;
+  currentUser: string = '';
+  empId: any;
+  isEdit: boolean = false;
+  empCodeData: any | undefined;
+  check: any = 1;
+
+  // Indian Compliance Data
+  indianStates: string[] = INDIAN_STATES;
+  salaryGroups: any[] = SALARY_GROUPS;
+  indianBanks: any[] = INDIAN_BANKS;
+
+  checkList: any = [
+    {
+      id: 0,
+      display: ""
+    }
+  ];
+
+  empChkError: any = [];
+  showLoadingSpinner: boolean = false;
+  warningMessage: string = '';
+  userAccessModel!: UserAccessModel;
+
+  checklistItems = [
+    { value: 0, label: 'Application Form' },
+    { value: 1, label: 'Copy of Aadhaar' },
+    { value: 3, label: 'Passport Size Photos' },
+    { value: 4, label: 'Copy of Passport' },
+    { value: 5, label: 'Copy of Visa' },
+    { value: 6, label: 'Appointment Letter' },
+    { value: 7, label: 'Confirmation Letter' },
+    { value: 8, label: 'Police Verification' },
+    { value: 9, label: 'CSG/TNG' },
+  ];
+  submitted = false;
+  payMode: string = '';
+
+
+  constructor(private fb: FormBuilder, public dialog: MatDialog, public service: EmployeeService, private activatedRoute: ActivatedRoute, private route: Router, private _dataService: DatasharingService,
+    private _masterService: MastermoduleService, private _indianComplianceService: IndianComplianceService) {
+
+    // Set default nationality to Indian Citizen
+    this.isIndianCitizen = true;
+
+    this.empId = this.activatedRoute.snapshot.params['EMP_ID'];
+    this.currentUser = sessionStorage.getItem('username')!;
+    if (this.currentUser == 'null' || this.currentUser == undefined) {
+      this._dataService.getUsername().subscribe((username) => {
+        this.currentUser = username;
+      });
+    }
+    
+    // Remove data loading from constructor - will be called in ngOnInit after proper initialization
+    this.frm = this.fb.group({
+      EMP_ID: [0],
+      EMP_CODE: [''],
+      EMP_BRANCH_CODE: [''],
+      EMP_CLIENT: ['', Validators.required],
+      EMP_ROLE: ['None'],
+      EMP_NAME: ['', [Validators.required]],
+      EMP_SEX: ['Male'],
+      EMP_DATE_OF_BIRTH: [''],
+      age: [''],
+      EMP_CITIZEN: ['0'],
+      EMP_NATIONAL: [''],
+      EMP_PASSPORT_NO: [''],
+      EMP_RACE: [''],
+      EMP_ADDRESS1: ['', [Validators.required]],
+      EMP_ADDRESS2: ['', [Validators.required]],
+      EMP_PHONE: ['', [Validators.required]],
+      EMP_MOBILEPHONE: [''],
+      EMP_MARTIAL_STATUS: ['', Validators.required],
+      EM_WORK_EXP: [''],
+      EMP_HGH_EDU: [''],
+      EMP_SPOUSE_NAME: [''],
+      EMP_SP_WORK: ['0'],
+      EMP_SP_TEL_NO: [''],
+      EMP_NO_CHILD: [0],
+      EMP_PER_NAME_CONTACT: [''],
+      EMP_CONTACT_ADDRESS1: ['', [Validators.required]],
+      EMP_CONTACT_ADDRESS2: ['', [Validators.required]],
+      EMP_CONTACT_TELEPHONE: ['', [Validators.required]],
+      
+      // Malaysian fields (keeping for backward compatibility)
+      EMP_POST_CODE: ['', [Validators.pattern('^[0-9]{6}$')]],
+      EMP_TOWN: [''],
+      EMP_STATE: [''],
+      EMP_CONTACT_POST_CODE: ['', [Validators.pattern('^[0-9]{6}$')]],
+      EMP_CONTACT_TOWN: [''],
+      EMP_CONTACT_STATE: [''],
+      TMPGUARD: ['1'],
+      EPFDETECT: ['No'],
+      EMPFL_EPFNO: [''],
+      SOCSODETECT: ['No'],
+      EMPFL_SOSCO_NO: [''],
+      DETECTBYND55: ['No'],
+      
+      // Indian Compliance Fields
+      AadhaarNumber: ['', [Validators.pattern('^[2-9]\\d{11}$')]],
+      PANNumber: ['', [Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')]],
+      PFAccountNumber: [''],
+      ESINumber: [''],
+      SalaryGroup: ['None'],
+      SpousePAN: ['', [Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')]],
+      SpouseAadhaar: ['', [Validators.pattern('^[2-9]\\d{11}$')]],
+      IndianState: [''],
+      BankAccountNumber: ['', [Validators.pattern('^\\d{9,18}$')]],
+      BankIFSC: ['', [Validators.pattern('^[A-Z]{4}0[A-Z0-9]{6}$')]], // IFSC pattern validation
+      BankName: [''],
+      UPIId: [''],
+      EMPPAY_JOB_TITLE: ['', [Validators.required]],
+      EMPPAY_CATEGORY: ['', [Validators.required]],
+      EMPPAY_DATE_JOINED: [''],
+      EMPPAY_DATE_RESIGNED: [''],
+      salary_structure: [''],
+      SALARYLAB: [0],
+      NewSalaryStructure: ['N'],
+      SalaryStructure1000_3h: ['0'],
+      EMPPAY_BASIC_RATE: ['', [Validators.required]],
+      ATTENDANCEALLOWANCE: [0],
+      AttendanceAllowanceWorkingDays: [0],
+      AttendanceAllowanceFollowCalendar: [false],
+      SpecialAllowance: [0],
+      PAYMODE: ['Bank'],
+      INCOMETAXDETECT: ['', Validators.required],
+      EMPFL_TAX_NO: [''],
+      application_form: [''],
+      copy_ic: [''],
+      bank_ac_detail: [''],
+      passport_size_photo: [''],
+      copy_of_passport: [''],
+      copy_of_visa: [''],
+      appointment_letter: [''],
+      confirm_letter: [''],
+      kdn_vetting: [''],
+      HasTransfered: [false],
+      TransferDate: [''],
+      KDNVetting: [],
+      EMP_CHECKLIST: [],
+      EMPPAY_ID: [0],
+      EMPFL_ID: [0]
+    });
+
+    this.checklistItems.forEach((item) => {
+      this.frm.addControl(`checklistItem_${item.value}`, new FormControl(false));
+    });
+
+    if (this.empId != 0 && this.empId != undefined) {
+      this.isEdit = true;
+
+      service.getEmployeeById(this.empId).subscribe((d: any) => {
+        let result = d['Result'];
+        let employee = result['employee'];
+        let employment = result['employment'];
+        let salaryDetail = result['salaryDetail'];
+        
+        // Handle null salaryDetail case
+        if (salaryDetail != null) {
+          this.payMode = salaryDetail['PAYMODE'];
+          this.changePaymentMode(salaryDetail['PAYMODE']);
+        } else {
+          this.payMode = 'Bank'; // Default payment mode
+          this.changePaymentMode('Bank');
+        }
+        
+        this.nationalityChange(employee['EMP_CITIZEN']);
+        this.frm.patchValue(employee);
+        this.frm.patchValue(employment);
+        if (salaryDetail != null) {
+          this.frm.patchValue(salaryDetail);
+        }
+        this.frm.get('EMP_CITIZEN')?.setValue(employee['EMP_CITIZEN'].toString());
+        this.frm.get('SALARYLAB')?.setValue(employment['SALARYLAB'].toString() ?? 0);
+        this.frm.get('EMP_SP_WORK')?.setValue(employee['EMP_SP_WORK'] == true ? "1" : "0");
+        this.frm.get('TMPGUARD')?.setValue(salaryDetail?.TMPGUARD == true ? "0" : "1");
+        this.frm.get('INCOMETAXDETECT')?.setValue(salaryDetail?.INCOMETAXDETECT == true ? "Yes" : "No");
+        this.frm.get('SOCSODETECT')?.setValue(salaryDetail?.SOCSODETECT == true ? "Yes" : "No");
+        this.frm.get('EPFDETECT')?.setValue(salaryDetail?.EPFDETECT == true ? "Yes" : "No");
+        this.frm.get('DETECTBYND55')?.setValue(salaryDetail?.DETECTBYND55 == true ? "Yes" : "No");
+
+        this.frm.get('AttendanceAllowanceFollowCalendar')?.setValue(employment['AttendanceAllowanceFollowCalendar'] == "Y");
+
+        this.calendarChangeEvent(employment['AttendanceAllowanceFollowCalendar'] == "Y");
+
+        const oEmployeeCheckList = employee['EMP_CHECKLIST']; //256+128+64+32+16+8+4+2+1;
+        this.checklistItems.forEach((item) => {
+          const formControl = this.frm.get(`checklistItem_${item.value}`);
+          if (formControl) {
+            formControl.setValue(!!(oEmployeeCheckList & (1 << item.value)));
+          }
+        });
+      }, () => {
+      }, () => {
+        this.calculateAge();
+        this.typeChange();
+      });
+    }
+    // Employee code data is now handled in loadInitialData method
+    this.frm.get('EMP_CODE')?.disable({ onlySelf: true });
+    this.frm.get("EMP_NO_CHILD")?.disable({ onlySelf: true });
+    this.frm.get("EMPPAY_BASIC_RATE")?.disable({ onlySelf: true });
+    this.frm.get("AttendanceAllowanceWorkingDays")?.disable({ onlySelf: true });
+
+    this.userAccessModel = {
+      readAccess: false,
+      updateAccess: false,
+      deleteAccess: false,
+      createAccess: false,
+    }
+  }
+
+
+  ngOnInit(): void {
+    this.currentUser = sessionStorage.getItem('username')!;
+    if (this.currentUser == null) {
+      this._dataService.getUsername().subscribe((username) => {
+        this.currentUser = username;
+        this.getUserAccessRights(this.currentUser, 'Employee Master');
+        this.loadInitialData();
+      });
+    } else {
+      this.getUserAccessRights(this.currentUser, 'Employee Master');
+      this.loadInitialData();
+    }
+
+    this.frm.get('EMPPAY_DATE_RESIGNED')?.valueChanges.subscribe(value => {
+      const currentPayMode = this.frm.get('PAYMODE')?.value;
+      if (value && currentPayMode !== 'Cheque') {
+        this.frm.get('PAYMODE')?.setValue('Cheque');
+      } else {
+        this.frm.get('PAYMODE')?.setValue(this.payMode);
+      }
+    });
+  }
+
+  loadInitialData(): void {
+    this.service.getEmployeeMaster(this.currentUser).subscribe((data: any) => {
+      this.data = data;
+      this.branchList = data['branchList'];
+      this.bankList = data['bankList'];
+      this.stateList = data['stateList'];
+      this.icColorList = data['icColorList'];
+      this.nationalityList = data['nationalityList'];
+      this.raceList = data['raceList'];
+      this.clientList = data['clientList'];
+      this.salaryStructureList = data['salaryStructureList'];
+      
+      // Handle edit scenario - load employee code data after initial data is loaded
+      if (this.empId != 0 && this.empId != undefined) {
+        // Edit mode - employee data will be loaded separately
+      } else {
+        // Create mode - load employee code data
+        this.empCodeData = data['emp']['Result'];
+        if (!this.isEdit) {
+          this.setEmpCode();
+        }
+      }
+    });
+  }
+
+  getUserAccessRights(userName: string, screenName: string) {
+    this._masterService.getUserAccessRights(userName, screenName).subscribe(
+      (data) => {
+        if (data != null) {
+          this.userAccessModel.readAccess = data.Read
+          this.userAccessModel.deleteAccess = data.Delete;
+          this.userAccessModel.updateAccess = data.Update;
+          this.userAccessModel.createAccess = data.Create;
+          if (this.currentUser == 'admin' || this.currentUser == 'superadmin') {
+          } else {
+            if (this.userAccessModel.readAccess === true) {
+              this.warningMessage = '';
+            } else {
+              this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
+                        You do not have permissions to view this page. <br>
+                        If you feel you should have access to this page, Please contact administrator. <br>
+                        Thank you`;
+
+            }
+          }
+        }
+      },
+      (error) => {
+        this.handleErrors(error);
+      }
+    );
+  }
+
+  nationalityChange(value: any) {
+    this.isForeigner = value == 1;
+    this.isIndianCitizen = value == 0;
+
+    if (this.isForeigner) {
+      // For foreigners, passport is required
+      this.frm.get('EMP_PASSPORT_NO')?.setValidators([Validators.required]);
+    } else {
+      // For Indian citizens, remove passport requirement
+      this.frm.get('EMP_PASSPORT_NO')?.clearValidators();
+      this.frm.get('EMP_PASSPORT_NO')?.setValue('');
+    }
+    
+    this.frm.get('EMP_PASSPORT_NO')?.updateValueAndValidity();
+  }
+
+  clientChange(value: any) {
+    this.service.getClientsFromBranchId(value, this.frm.get('EMP_ROLE')?.value).subscribe((data: any) => {
+      // this.empCodeData = data.emp
+      console.log(data);
+      this.clientList = data['clientList'];
+      this.setEmpCode();
+    })
+  }
+
+  typeChange() {
+    if (this.empCodeData != undefined) {
+      this.setEmpCode();
+    }
+
+    if (this.frm.get('EMP_ROLE')?.value === 'Staff') {
+      this.frm.get("EMP_CLIENT")?.setValue("");
+      this.frm.get("EMP_CLIENT")?.disable({ onlySelf: true });
+    } else {
+      this.frm.get("EMP_CLIENT")?.enable({ onlySelf: true });
+    }
+
+  }
+
+  setEmpCode() {
+    if (this.empCodeData) {
+      const empRole = this.frm.get('EMP_ROLE')?.value || 'Guard';
+      const roleChar = empRole.charAt(0).toUpperCase();
+      let empCode = this.empCodeData["ShortName"] + roleChar + this.empCodeData["Code"];
+      this.frm.get('EMP_CODE')?.setValue(empCode);
+    }
+  }
+
+  calculateAge() {
+    let dob = this.frm.get('EMP_DATE_OF_BIRTH')?.value
+    if (dob) {
+      const birthDate = new Date(dob);
+      const currentDate = new Date();
+      this.frm.get('age')?.setValue(currentDate.getFullYear() - birthDate.getFullYear());
+    }
+  }
+
+
+  changePaymentMode(value: any) {
+    this.isBank = value === "Bank";
+    // Bank field validation removed as bank details section is removed from form
+  }
+
+  onSubmit() {
+    this.submitted = true;
+    
+    // Custom validation: Prevent submission if EMP_ROLE is 'None'
+    if (this.frm.get('EMP_ROLE')?.value === 'None') {
+      this.showMessage('Please select a valid employee type (Guard or Staff) before creating employee.', 'warning', 'Warning Message');
+      return;
+    }
+    
+    if (this.frm.invalid) {
+      this.showMessage('Please correct the validation errors in the form before submitting.', 'warning', 'Warning Message');
+      console.log('Form invalid:', this.frm.errors);
+      
+      // Log individual control errors for debugging
+      Object.keys(this.frm.controls).forEach(key => {
+        const controlErrors = this.frm.get(key)?.errors;
+        if (controlErrors != null) {
+          console.log('Key control error:', key, controlErrors);
+        }
+      });
+      return;
+    }
+
+    if (!this.employeeCheckInfoValidation && this.isForeigner) {
+      this.showMessage('Employee already has this IC number. Please choose a different IC number.', 'warning', 'Warning Message');      
+      return;
+    }
+
+    this.showSpinner();
+    let data = this.frm.getRawValue();
+
+    // Convert numeric fields from string to number
+    data['EMPPAY_BASIC_RATE'] = parseFloat(data['EMPPAY_BASIC_RATE']) || 0;
+    data['SALARYLAB'] = parseFloat(data['SALARYLAB']) || 0;
+    data['ATTENDANCEALLOWANCE'] = parseFloat(data['ATTENDANCEALLOWANCE']) || 0;
+    data['NewStructureATTENDANCEALLOWANCE'] = parseFloat(data['NewStructureATTENDANCEALLOWANCE']) || 0;
+    data['SpecialAllowance'] = parseFloat(data['SpecialAllowance']) || 0;
+    data['AttendanceAllowanceWorkingDays'] = parseFloat(data['AttendanceAllowanceWorkingDays']) || 0;
+
+    if (data['EMP_NO_CHILD'] !== undefined) {
+      data['EMP_NO_CHILD'] = parseInt(data['EMP_NO_CHILD'], 10) || 0;
+    }
+
+    if (data['EMP_CITIZEN'] !== undefined) {
+      data['EMP_CITIZEN'] = parseInt(data['EMP_CITIZEN'], 10) || 0;
+    }
+
+    data['EMP_SP_WORK'] = this.frm.get('EMP_SP_WORK')?.value == 'Yes';
+
+    data['OldBranch'] = '';
+    data['EMP_IC_COLOR'] = 'test';
+    data['LastUpdatedBy'] = 'admin';
+    data['TMPGUARD'] = this.frm.get('TMPGUARD')?.value == '0';
+    data['DETECTBYND55'] = this.frm.get('DETECTBYND55')?.value == 'Yes';
+    data['INCOMETAXDETECT'] = this.frm.get('INCOMETAXDETECT')?.value == 'Yes';
+    data['SOCSODETECT'] = this.frm.get('SOCSODETECT')?.value == 'Yes';
+    data['EPFDETECT'] = this.frm.get('EPFDETECT')?.value == 'Yes';
+    data['KDNVetting'] = false;
+
+    data['AttendanceAllowanceFollowCalendar'] = this.frm.get('AttendanceAllowanceFollowCalendar')?.value ? 'Y' : 'N';
+
+    data['LASTUPDATE'] = new Date().toISOString();
+    
+    // Process Employment details dates securely avoiding auto-filling today's date
+    data['EMP_DATE_OF_BIRTH'] = this.frm.get('EMP_DATE_OF_BIRTH')?.value ? this.returnDate(this.frm.get('EMP_DATE_OF_BIRTH')?.value) : null;
+    data['TransferDate'] = null;
+    
+    data['EMPPAY_DATE_JOINED'] = this.frm.get('EMPPAY_DATE_JOINED')?.value ? this.returnDate(this.frm.get('EMPPAY_DATE_JOINED')?.value) : null;
+    data['EMPPAY_DATE_RESIGNED'] = this.frm.get('EMPPAY_DATE_RESIGNED')?.value ? this.returnDate(this.frm.get('EMPPAY_DATE_RESIGNED')?.value) : null;
+    let total = 0;
+    this.checklistItems.forEach((item) => {
+      const formControl = this.frm.get(`checklistItem_${item.value}`);
+
+      if (formControl && formControl.value) {
+        total += Math.pow(2, item.value);
+        if (Math.pow(2, item.value) == 256) {
+          data['KDNVetting'] = true;
+        }
+      }
+    });
+
+    data['EMP_CHECKLIST'] = total;
+    data['EMP_POST_CODE'] = this.frm.get('EMP_POST_CODE')?.value ?? "";
+    data['EMP_STATE'] = this.frm.get('EMP_STATE')?.value ?? "";
+    data['EMP_CONTACT_POST_CODE'] = this.frm.get('EMP_CONTACT_POST_CODE')?.value ?? "";
+    data['EMP_CONTACT_STATE'] = this.frm.get('EMP_CONTACT_STATE')?.value ?? "";
+
+
+    this.service.saveEmployee(data).subscribe({
+      next: (d: any) => {
+        if (d.Success == 'Success') {
+          if (this.isEdit) {
+            this.showMessage('Successfully Updated Employee Details', 'success', 'Success Message')
+          } else {
+            this.showMessage('Successfully Saved Employee Details', 'success', 'Success Message')
+          }
+          this.route.navigate(['/master/employee-master']);
+        } else {
+          if (d.Success == 'Warning') {
+            this.showMessage(d.Message || 'Form contains some errors', 'warning', 'Warning Message');
+          } else if (d.Success == 'Error') {
+            this.showMessage(d.Message || 'Failed to save employee details', 'error', 'Error Message');
+          }
+        }
+        this.hideSpinner();
+      },
+      error: (err: any) => {
+        this.hideSpinner();
+        console.error('Save error:', err);
+        const errorMsg = typeof err === 'string' ? err : (err.error?.Message || err.message || 'Server error occurred');
+        this.showMessage('Network/Server error: ' + errorMsg, 'error', 'Error Message');
+      }
+    });
+  }
+
+  returnDate(date?: any) {
+    if (!date) {
+      return null;
+    }
+    let currentDate = new Date(date);
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month is zero-based
+    const day = String(currentDate.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  calendarChange(event: any) {
+    this.calendarChangeEvent(event.checked);
+  }
+
+  calendarChangeEvent(flag: boolean) {
+    if (flag) {
+      this.frm.get('AttendanceAllowanceWorkingDays')?.setValue("0");
+      this.frm.get('AttendanceAllowanceWorkingDays')?.disable({ onlySelf: true });
+    } else {
+      this.frm.get('AttendanceAllowanceWorkingDays')?.setValue("0");
+      this.frm.get('AttendanceAllowanceWorkingDays')?.enable({ onlySelf: true });
+    }
+  }
+
+  salaryStructureChange(event: any) {
+    if (event.value == 'N') {
+      this.frm.get('EMPPAY_BASIC_RATE')?.enable({ onlySelf: true });
+      this.frm.get('EMPPAY_BASIC_RATE')?.setValue("");
+    } else {
+      this.frm.get('EMPPAY_BASIC_RATE')?.setValue("0");
+      this.frm.get('EMPPAY_BASIC_RATE')?.disable({ onlySelf: true });
+    }
+  }
+
+  isTemporaryEmployeeChange(value: any) {
+    if (value == '0') {
+      this.frm.get("INCOMETAXDETECT")?.setValue("No");
+      this.frm.get("SOCSODETECT")?.setValue("No");
+      this.frm.get("EPFDETECT")?.setValue("No");
+      this.frm.get("DETECTBYND55")?.setValue("No");
+      this.frm.get("EMPFL_TAX_NO")?.disable({ onlySelf: true });
+      this.frm.get("EMPFL_EPFNO")?.disable({ onlySelf: true });
+      this.frm.get("EMPFL_SOSCO_NO")?.disable({ onlySelf: true });
+
+    } else {
+      this.frm.get("INCOMETAXDETECT")?.setValue("Yes");
+      this.frm.get("SOCSODETECT")?.setValue("Yes");
+      this.frm.get("EPFDETECT")?.setValue("Yes");
+      this.frm.get("DETECTBYND55")?.setValue("Yes");
+
+      this.frm.get("EMPFL_TAX_NO")?.enable({ onlySelf: true });
+      this.frm.get("EMPFL_EPFNO")?.enable({ onlySelf: true });
+      this.frm.get("EMPFL_SOSCO_NO")?.enable({ onlySelf: true });
+    }
+  }
+
+  checkEmployeeInfo(from: any) {
+    let _trigger = true;
+    let data;
+    if (from == "NewIC") {
+      data = this.frm.get("EMP_IC_NEW")?.value;
+    } else if (from == "OldIC") {
+      data = this.frm.get("EMP_IC_OLD")?.value;
+    } else if (from == "Passport") {
+      data = this.frm.get("EMP_PASSPORT_NO")?.value;
+    } else if (from == "SOCSONo") {
+      data = this.frm.get("ESINumber")?.value;
+    } else if (from == "EPFNo") {
+      data = this.frm.get("PFAccountNumber")?.value;
+    } else if (from == "BankAccount") {
+      if (this.frm.get("BankName")?.value != "" && this.frm.get("BankAccountNumber")?.value != "") {
+        data = this.frm.get("BankName")?.value + "//" + this.frm.get("BankAccountNumber")?.value;
+        _trigger = true;
+      } else {
+        _trigger = false;
+      }
+    }
+
+    if (_trigger) {
+      this.service.checkEmployeeInfo(from, data).subscribe((d: any) => {
+        var result = d['Result'];
+        result.EMP_ID = result?.EMP_ID == 0 ? -1 : result?.EMP_ID;
+        if (result?.EMP_ID != this.empId) {          
+          this.empChkError[from] = result?.MESSAGE;
+          this.employeeCheckInfoValidation = result?.MESSAGE == "success";
+        }
+      })
+    }
+  }
+
+  maritalStatusChange(event: any) {
+    if (event.value == "Married") {
+      this.frm.get("EMP_NO_CHILD")?.enable({ onlySelf: true });
+    } else {
+      this.frm.get("EMP_NO_CHILD")?.disable({ onlySelf: true });
+    }
+  }
+
+  salaryStructureChangeSlab(data: any) {
+    console.log(data.value);
+
+    // SalaryBand
+    // WorkingDays
+
+    let da = this.salaryStructureList.filter((x: any) => x.SalaryId == data.value)
+    console.log(da);
+    this.frm.get("EMPPAY_BASIC_RATE")?.setValue(da[0]['SalaryBand'])
+    this.frm.get("AttendanceAllowanceWorkingDays")?.setValue(da[0]['WorkingDays'])
+
+  }
+
+  // Bank selection handler
+  onBankChange(bankCode: string) {
+    const selectedBank = this.indianBanks.find(bank => bank.code === bankCode);
+    if (selectedBank) {
+      this.frm.get('BankName')?.setValue(selectedBank.name);
+      this.frm.get('BankIFSC')?.setValue(selectedBank.ifsc);
+      this.checkEmployeeInfo('BankAccount');
+    }
+  }
+
+  // Salary group change handler
+  onSalaryGroupChange(group: string) {
+    this.frm.get('SalaryGroup')?.setValue(group);
+    // Add logic for salary group specific validations or calculations
+  }
+
+  showSpinner() {
+    this.showLoadingSpinner = true;
+  }
+
+  hideSpinner() {
+    this.showLoadingSpinner = false;
+  }
+
+  private showMessage(message: string, icon: 'success' | 'warning' | 'info' | 'error' = 'info',
+    title: 'Success Message' | 'Warning Message' | 'Error Message'): void {
+    Swal.fire({
+      toast: true,
+      position: 'top',
+      showConfirmButton: false,
+      title: title,
+      text: message,
+      icon: icon, // Dynamically set the icon based on the parameter
+      showCloseButton: false,
+      timer: 5000,
+      width: '600px'
+    });
+    this.hideSpinner();
+    return;
+  }
+  handleErrors(error: string) {
+    if (error != null && error != '') {
+      this.hideSpinner();
+    }
+  };
+}

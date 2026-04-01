@@ -1,0 +1,138 @@
+<div class="wlt-c-furg-content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <h1 class="mb-1">Report/ESI Statement Report</h1>
+      </div>
+      <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
+        <ol class="breadcrumb float-md-right">
+          <li class="breadcrumb-item"><a href="#">Report</a></li>
+          <li class="breadcrumb-item active">ESI Statement Report</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<mat-card>
+  <mat-card-content>
+    <!-- Loading Spinner -->
+    <div [style.display]="showLoadingSpinner ? 'block' : 'none'" 
+         style="margin-top: -10.5rem; display: block; margin-left: -6.5rem;">
+      <div class="d-flex justify-content-center">
+        <span class="loader"></span>
+      </div>
+    </div>
+
+    <!-- Warning Message -->
+    <div *ngIf="warningMessage !== ''">
+      <mat-label style="color:red" [innerHTML]="warningMessage"></mat-label>
+    </div>
+    <div *ngIf="errorMessage !== ''">
+      <mat-label style="color:red" [innerHTML]="errorMessage"></mat-label>
+    </div>
+
+    <!-- Report Form -->
+    <form [formGroup]="frm" *ngIf="warningMessage === ''">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Branch</mat-label>
+            <mat-select formControlName="BranchCode" (selectionChange)="onBranchSelectionChange($event)">
+              <mat-option value="">Select Branch</mat-option>
+              <mat-option *ngFor="let branch of branchModel" [value]="branch.Code">
+                {{ branch.Name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Client (Optional)</mat-label>
+            <mat-select formControlName="ClientCode">
+              <mat-option value="">All Clients</mat-option>
+              <mat-option *ngFor="let client of clientModel" [value]="client.Code">
+                {{ client.Name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-3 col-lg-2">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Month</mat-label>
+            <mat-select formControlName="Month">
+              <mat-option [value]="1">January</mat-option>
+              <mat-option [value]="2">February</mat-option>
+              <mat-option [value]="3">March</mat-option>
+              <mat-option [value]="4">April</mat-option>
+              <mat-option [value]="5">May</mat-option>
+              <mat-option [value]="6">June</mat-option>
+              <mat-option [value]="7">July</mat-option>
+              <mat-option [value]="8">August</mat-option>
+              <mat-option [value]="9">September</mat-option>
+              <mat-option [value]="10">October</mat-option>
+              <mat-option [value]="11">November</mat-option>
+              <mat-option [value]="12">December</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-2">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Year</mat-label>
+            <mat-select formControlName="Year">
+              <mat-option [value]="2024">2024</mat-option>
+              <mat-option [value]="2025">2025</mat-option>
+              <mat-option [value]="2026">2026</mat-option>
+              <mat-option [value]="2027">2027</mat-option>
+              <mat-option [value]="2028">2028</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Employee Type</mat-label>
+            <mat-select formControlName="EmployeeType">
+              <mat-option value="Guard">Guard</mat-option>
+              <mat-option value="Staff">Staff</mat-option>
+              <mat-option value="All">All</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Report Type Buttons -->
+      <div class="row">
+        <div class="col-12 text-left">
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="generateReport(1)" [disabled]="frm.invalid">
+            Monthly Statement
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="generateReport(2)" [disabled]="frm.invalid">
+            Summary Report
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="generateReport(3)" [disabled]="frm.invalid">
+            Detailed Report
+          </button>
+          <button class="btn wlt-c-furg-btn-secondary m-1" (click)="resetForm()">
+            Reset
+          </button>
+        </div>
+      </div>
+    </form>
+
+      <!-- Export / Print Buttons -->
+      <div class="row" *ngIf="currentReportHtml && warningMessage === ''">
+        <div class="col-12 text-left report-actions">
+          <button class="btn wlt-c-furg-btn-secondary m-1" (click)="generateExcelFileClick()">Export to Excel</button>
+          <button class="btn wlt-c-furg-btn-secondary m-1" (click)="printReport()">Print Preview</button>
+        </div>
+      </div>
+
+    <!-- Report Display with DomSanitized HTML -->
+    <div *ngIf="currentReportHtml && warningMessage === ''" class="report-container mt-4">
+      <div [innerHTML]="currentReportHtml" class="compliance-report-display"></div>
+    </div>
+
+  </mat-card-content>
+</mat-card>

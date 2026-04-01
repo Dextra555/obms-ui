@@ -1,0 +1,121 @@
+<div class="form-header">
+    <div style="text-align: center; margin-bottom: 10px;">
+        <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">FreightWatch G Security Services India Pvt. Ltd</div>
+        <h1 style="margin: 0; font-size: 16px; font-weight: bold;">FORM XXVI - MUSTER ROLL</h1>
+        <p style="margin: 2px 0; font-size: 11px;">(See Rule 75)</p>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+        <div style="font-size: 11px;">
+            <div style="font-weight: bold;">{{CompanyName}}</div>
+            <div>{{CompanyAddress}}</div>
+            <div>Tel: {{CompanyPhone}} | E-mail: {{CompanyEmail}}</div>
+            <div>{{CompanyCIN}}</div>
+        </div>
+        <div style="text-align: right;">
+            <img src="assets/img/logo-white.png" alt="Logo" style="width: 80px; height: auto;">
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 20px; font-size: 11px; border-top: 1px solid #000; padding-top: 10px; flex-wrap: wrap;">
+        <div><strong>Branch:</strong> {{Branch || 'N/A'}}</div>
+        <div><strong>Client:</strong> {{Client || 'N/A'}}</div>
+        <div><strong>Period:</strong> {{Period || 'N/A'}}</div>
+    </div>
+</div>
+
+<div style="margin-bottom: 15px; font-size: 11px;">
+    <div style="font-weight: bold; margin-bottom: 5px;">Register Of Employment Of Contract Labour</div>
+    <div><strong>Name and address of principal employer:</strong> {{PrincipalEmployer || 'N/A'}}</div>
+    <div><strong>Name and address of contractor:</strong> {{ContractorName || 'N/A'}}</div>
+    <div><strong>Name and location of work site:</strong> {{WorkSite || 'N/A'}}</div>
+</div>
+<table class="report-table muster-roll">
+    <thead>
+        <tr>
+            <th rowspan="2">S.No</th>
+            <th rowspan="2">Name of workman & employee ID</th>
+            <th rowspan="2">Age & Sex</th>
+            <th rowspan="2">Designation (Nature of work)</th>
+            <th rowspan="2">Father/Husband Name</th>
+            <th colspan="{{DaysColspan}}">Daily hours of work done</th>
+            <th rowspan="2">No. of days worked</th>
+            <th rowspan="2">Signature of worker</th>
+            <th rowspan="2">Date of report</th>
+            <th rowspan="2">Date of submission</th>
+            <th rowspan="2">Date of termination of employment</th>
+            <th rowspan="2">Signature of work-site incharge</th>
+        </tr>
+        <tr>
+            {{DaysHeaders}}
+        </tr>
+    </thead>
+    <tbody>
+        {{DataRows}}
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="{{FooterColspan}}" style="font-weight: bold; text-align: left; padding: 5px;">
+                Total days: {{TotalDays || 0}}
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        font-size: 11px;
+        line-height: 1.2;
+        margin: 10px;
+    }
+    
+    .form-header {
+        border: 2px solid #000;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .report-table.muster-roll {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .report-table.muster-roll th,
+    .report-table.muster-roll td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        vertical-align: middle;
+        text-align: center;
+    }
+    
+    .report-table.muster-roll th {
+        background: #f0f0f0;
+        font-weight: bold;
+        font-size: 9px;
+    }
+    
+    .report-table.muster-roll td.left-text {
+        text-align: left;
+    }
+    
+    @media print {
+        body {
+            margin: 0;
+            font-size: 10px;
+        }
+        
+        .form-header {
+            border: 2px solid #000;
+            page-break-inside: avoid;
+        }
+        
+        .report-table.muster-roll th,
+        .report-table.muster-roll td {
+            font-size: 8px;
+            padding: 3px 4px;
+        }
+    }
+</style>

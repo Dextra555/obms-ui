@@ -1,0 +1,90 @@
+/* Service Type Component Styles */
+.wlt-c-furg-content-header {
+  background-color: #f8f9fa;
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+}
+
+.wlt-c-furg-btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.wlt-c-furg-btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  color: white;
+}
+
+.wlt-c-furg-text-primary {
+  color: #007bff;
+}
+
+.wlt-c-furg-text-warning {
+  color: #ffc107;
+}
+
+.wlt-c-furg-text-danger {
+  color: #dc3545;
+}
+
+.wlt-table {
+  width: 100%;
+  margin-bottom: 1rem;
+  background-color: transparent;
+}
+
+.wlt-table.table-striped {
+  background-color: #fff;
+}
+
+.badge {
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+}
+
+.badge-success {
+  color: #fff;
+  background-color: #28a745;
+}
+
+.badge-info {
+  color: #fff;
+  background-color: #17a2b8;
+}
+
+.badge-warning {
+  color: #212529;
+  background-color: #ffc107;
+}
+
+.badge-danger {
+  color: #fff;
+  background-color: #dc3545;
+}
+
+.badge-secondary {
+  color: #fff;
+  background-color: #6c757d;
+}
+
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

@@ -1,0 +1,251 @@
+<div class="wlt-c-furg-content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <h1 class="mb-1">Report/Client Compliance Report</h1>
+      </div>
+      <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
+        <ol class="breadcrumb float-md-right">
+          <li class="breadcrumb-item"><a href="#">Report</a></li>
+          <li class="breadcrumb-item active">Client Compliance Report</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<mat-card>
+  <mat-card-content>
+    <form [formGroup]="complianceForm" *ngIf="warningMessage === ''">
+      <div class="row" *ngIf="warningMessage === ''">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Compliance Report Type</mat-label>
+            <mat-select formControlName="ReportType">
+              <mat-option *ngFor="let type of complianceFormTypes" [value]="type.value">
+                {{ type.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Branch</mat-label>
+            <mat-select formControlName="BranchCode" (selectionChange)="onBranchSelectionChange($event)">
+              <mat-option *ngFor="let branch of branchModel" [value]="branch.Code">
+                {{ branch.Name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-4 col-lg-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Client (Optional)</mat-label>
+            <mat-select formControlName="ClientCode">
+              <mat-option value="">All Clients</mat-option>
+              <mat-option *ngFor="let client of clientModel" [value]="client.Code">
+                {{ client.Name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-4 col-lg-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>State</mat-label>
+            <mat-select formControlName="State">
+              <mat-option *ngFor="let state of stateList" [value]="state.code">
+                {{ state.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="warningMessage === ''">
+        <div class="col-12 col-sm-12 col-md-3 col-lg-2">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Month</mat-label>
+            <mat-select formControlName="Month">
+              <mat-option [value]="1">January</mat-option>
+              <mat-option [value]="2">February</mat-option>
+              <mat-option [value]="3">March</mat-option>
+              <mat-option [value]="4">April</mat-option>
+              <mat-option [value]="5">May</mat-option>
+              <mat-option [value]="6">June</mat-option>
+              <mat-option [value]="7">July</mat-option>
+              <mat-option [value]="8">August</mat-option>
+              <mat-option [value]="9">September</mat-option>
+              <mat-option [value]="10">October</mat-option>
+              <mat-option [value]="11">November</mat-option>
+              <mat-option [value]="12">December</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-2">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Year</mat-label>
+            <mat-select formControlName="Year">
+              <mat-option [value]="2024">2024</mat-option>
+              <mat-option [value]="2025">2025</mat-option>
+              <mat-option [value]="2026">2026</mat-option>
+              <mat-option [value]="2027">2027</mat-option>
+              <mat-option [value]="2028">2028</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-6 col-lg-8"></div>
+      </div>
+
+      <!-- Additional Fields for Specific Forms -->
+      <div class="row" *ngIf="complianceForm.get('ReportType')?.value === 'form-xxvi' || 
+                                   complianceForm.get('ReportType')?.value === 'form-xxvii' || 
+                                   complianceForm.get('ReportType')?.value === 'form-xxix'">
+        <div class="col-12">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Principal Employer</mat-label>
+            <input matInput formControlName="PrincipalEmployer"
+              placeholder="e.g., M/s. Siruvapuri Murugan Industrial & Logistics Private Ltd">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="complianceForm.get('ReportType')?.value === 'form-xxvi' || 
+                                   complianceForm.get('ReportType')?.value === 'form-xxvii' || 
+                                   complianceForm.get('ReportType')?.value === 'form-xxix'">
+        <div class="col-12">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Contractor Name</mat-label>
+            <input matInput formControlName="ContractorName"
+              placeholder="e.g., FREIGTWATCH G SECURITY SERVICES INDIA PVT. LTD.">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="complianceForm.get('ReportType')?.value === 'form-xxvi' || 
+                                   complianceForm.get('ReportType')?.value === 'form-xxvii' || 
+                                   complianceForm.get('ReportType')?.value === 'form-xxix'">
+        <div class="col-12">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Work Site Address</mat-label>
+            <input matInput formControlName="WorkSite"
+              placeholder="e.g., 77/2A3A2, Thamaraipakkam Village, Thiruvallur, TN-601103">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="complianceForm.get('ReportType')?.value === 'form-xvii'">
+        <div class="col-12">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Unit Name</mat-label>
+            <input matInput formControlName="UnitName" placeholder="e.g., Hosur Unit 1 DILP, Redhills SMILP">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Options for Wage Slips -->
+      <div class="row" *ngIf="complianceForm.get('ReportType')?.value === 'form-xxviii'">
+        <div class="col-12">
+          <mat-checkbox formControlName="ShowIndividualSlips" class="mr-2">
+            Show Individual Wage Slips for All Employees
+          </mat-checkbox>
+        </div>
+      </div>
+
+      <!-- Options for Compliance Summary -->
+      <div class="row" *ngIf="complianceForm.get('ReportType')?.value === 'compliance-summary'">
+        <div class="col-12">
+          <mat-checkbox formControlName="ShowIndividualSlips" class="mr-2">
+            Include All Forms in Summary Report
+          </mat-checkbox>
+        </div>
+      </div>
+
+      <!-- Report Type Buttons -->
+      <div class="row" *ngIf="warningMessage === '' && complianceForm.get('State')?.value === 'Central'">
+        <div class="col-12 text-left">
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('form-xvii')"
+            [disabled]="complianceForm.invalid">
+            Form XVII
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('form-xxvi')"
+            [disabled]="complianceForm.invalid">
+            Form XXVI
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('form-xxvii')"
+            [disabled]="complianceForm.invalid">
+            Form XXVII
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('form-xxviii')"
+            [disabled]="complianceForm.invalid">
+            Form XXVIII
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('form-xxix')"
+            [disabled]="complianceForm.invalid">
+            Form XXIX
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('overtime')"
+            [disabled]="complianceForm.invalid">
+            OT Register
+          </button>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="warningMessage === '' && complianceForm.get('State')?.value === 'AP'">
+        <div class="col-12 text-left">
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('ap-form-xvi')" [disabled]="complianceForm.invalid">
+             Form XVI
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('ap-form-xvii')" [disabled]="complianceForm.invalid">
+             Form XVII
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('ap-form-xx')" [disabled]="complianceForm.invalid">
+             Form XX
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('ap-form-xxi')" [disabled]="complianceForm.invalid">
+             Form XXI
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('ap-form-xxii')" [disabled]="complianceForm.invalid">
+             Form XXII
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('ap-form-xxiii')" [disabled]="complianceForm.invalid">
+             Form XXIII
+          </button>
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="showReport('ap-form-xxix')" [disabled]="complianceForm.invalid">
+             Form XXIX
+          </button>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="currentReportHtml && warningMessage === ''">
+        <div class="col-12 text-left report-actions">
+          <button class="btn wlt-c-furg-btn-secondary m-1" (click)="generateExcelFileClick()">
+            Export to Excel
+          </button>
+          <button class="btn wlt-c-furg-btn-secondary m-1" (click)="printReport()">
+            Print Preview
+          </button>
+        </div>
+      </div>
+    </form>
+    <br />
+    <div *ngIf="warningMessage !== ''">
+      <mat-label style="color:red" [innerHTML]="warningMessage"></mat-label>
+    </div>
+    <div *ngIf="errorMessage !== ''">
+      <mat-label style="color:red" [innerHTML]="errorMessage"></mat-label>
+    </div>
+
+    <!-- Report Display with DomSanitized HTML -->
+    <div *ngIf="currentReportHtml && warningMessage === ''" class="report-container mt-4">
+      <div [innerHTML]="currentReportHtml" class="compliance-report-display"></div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div [style.display]="showLoadingSpinner ? 'block' : 'none'"
+      style="margin-top: -10.5rem; display: block; margin-left: -6.5rem;">
+      <div class="d-flex justify-content-center">
+        <span class="loader"></span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

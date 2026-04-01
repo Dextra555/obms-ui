@@ -1,0 +1,263 @@
+<h2 mat-dialog-title>Commercial Breakdown</h2>
+<div class="px-3 pb-2">
+  <div class="alert alert-info py-2 mb-0" style="font-size: 0.85rem;">
+    <i class="fas fa-external-link-alt mr-1"></i>
+    Reference: <a href="https://www.scribd.com/document/855246540/TN-Govt-Gazette-Notification-Security-Guards-Minimum-Wage-Revision-w-e-f-23rd-Oct-2024" target="_blank" class="font-weight-bold">TN Govt Gazette Notification - Minimum Wage Revision</a>
+  </div>
+</div>
+<mat-dialog-content [formGroup]="frm">
+  <!-- Man Power Cost Section -->
+  <div class="card bg-light mb-3">
+    <div class="card-header">
+      <strong>MAN POWER COST</strong>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Minimum Wages</mat-label>
+            <input type="number" formControlName="MinimumWages" matInput placeholder="0.00" readonly>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Basic</mat-label>
+            <input type="number" formControlName="Basic" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>DA</mat-label>
+            <input type="number" formControlName="DA" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>HRA</mat-label>
+            <input type="number" formControlName="HRA" matInput placeholder="0.00" readonly>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>HRA %</mat-label>
+            <input type="number" formControlName="HRAPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Leaves</mat-label>
+            <input type="number" formControlName="Leaves" matInput placeholder="0.00" readonly>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Leaves %</mat-label>
+            <input type="number" formControlName="LeavesPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Professional Tax</mat-label>
+            <input type="number" formControlName="ProfessionalTax" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Bonus</mat-label>
+            <input type="number" formControlName="Bonus" matInput placeholder="0.00" readonly>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Bonus %</mat-label>
+            <input type="number" formControlName="BonusPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Reliever Charges</mat-label>
+            <input type="number" formControlName="RelieverCharges" matInput placeholder="0.00" readonly>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Reliever Charges %</mat-label>
+            <input type="number" formControlName="RelieverChargesPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <!-- Empty cell for spacing -->
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>SUB TOTAL:</strong>
+            <span class="badge bg-primary fs-6">{{ subTotal | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statutory Costs Section -->
+  <div class="card bg-light mb-3">
+    <div class="card-header">
+      <strong>STATUTORY COSTS</strong>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>PF</mat-label>
+            <input type="number" formControlName="PF" matInput placeholder="0.00" readonly>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>PF %</mat-label>
+            <input type="number" formControlName="PFPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>ESI</mat-label>
+            <input type="number" formControlName="ESI" matInput placeholder="0.00" readonly>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>ESI %</mat-label>
+            <input type="number" formControlName="ESIPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>TOTAL + STATUTORY:</strong>
+            <span class="badge bg-info fs-6">{{ totalPlusStatutory | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Other Costs Section -->
+  <div class="card bg-light mb-3">
+    <div class="card-header">
+      <strong>OTHER COSTS</strong>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Uniform Cost</mat-label>
+            <input type="number" formControlName="UniformCost" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Others</mat-label>
+            <input type="number" formControlName="Others" matInput placeholder="0.00" readonly>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Others %</mat-label>
+            <input type="number" formControlName="OthersPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Administration Charges</mat-label>
+            <input type="number" formControlName="AdministrationCharges" matInput placeholder="0.00" readonly>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Admin Charges %</mat-label>
+            <input type="number" formControlName="AdministrationChargesPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Section -->
+  <div class="card bg-warning mb-3">
+    <div class="card-header">
+      <strong>SUMMARY</strong>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <strong>TOTAL DIRECT COST (A):</strong>
+            <span class="badge bg-warning text-dark fs-6">{{ totalDirectCost | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Management Fee %</mat-label>
+            <input type="number" formControlName="ManagementFeePercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <strong>Management Fee:</strong>
+            <span class="badge bg-secondary fs-6">{{ managementFee | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong>Monthly Charged Cost (B):</strong>
+            <span class="badge bg-success fs-5">{{ monthlyChargedCost | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-2" *ngIf="noOfGuards > 1">
+        <div class="col-12 border-top pt-2">
+          <div class="d-flex justify-content-between align-items-center text-primary">
+            <strong>Estimated Month Total ({{noOfGuards}} Guards):</strong>
+            <span class="badge bg-primary fs-5">{{ grandTotal | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grand Total section removed -->
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="frm.invalid">Save</button>
+</mat-dialog-actions>

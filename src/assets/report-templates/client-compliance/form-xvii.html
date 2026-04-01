@@ -1,0 +1,144 @@
+<div class="form-header">
+    <div style="text-align: center; margin-bottom: 15px;">
+        <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">FreightWatch G Security Services India Pvt. Ltd</div>
+        <div style="font-weight: bold; font-size: 14px;">{{ClientName}}</div>
+        <div style="font-size: 12px; margin: 5px 0;">For the month of {{Period}}</div>
+        <div style="font-weight: bold; font-size: 14px;">{{CompanyName}}</div>
+        <div style="font-weight: bold; font-size: 16px; margin: 10px 0;">SALARY FOR THE MONTH OF {{Period}}</div>
+        <h1 style="margin: 0; font-size: 18px; font-weight: bold;">REGISTER OF WAGES FORM XVII</h1>
+        <p style="margin: 2px 0; font-size: 11px;">(See Rule 78 (1)(a))</p>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+        <div style="font-size: 11px;">
+            <div style="font-weight: bold;">{{CompanyName}}</div>
+            <div>{{CompanyAddress}}</div>
+            <div>Tel: {{CompanyPhone}} | E-mail: {{CompanyEmail}}</div>
+            <div>CIN No. {{CompanyCIN}}</div>
+        </div>
+        <div style="text-align: right;">
+            <img src="assets/img/logo-white.png" alt="Logo" style="width: 80px; height: auto;">
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 20px; font-size: 11px; border-top: 1px solid #000; padding-top: 10px; flex-wrap: wrap;">
+        <div><strong>Branch:</strong> {{BranchName}}</div>
+        <div><strong>Client:</strong> {{ClientName}}</div>
+        <div><strong>Period:</strong> {{Period}}</div>
+    </div>
+</div>
+
+<div style="margin-bottom: 15px; font-size: 11px;">
+    <div style="font-weight: bold; margin-bottom: 5px;">Register of Wages for Contract Labour</div>
+    <div><strong>Principal Employer:</strong> {{PrincipalEmployer}}</div>
+    <div><strong>Contractor:</strong> {{ContractorName}}</div>
+    <div><strong>Work Site:</strong> {{WorkSite}}</div>
+</div>
+
+<table class="report-table register-wages">
+    <thead>
+        <tr>
+            <th rowspan="2">S.No</th>
+            <th rowspan="2">Emp. Code</th>
+            <th rowspan="2">Name</th>
+            <th rowspan="2">Designation</th>
+            <th colspan="11">Fixed salary / Wage Rate</th>
+            <th colspan="11">Earned salary</th>
+            <th colspan="8" style="background: #fff3cd;">Deductions</th>
+            <th rowspan="2">Net amount</th>
+            <th rowspan="2">Remarks</th>
+            <th rowspan="2">Signature</th>
+        </tr>
+        <tr>
+            <!-- Fixed -->
+            <th>BASIC</th>
+            <th>DA</th>
+            <th>OTHERS</th>
+            <th>HRA</th>
+            <th>LEAVE WAGES</th>
+            <th>NH</th>
+            <th>ADVANCE</th>
+            <th>BONUS</th>
+            <th>ACTUAL DAYS</th>
+            <th>Fixed salary</th>
+            <th>No. of w. days</th>
+            <!-- Earned -->
+            <th>Basic</th>
+            <th>DA</th>
+            <th>Others</th>
+            <th>HRA</th>
+            <th>Leave Wages</th>
+            <th>NH</th>
+            <th>Advance</th>
+            <th>Bonus</th>
+            <th>OT</th>
+            <th>OT Amount</th>
+            <th>Gr. salary</th>
+            <!-- Deductions -->
+            <th style="background: #fff3cd;">PF 12%</th>
+            <th style="background: #fff3cd;">ESI 0.75%</th>
+            <th style="background: #fff3cd;">PT</th>
+            <th style="background: #fff3cd;">Advance</th>
+            <th style="background: #fff3cd;">LWF</th>
+            <th style="background: #fff3cd;">Total ded.</th>
+            <th style="background: #fff3cd;">Mobile</th>
+            <th style="background: #fff3cd;">Arrear</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{DataRows}}
+    </tbody>
+    <tfoot>
+        <tr class="total-row">
+            <td colspan="4">TOTAL</td>
+            <td>{{TotalBasicFixed || 0}}</td>
+            <td>{{TotalDAFixed || 0}}</td>
+            <td>{{TotalOthersFixed || 0}}</td>
+            <td>{{TotalHRAFixed || 0}}</td>
+            <td>{{TotalLeaveWagesFixed || 0}}</td>
+            <td>{{TotalNHFixed || 0}}</td>
+            <td>{{TotalAdvanceFixed || 0}}</td>
+            <td>{{TotalBonusFixed || 0}}</td>
+            <td>{{TotalActualDays || 0}}</td>
+            <td>{{TotalFixedSalary || 0}}</td>
+            <td>{{TotalWorkDays || 0}}</td>
+            <td>{{TotalBasic || 0}}</td>
+            <td>{{TotalDA || 0}}</td>
+            <td>{{TotalOthers || 0}}</td>
+            <td>{{TotalHRA || 0}}</td>
+            <td>{{TotalLeaveWages || 0}}</td>
+            <td>{{TotalNH || 0}}</td>
+            <td>{{TotalAdvance || 0}}</td>
+            <td>{{TotalBonus || 0}}</td>
+            <td>{{TotalOT || 0}}</td>
+            <td>{{TotalOTAmount || 0}}</td>
+            <td>{{TotalGross || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalPF || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalESI || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalPT || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalAdvanceDed || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalLWF || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalDeductions || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalMobile || 0}}</td>
+            <td style="background: #fff3cd;">{{TotalArrear || 0}}</td>
+            <td>{{TotalNet || 0}}</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tfoot>
+</table>
+
+<style>
+    body { font-family: 'Poppins', sans-serif; font-size: 11px; line-height: 1.2; margin: 10px; }
+    .form-header { border: 2px solid #000; padding: 15px; margin-bottom: 15px; }
+    .report-table.register-wages { border-collapse: collapse; width: 100%; font-size: 10px; margin-bottom: 15px; }
+    .report-table.register-wages th, .report-table.register-wages td { border: 1px solid #000; padding: 4px 6px; vertical-align: middle; text-align: center; }
+    .report-table.register-wages th { background: #f0f0f0; font-weight: bold; font-size: 9px; }
+    .report-table.register-wages td.left-text { text-align: left; }
+    .total-row td { background: #f0f0f0; font-weight: bold; }
+    @media print {
+        body { margin: 0; font-size: 10px; }
+        .form-header { border: 2px solid #000; page-break-inside: avoid; }
+        .report-table.register-wages th, .report-table.register-wages td { font-size: 8px; padding: 3px 4px; }
+    }
+</style>

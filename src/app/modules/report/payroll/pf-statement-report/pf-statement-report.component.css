@@ -1,0 +1,320 @@
+/* PF Statement Report Component - Matching Client Compliance Report Design */
+
+.report-container {
+  margin-top: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 20px;
+  background-color: #fff;
+}
+
+.pf-report-display {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  overflow-x: auto;
+  background: white;
+}
+
+.pf-report-display table {
+  white-space: normal !important;
+}
+
+.pf-report-display th,
+.pf-report-display td {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+}
+
+.pf-report-display pre {
+  margin: 0;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  overflow-x: auto;
+}
+
+.pf-report-display table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+  font-size: 11px;
+}
+
+.pf-report-display table, th, td {
+  border: 1px solid #333;
+  padding: 8px;
+  text-align: left;
+}
+
+.pf-report-display th {
+  background-color: #f9f9f9;
+  font-weight: bold;
+}
+
+.pf-report-display h1, h2, h3 {
+  margin: 15px 0 10px 0;
+  font-size: 14px;
+}
+
+.pf-report-display .report-header {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #333;
+  background: #fdfdfd;
+}
+
+.pf-report-display .invoice-branding {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  border-bottom: 1px solid #bbb;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+
+.pf-report-display .company-info .company-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.pf-report-display .company-info .company-tagline {
+  font-style: italic;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.pf-report-display .company-info .company-address,
+.pf-report-display .company-info .company-contact {
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+
+.pf-report-display .logo-holder {
+  float: left;
+  margin-right: 14px;
+}
+
+.pf-report-display .report-logo {
+  height: 56px;
+  width: auto;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.pf-report-display .certified-info {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1a6605;
+  border: 1px solid #1a6605;
+  padding: 5px 8px;
+  text-align: center;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.pf-report-display .report-title {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.pf-report-display .report-title h2 {
+  margin-bottom: 6px;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.pf-report-display .report-meta {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 10px;
+}
+
+.pf-report-display .report-meta p {
+  margin: 0;
+}
+
+.pf-report-display .report-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+  font-size: 11px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.pf-report-display .report-table thead {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.pf-report-display .report-table th {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+  font-weight: bold;
+  background-color: #4CAF50;
+  color: white;
+}
+
+.pf-report-display .report-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.pf-report-display .report-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.pf-report-display .report-table tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+.pf-report-display .total-row {
+  background-color: #e8f5e9 !important;
+  font-weight: bold;
+  border-top: 2px solid #4CAF50;
+}
+
+.pf-report-display .notes {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #fffacd;
+  border-left: 4px solid #ffeb3b;
+  border-radius: 4px;
+}
+
+.pf-report-display .notes p {
+  margin: 5px 0;
+  font-size: 11px;
+}
+
+.mt-4 {
+  margin-top: 2rem;
+}
+
+.report-actions {
+  margin-top: 0.75rem;
+}
+
+.report-actions .btn {
+  border: 1px solid #4a90e2;
+  color: #fff;
+  background-color: #1976d2;
+}
+
+.report-actions .btn:hover {
+  background-color: #115293;
+}
+
+.pf-report-display .report-table th,
+.pf-report-display .report-table td {
+  border: 1px solid #444;
+  padding: 5px;
+}
+
+.pf-report-display table.report-table {
+  font-size: 10px;
+  page-break-inside: auto;
+}
+
+.pf-report-display table.report-table tr {
+  page-break-inside: avoid;
+  page-break-after: auto;
+}
+
+.pf-report-display table.report-table th {
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+/* Loader styles */
+.loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* PF Status Indicators */
+.pf-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.pf-applicable {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.pf-not-applicable {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Print styles */
+@media print {
+  .report-container {
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .pf-report-display {
+    font-size: 10px;
+  }
+  
+  .pf-report-display table {
+    font-size: 9px;
+  }
+  
+  .pf-report-display table, th, td {
+    padding: 4px;
+  }
+  
+  .pf-report-display .report-table th {
+    padding: 6px;
+  }
+  
+  .pf-report-display .report-table td {
+    padding: 4px;
+  }
+}
+
+@media (max-width: 576px) {
+  .pf-report-display {
+    font-size: 9px;
+  }
+  
+  .pf-report-display table {
+    font-size: 8px;
+  }
+  
+  .pf-report-display table, th, td {
+    padding: 2px;
+  }
+  
+  .pf-report-display .report-table th {
+    padding: 4px;
+  }
+  
+  .pf-report-display .report-table td {
+    padding: 2px;
+  }
+}

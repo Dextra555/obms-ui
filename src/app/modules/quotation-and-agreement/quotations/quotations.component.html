@@ -1,0 +1,135 @@
+<div class="wlt-c-furg-content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <h1 class="mb-1">Quotations</h1>
+      </div>
+      <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
+        <ol class="breadcrumb float-md-right">
+          <li class="breadcrumb-item"><a href="#">Quotation & Agreement</a></li>
+          <li class="breadcrumb-item active">Quotations</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+<mat-card>
+  <mat-card-content>
+    <div class="row" *ngIf="warningMessage ===''">
+      <div class="col-12 col-sm-12 col-md-4 col-lg-4 order-2 order-md-1">
+        <div class="text-right">
+          <mat-form-field appearance="outline" style="width: 130px; margin-right: 10px;">
+            <mat-label>Quotation Id</mat-label>
+            <input matInput [(ngModel)]="searchID" (keyup)="applyIDFilter($event)" placeholder="Quotation Id">
+          </mat-form-field>
+          <mat-form-field appearance="outline" style="margin-right: 10px;">
+            <mat-label>Search</mat-label>
+            <input matInput [(ngModel)]="searchString" (keyup)="applyFilter($event)" placeholder="Search">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Branch</mat-label>
+            <mat-select [(value)]="selectedBranch" (selectionChange)="changeBranch($event.value)">
+              <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="col-12 col-sm-12 col-md-8 col-lg-8 order-1 order-md-2">
+        <div class="text-right pt-2" style="display: flex; flex-direction: column; align-items: flex-end;">
+          <button class="btn wlt-c-furg-btn-primary mb-2" style="width: 120px;"
+            [routerLink]="['/quotation-and-agreement/quotations/new-quotation']">
+            <mat-icon>add</mat-icon>
+            <span>New</span>
+          </button>
+          <button class="btn wlt-c-furg-btn-primary" (click)="clearFilters()" style="width: 120px;">
+            <mat-icon>clear</mat-icon>
+            <span>Clear</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" *ngIf="errorMessage =='' && warningMessage ===''">
+      <table mat-table [dataSource]="dataSource" class="wlt-table table-striped" matSort
+        matSortActive="AddedDate" matSortDirection="desc"
+        (matSortChange)="announceSortChange($event)">
+
+        <ng-container matColumnDef="SNo">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> SNo </th>
+          <td mat-cell *matCellDef="let element; let i = index" class="text-left"> {{ i + 1 }} </td>
+        </ng-container>
+        <ng-container matColumnDef="QuotationID">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Quotation Id </th>
+          <td mat-cell *matCellDef="let element" class="text-left"> {{ element.ID }} </td>
+        </ng-container>
+        <ng-container matColumnDef="BranchName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Branch Name</th>
+          <td mat-cell *matCellDef="let element" class="text-left"> {{element.BranchName}} </td>
+        </ng-container>
+        <ng-container matColumnDef="ClientName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Client Name</th>
+          <td mat-cell *matCellDef="let element" class="text-left"> {{element.ClientName}} </td>
+        </ng-container>
+        <ng-container matColumnDef="WorkPlace">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Work Place</th>
+          <td mat-cell *matCellDef="let element" class="text-left"> {{element.WorkPlace}} </td>
+        </ng-container>
+        <ng-container matColumnDef="QuotationDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Start</th>
+          <td mat-cell *matCellDef="let element" class="text-left"> {{returnDate(element.QuotationDate)}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="AddedDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Added Date </th>
+          <td mat-cell *matCellDef="let element"> {{element.AddedDate | date:'dd-MMM-yyyy'}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Status">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
+          <td mat-cell *matCellDef="let element" class="text-left"> {{ element.Status || 'Open' }} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="action" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef style="text-align:center; width: 160px;">
+            Action
+          </th>
+          <td mat-cell *matCellDef="let row" style="text-align:center;">
+            <a style="cursor:pointer;" class="mr-2" matTooltip="View" (click)="viewDetails(row.ID)">
+              <mat-icon aria-hidden="false" aria-label="view icon" style="color: grey;">visibility</mat-icon>
+            </a>
+            <a *ngIf="row.Status !== 'Closed'" style="cursor:pointer;" class="wlt-c-furg-text-primary mr-2" matTooltip="Edit"
+              [routerLink]="['/quotation-and-agreement/quotations/edit-quotation',row.ID]">
+              <mat-icon aria-hidden="false" aria-label="edit icon">edit</mat-icon>
+            </a>
+            <a style="cursor:pointer; color: maroon;" class="mr-2" matTooltip="Export PDF"
+              (click)="exportToPDF(row.ID)">
+              <mat-icon aria-hidden="false" aria-label="pdf icon">picture_as_pdf</mat-icon>
+            </a>
+            <a *ngIf="row.Status !== 'Closed'" style="cursor:pointer; color: green;" class="mr-2" matTooltip="Generate Agreement"
+              (click)="generateAgreement(row.ID)">
+              <mat-icon aria-hidden="false" aria-label="agreement icon">assignment_turned_in</mat-icon>
+            </a>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+    <div *ngIf="warningMessage !==''">
+      <mat-label style="color:red" [innerHTML]="warningMessage"></mat-label>
+    </div>
+    <div *ngIf="errorMessage !==''">
+      <mat-label style="color:red" [innerHTML]="errorMessage"></mat-label>
+    </div>
+    <mat-paginator [pageSizeOptions]="[10, 20, 30]" showFirstLastButtons aria-label="Select page of periodic elements">
+    </mat-paginator>
+  </mat-card-content>
+</mat-card>
+
+<!-- loader -->
+<div [style.display]="showLoadingSpinner ? 'block' : 'none'"
+  style="margin-top: -20.5rem; display: block; margin-left: -6.5rem;">
+  <div class="d-flex justify-content-center">
+    <span class="loader"></span>
+  </div>
+</div>
