@@ -375,56 +375,64 @@ export class NonComplianceReportComponent implements OnInit {
   }
 
   private buildRowHtml(reportType: string, row: any, index: number): string {
+    // Safe accessors to prevent runtime errors when API returns incomplete rows
+    const severity = (row.severity || 'Low') as string;
+    const status   = (row.status   || 'Pending') as string;
     switch (reportType) {
-      case 'form-xxvi':
-        const attendancePercentage = parseFloat(((row.daysWorked / row.totalDays) * 100).toFixed(1));
-        const severityClass = `severity-${row.severity.toLowerCase()}`;
-        const statusClass = `status-${row.status.toLowerCase().replace(' ', '-')}`;
+      case 'form-xxvi': {
+        const totalDays = row.totalDays || 1;
+        const daysWorked = row.daysWorked || 0;
+        const attendancePercentage = parseFloat(((daysWorked / totalDays) * 100).toFixed(1));
+        const severityClass  = `severity-${severity.toLowerCase()}`;
+        const statusClass    = `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
         const attendanceClass = attendancePercentage < 75 ? 'attendance-low' : 'attendance-good';
         return `
           <tr>
             <td class="text-center">${row.sno || index + 1}</td>
-            <td>${row.employeeCode}</td>
-            <td>${row.employeeName}</td>
-            <td>${row.branch}</td>
-            <td>${row.client}</td>
-            <td class="text-center">${row.totalDays}</td>
-            <td class="text-center">${row.daysWorked}</td>
+            <td>${row.employeeCode ?? ''}</td>
+            <td>${row.employeeName ?? ''}</td>
+            <td>${row.branch ?? ''}</td>
+            <td>${row.client ?? ''}</td>
+            <td class="text-center">${totalDays}</td>
+            <td class="text-center">${daysWorked}</td>
             <td class="text-center ${attendanceClass}">${attendancePercentage}%</td>
-            <td>${row.attendanceIssue}</td>
-            <td>${row.description}</td>
-            <td class="text-center ${severityClass}">${row.severity}</td>
-            <td class="text-center ${statusClass}">${row.status}</td>
-            <td>${row.assignedTo}</td>
-            <td class="text-center">${row.dueDate}</td>
-            <td class="text-right">₹${row.penaltyAmount?.toLocaleString() || 0}</td>
+            <td>${row.attendanceIssue ?? ''}</td>
+            <td>${row.description ?? ''}</td>
+            <td class="text-center ${severityClass}">${severity}</td>
+            <td class="text-center ${statusClass}">${status}</td>
+            <td>${row.assignedTo ?? ''}</td>
+            <td class="text-center">${row.dueDate ?? ''}</td>
+            <td class="text-right">₹${(row.penaltyAmount ?? 0).toLocaleString()}</td>
           </tr>
         `;
+      }
       case 'form-xxvii':
-      case 'form-xxviii':
-        const severityClass2 = `severity-${row.severity.toLowerCase()}`;
-        const statusClass2 = `status-${row.status.toLowerCase().replace(' ', '-')}`;
+      case 'form-xxviii': {
+        const severityClass2 = `severity-${severity.toLowerCase()}`;
+        const statusClass2   = `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
+        const basicWages = row.basicWages ?? 0;
         return `
           <tr>
             <td class="text-center">${row.sno || index + 1}</td>
-            <td>${row.employeeCode}</td>
-            <td>${row.employeeName}</td>
-            <td>${row.branch}</td>
-            <td>${row.client}</td>
-            <td class="text-right">₹${row.basicWages.toLocaleString()}</td>
+            <td>${row.employeeCode ?? ''}</td>
+            <td>${row.employeeName ?? ''}</td>
+            <td>${row.branch ?? ''}</td>
+            <td>${row.client ?? ''}</td>
+            <td class="text-right">₹${basicWages.toLocaleString()}</td>
             <td class="text-center ${row.minimumWageViolation ? 'violation-yes' : 'violation-no'}">${row.minimumWageViolation ? 'YES' : 'NO'}</td>
             <td class="text-center ${row.pfDeductionIssue ? 'violation-yes' : 'violation-no'}">${row.pfDeductionIssue ? 'YES' : 'NO'}</td>
             <td class="text-center ${row.esiDeductionIssue ? 'violation-yes' : 'violation-no'}">${row.esiDeductionIssue ? 'YES' : 'NO'}</td>
             <td class="text-center ${row.ptDeductionIssue ? 'violation-yes' : 'violation-no'}">${row.ptDeductionIssue ? 'YES' : 'NO'}</td>
             <td class="text-center ${row.salaryDelay ? 'violation-yes' : 'violation-no'}">${row.salaryDelay ? 'YES' : 'NO'}</td>
-            <td>${row.description}</td>
-            <td class="text-center ${severityClass2}">${row.severity}</td>
-            <td class="text-center ${statusClass2}">${row.status}</td>
-            <td>${row.assignedTo}</td>
-            <td class="text-center">${row.dueDate}</td>
-            <td class="text-right">₹${row.penaltyAmount?.toLocaleString() || 0}</td>
+            <td>${row.description ?? ''}</td>
+            <td class="text-center ${severityClass2}">${severity}</td>
+            <td class="text-center ${statusClass2}">${status}</td>
+            <td>${row.assignedTo ?? ''}</td>
+            <td class="text-center">${row.dueDate ?? ''}</td>
+            <td class="text-right">₹${(row.penaltyAmount ?? 0).toLocaleString()}</td>
           </tr>
         `;
+      }
       default:
         return '';
     }

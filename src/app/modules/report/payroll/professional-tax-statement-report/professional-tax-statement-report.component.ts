@@ -157,7 +157,7 @@ export class ProfessionalTaxStatementReportComponent implements OnInit {
       GeneratedDate: new Date().toLocaleString('en-IN')
     };
 
-    const payload = { branch: formValues.BranchCode, client: formValues.ClientCode || '', period, state: formValues.State, reportTypeNum };
+    const payload = { Parameters: { branch: formValues.BranchCode, client: formValues.ClientCode || '', period, state: formValues.State, reportTypeNum } };
 
     // Use the dedicated GetPTStatement endpoint
     this.http.post<any>(`${this._masterService.apiUrl}ComplianceReport/GetPTStatement`, payload).subscribe(
@@ -177,9 +177,23 @@ export class ProfessionalTaxStatementReportComponent implements OnInit {
 
   private renderHtml(template: string, apiData: any, meta: any): string {
     let filled = template;
-    Object.keys(meta).forEach(key => {
-      filled = filled.replace(new RegExp(`{{${key}}}`, 'g'), meta[key] ?? '');
-    });
+    const fmt = (v: any) => (v != null ? Number(v).toLocaleString('en-IN') : '0');
+
+    // Build combined lookup map (meta + totals)
+    const allData: { [key: string]: any } = { ...meta };
+    if (apiData?.totals) {
+      const t = apiData.totals;
+      allData['TotalGross'] = fmt(t['TotalGross'] ?? t['totalGross'] ?? 0);
+      allData['TotalPT']    = fmt(t['TotalPT']    ?? t['totalPT']    ?? 0);
+    }
+
+    // Replace {{Key}} and {{Key || 'default'}} placeholders
+    filled = filled.replace(/{\{\s*([\w]+)(?:\s*\|\|\s*['"]?([^'"\}]+)['"]?)?\s*\}}/g,
+      (match, key, defaultVal) => {
+        if (key === 'DataRows') return match;
+        if (allData[key] !== undefined && allData[key] !== null && allData[key] !== '') return allData[key];
+        return defaultVal !== undefined ? defaultVal : '';
+      });
 
     let rowHtml = '<tr><td colspan="7" style="text-align:center;color:#888;">No records found for the selected period.</td></tr>';
     if (apiData?.rows && apiData.rows.length > 0) {
@@ -187,15 +201,8 @@ export class ProfessionalTaxStatementReportComponent implements OnInit {
     }
     filled = filled.replace(/{{DataRows}}/g, rowHtml);
 
-    // Backend totals: TotalGross, TotalPT — match template placeholders directly
-    if (apiData?.totals) {
-      const t = apiData.totals;
-      const fmt = (v: any) => (v != null ? Number(v).toLocaleString('en-IN') : '0');
-      filled = filled.replace(/{{TotalGross}}/g, fmt(t['TotalGross'] ?? t['totalGross'] ?? 0));
-      filled = filled.replace(/{{TotalPT}}/g,    fmt(t['TotalPT']    ?? t['totalPT']    ?? 0));
-    }
-
-    filled = filled.replace(/{{[\w\s|'"]+}}/g, '0');
+    // Clear any remaining unreplaced placeholders
+    filled = filled.replace(/{\{[\w\s|'"]+\}}/g, '');
     return filled;
   }
 

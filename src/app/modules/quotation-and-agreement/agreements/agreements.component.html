@@ -108,11 +108,12 @@
               (click)="exportToPDF(row.ID)">
               <mat-icon aria-hidden="false" aria-label="pdf icon">picture_as_pdf</mat-icon>
             </a>
-            <a *ngIf="this.userAccessModel.deleteAccess == true || currentUser == 'superadmin'"
+            <!-- Delete option hidden -->
+            <!-- <a *ngIf="this.userAccessModel.deleteAccess == true || currentUser == 'superadmin'"
                style="cursor:pointer; color: red;" class="mr-2" matTooltip="Delete Agreement"
                (click)="deleteAgreement(row.ID, row.ClientName)">
               <mat-icon aria-hidden="false" aria-label="delete icon">delete_outline</mat-icon>
-            </a>
+            </a> -->
             <a style="cursor:pointer; color: orange;" class="mr-2" matTooltip="Cancel Agreement"
               (click)="cancelAgreement(row.ID, row.ClientName)">
               <mat-icon aria-hidden="false" aria-label="cancel icon">block</mat-icon>

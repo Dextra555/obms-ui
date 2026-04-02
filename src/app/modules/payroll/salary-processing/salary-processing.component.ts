@@ -152,7 +152,9 @@ export class SalaryProcessingComponent implements OnInit {
     })
   }
   ShowLastRemarks() {
-    let dtSalaryProcessDate = this.salaryProcessingForm.value.SalaryPeriod;
+    // SalaryPeriod comes from formatDate as a string 'yyyy-MM-dd', need to convert it to Date
+    let dtSalaryProcessDateString = this.salaryProcessingForm.value.SalaryPeriod;
+    let dtSalaryProcessDate = new Date(dtSalaryProcessDateString);
     this.dtSalaryProcessDate = this.formatDate(
       new Date(dtSalaryProcessDate.getFullYear(), dtSalaryProcessDate.getMonth() + 1, 0)
     );

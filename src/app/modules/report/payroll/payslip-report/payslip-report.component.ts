@@ -63,6 +63,7 @@ export class PayslipReportComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl('about:blank');
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         this._dataService.scrollToTop(); // Scroll to top on route change

@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort, Sort } from '@angular/material/sort';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { QuotationService } from "../../quotation.service";
@@ -270,7 +270,7 @@ export class NewQuotationComponent {
     let t = monthTotal - vDiscount;
     
     // Get dynamic GST rate
-    let gstRate = 8; // Default fallback for loading
+    let gstRate = 18; // Default fallback
     const serviceTypeId = row.ServiceTypeID;
     if (serviceTypeId) {
       const selectedService = this.serviceTypes.find(st => st.Id === serviceTypeId);
@@ -279,6 +279,29 @@ export class NewQuotationComponent {
         if (config && config.gstRate) {
           gstRate = config.gstRate;
         }
+      }
+    }
+
+    // Apply CGST/IGST logic
+    let branchState = '';
+    let clientState = '';
+    let taxType = 'IGST'; // Default to IGST
+    
+    if (this.branchList && this.clientList) {
+      const branchObj = this.branchList.find((x: any) => x.Code === row.Branch);
+      const clientObj = this.clientList.find((x: any) => x.Code === row.Client);
+      branchState = branchObj?.State || branchObj?.state || '';
+      clientState = clientObj?.State || clientObj?.state || '';
+      
+      // Normalize state codes
+      const normalizedBranchState = branchState.toUpperCase().replace(/\s/g, '');
+      const normalizedClientState = clientState.toUpperCase().replace(/\s/g, '');
+      
+      // Determine tax type
+      if (normalizedBranchState === normalizedClientState && normalizedBranchState !== '') {
+        taxType = 'CGST';
+      } else {
+        taxType = 'IGST';
       }
     }
 
@@ -341,18 +364,58 @@ export class NewQuotationComponent {
     }
     data['QuotationDate'] = this.returnDate(this.frm.get('QuotationDate')?.value);
     let msg = "";
+    
+    if (this.isEdit) {
+      msg = 'Successfully Updated Quotation Details';
+    } else {
+      msg = 'Successfully Saved Quotation Details';
+    }
+    
     this.service.saveAndUpdateQuotation(data).subscribe((d: any) => {
-      const savedQuotation = d['quotation'] || d;
-      const quotationId = savedQuotation['ID'] || savedQuotation['id'] || this.ID || 0;
+      console.log('Quotation save response:', d);
+      const quotationId = d['QuotationID'] || d['quotation']?.ID || d['quotation']?.id || d['ID'] || d['id'] || 0;
+      
+      console.log('Extracted quotationId:', quotationId);
+      
+      if (quotationId === 0) {
+        console.error('Failed to get valid QuotationID from response:', d);
+        Swal.fire({
+          toast: true,
+          position: 'top',
+          showConfirmButton: false,
+          title: 'Error',
+          text: 'Failed to save quotation. Please try again.',
+          icon: 'error',
+          showCloseButton: false,
+          timer: 3000,
+        });
+        return;
+      }
 
       // Save each quotation detail
       if (this.details && this.details.length > 0) {
-        let detailsSaved = 0;
-        this.details.forEach((detail: any) => {
+        const detailSavePromises = this.details.map((detail: any) => {
           detail.QuotationID = quotationId;
-          detail.Client = this.frm.get('Client')?.value;
-          detail.Branch = this.frm.get('Branch')?.value;
+          detail.Client = this.frm.get('Client')?.value || '';
+          detail.Branch = this.frm.get('Branch')?.value || '';
           detail.QuotationDate = data['QuotationDate'];
+          
+          // Ensure all required fields have proper values
+          detail.Description = detail.Description || '';
+          detail.NoOfGuards = parseInt(detail.NoOfGuards) || 0;
+          detail.Rate = parseFloat(detail.Rate) || 0;
+          detail.NoOfHours = parseFloat(detail.NoOfHours) || 0;
+          detail.NoOfDays = parseFloat(detail.NoOfDays) || 0;
+          detail.FollowCalender = detail.FollowCalender || false;
+          detail.HasDiscount = detail.HasDiscount || false;
+          detail.DiscountAmount = parseFloat(detail.DiscountAmount) || 0;
+          detail.DiscountHour = parseInt(detail.DiscountHour) || 0;
+          detail.IsTaxable = detail.IsTaxable || false;
+          detail.TaxAmount = parseFloat(detail.TaxAmount) || 0;
+          detail.MonthTotal = parseFloat(detail.MonthTotal) || 0;
+          detail.LASTUPDATE = new Date();
+          detail.Category = detail.Category || '';
+          detail.Reason = detail.Reason || '';
 
           // Extract commercial breakdown data and merge into main detail object for database storage
           if (detail.CommercialBreakdown) {
@@ -383,37 +446,66 @@ export class NewQuotationComponent {
             detail.TotalPlusStatutory = cb.TotalPlusStatutory || 0;
             detail.TotalDirectCost = cb.TotalDirectCost || 0;
             detail.MonthlyChargedCost = cb.MonthlyChargedCost || 0;
+          } else {
+            // Set default values for commercial breakdown fields if not present
+            detail.Basic = detail.Basic || 0;
+            detail.DA = detail.DA || 0;
+            detail.Leaves = detail.Leaves || 0;
+            detail.Allowance = detail.Allowance || 0;
+            detail.Bonus = detail.Bonus || 0;
+            detail.NFH = detail.NFH || 0;
+            detail.PF = detail.PF || 0;
+            detail.ESI = detail.ESI || 0;
+            detail.Uniform = detail.Uniform || 0;
+            detail.ServiceFee = detail.ServiceFee || 0;
+            detail.HRA = detail.HRA || 0;
+            detail.HRAPercentage = detail.HRAPercentage || 0;
+            detail.ProfessionalTax = detail.ProfessionalTax || 0;
+            detail.RelieverCharges = detail.RelieverCharges || 0;
+            detail.RelieverChargesPercentage = detail.RelieverChargesPercentage || 0;
+            detail.Others = detail.Others || 0;
+            detail.OthersPercentage = detail.OthersPercentage || 0;
+            detail.AdministrationCharges = detail.AdministrationCharges || 0;
+            detail.AdministrationChargesPercentage = detail.AdministrationChargesPercentage || 0;
+            detail.ManagementFee = detail.ManagementFee || 0;
+            detail.ManagementFeePercentage = detail.ManagementFeePercentage || 0;
+            detail.SubTotal = detail.SubTotal || 0;
+            detail.TotalPlusStatutory = detail.TotalPlusStatutory || 0;
+            detail.TotalDirectCost = detail.TotalDirectCost || 0;
+            detail.MonthlyChargedCost = detail.MonthlyChargedCost || 0;
           }
 
-          this.service.saveAndUpdateQuotationDetails(detail).subscribe({
-            next: () => {
-              detailsSaved++;
-            },
-            error: (err) => {
-              console.error('Error saving detail:', err);
-            }
-          });
+          console.log('Saving detail:', detail);
+          return this.service.saveAndUpdateQuotationDetails(detail).toPromise();
         });
-      }
 
-      if (this.isEdit) {
-        msg = 'Successfully Updated Quotation Details';
+        // Wait for all details to be saved before proceeding
+        Promise.all(detailSavePromises).then(() => {
+          this.showSuccessMessageAndNavigate(msg);
+        }).catch((err) => {
+          console.error('Error saving some details:', err);
+          // Still show success message even if some details fail to save
+          this.showSuccessMessageAndNavigate(msg);
+        });
       } else {
-        msg = 'Successfully Saved Quotation Details';
+        this.showSuccessMessageAndNavigate(msg);
       }
-      Swal.fire({
-        toast: true,
-        position: 'top',
-        showConfirmButton: false,
-        title: 'Success',
-        text: msg,
-        icon: 'success',
-        showCloseButton: false,
-        timer: 3000,
-      }).then(() => {
-        this.route.navigate(['/quotation-and-agreement/quotations']);
-      });
     })
+  }
+
+  private showSuccessMessageAndNavigate(msg: string) {
+    Swal.fire({
+      toast: true,
+      position: 'top',
+      showConfirmButton: false,
+      title: 'Success',
+      text: msg,
+      icon: 'success',
+      showCloseButton: false,
+      timer: 3000,
+    }).then(() => {
+      this.route.navigate(['/quotation-and-agreement/quotations']);
+    });
   }
 
   returnDate(date?: any) {

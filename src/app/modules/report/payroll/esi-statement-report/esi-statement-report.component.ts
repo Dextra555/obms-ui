@@ -137,7 +137,7 @@ export class EsiStatementReportComponent implements OnInit {
       GeneratedDate: new Date().toLocaleString('en-IN')
     };
 
-    const payload = { branch: formValues.BranchCode, client: formValues.ClientCode || '', period, reportTypeNum };
+    const payload = { Parameters: { branch: formValues.BranchCode, client: formValues.ClientCode || '', period, reportTypeNum } };
 
     // Use the dedicated GetESIStatement endpoint
     this.http.post<any>(`${this._masterService.apiUrl}ComplianceReport/GetESIStatement`, payload).subscribe(
@@ -157,10 +157,28 @@ export class EsiStatementReportComponent implements OnInit {
 
   private renderHtml(template: string, apiData: any, meta: any): string {
     let filled = template;
-    // Replace metadata
-    Object.keys(meta).forEach(key => {
-      filled = filled.replace(new RegExp(`{{${key}}}`, 'g'), meta[key] ?? '');
-    });
+    const fmt = (v: any) => (v != null ? Number(v).toLocaleString('en-IN') : '0');
+
+    // Build combined lookup map (meta + remapped totals)
+    const allData: { [key: string]: any } = { ...meta };
+    if (apiData?.totals) {
+      const t = apiData.totals;
+      // Remap API totals keys to template placeholder keys
+      // Backend: TotalGross, TotalEmpESI, TotalErESI, TotalESI
+      // Template: {{TotalWages}}, {{TotalEmpShare}}, {{TotalEmployerShare}}, {{TotalAmount}}
+      allData['TotalWages']         = fmt(t['TotalGross']   ?? t['totalWages']         ?? 0);
+      allData['TotalEmpShare']      = fmt(t['TotalEmpESI']  ?? t['totalEmpShare']      ?? 0);
+      allData['TotalEmployerShare'] = fmt(t['TotalErESI']   ?? t['totalEmployerShare'] ?? 0);
+      allData['TotalAmount']        = fmt(t['TotalESI']     ?? t['totalAmount']        ?? 0);
+    }
+
+    // Replace {{Key}} and {{Key || 'default'}} placeholders
+    filled = filled.replace(/{\{\s*([\w]+)(?:\s*\|\|\s*['"]?([^'"\}]+)['"]?)?\s*\}}/g,
+      (match, key, defaultVal) => {
+        if (key === 'DataRows') return match;
+        if (allData[key] !== undefined && allData[key] !== null && allData[key] !== '') return allData[key];
+        return defaultVal !== undefined ? defaultVal : '';
+      });
 
     // Build data rows
     let rowHtml = '<tr><td colspan="9" style="text-align:center;color:#888;">No records found for the selected period.</td></tr>';
@@ -169,24 +187,8 @@ export class EsiStatementReportComponent implements OnInit {
     }
     filled = filled.replace(/{{DataRows}}/g, rowHtml);
 
-    // Remap API totals keys to template placeholder keys
-    // Backend: TotalGross, TotalEmpESI, TotalErESI, TotalESI
-    // Template: {{TotalWages}}, {{TotalEmpShare}}, {{TotalEmployerShare}}, {{TotalAmount}}
-    if (apiData?.totals) {
-      const t = apiData.totals;
-      const fmt = (v: any) => (v != null ? Number(v).toLocaleString('en-IN') : '0');
-      const totalsMap: { [k: string]: string } = {
-        TotalWages:           fmt(t['TotalGross']      ?? t['totalWages']          ?? 0),
-        TotalEmpShare:        fmt(t['TotalEmpESI']     ?? t['totalEmpShare']       ?? 0),
-        TotalEmployerShare:   fmt(t['TotalErESI']      ?? t['totalEmployerShare']  ?? 0),
-        TotalAmount:          fmt(t['TotalESI']        ?? t['totalAmount']         ?? 0),
-      };
-      Object.keys(totalsMap).forEach(k => {
-        filled = filled.replace(new RegExp(`{{${k}}}`, 'g'), totalsMap[k]);
-      });
-    }
-
-    filled = filled.replace(/{{[\w\s|'"]+}}/g, '0');
+    // Clear any remaining unreplaced placeholders
+    filled = filled.replace(/{\{[\w\s|'"]+\}}/g, '');
     return filled;
   }
 

@@ -268,8 +268,8 @@ export class MastermoduleService {
 
   getComplianceReportData(reportName: string, parameters: any): Observable<any> {
     const requestBody = {
-      reportName: reportName,
-      parameters: parameters
+      ReportName: reportName,
+      Parameters: parameters
     };
     return this.httpClient.post(`${this.apiUrl}ComplianceReport/GetComplianceReportData`, requestBody)
       .pipe(catchError(this.errorHandle));
