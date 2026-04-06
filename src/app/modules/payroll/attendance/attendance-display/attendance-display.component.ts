@@ -28,6 +28,9 @@ export interface AttendanceData {
   employeeName: string;
   employeeCode: string;
   branch: string;
+  branchName?: string; // Full branch name
+  clientName?: string; // Client name
+  employeeType?: string; // Optional employee type field
   punchInTime: string;
   punchOutTime: string;
   totalHours: number;
@@ -53,6 +56,8 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     'id',
     'employeeCode',
     'employeeName',
+    'clientName',
+    'branchName',
     'attendanceDate',
     'punchInTime',
     'punchOutTime',
@@ -74,6 +79,12 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
   filteredAttendanceData: AttendanceData[] = [];
   employees: any[] = [];
   branches: any[] = [];
+  clients: any[] = []; // Add clients array
+  previousFilters: any = {}; // Track previous filter values
+  
+  // Loading flags
+  branchesLoaded: boolean = false;
+  clientsLoaded: boolean = false;
   
   // Loading and status
   isLoading: boolean = false;
@@ -203,6 +214,7 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     this.attendanceFilterForm = this.fb.group({
       attendanceDate: [new Date(), Validators.required],
       branchCode: [''],
+      clientCode: [''], // Add client filter
       employeeCode: [''],
       status: [''],
       employeeType: ['']
@@ -232,16 +244,218 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     this.showLoadingSpinner = true;
     
-    // Set default branches
-    this.branches = [
-      { Code: 'HQ', Name: 'Head Quarter' },
-      { Code: 'BRANCH1', Name: 'Branch 1' },
-      { Code: 'BRANCH2', Name: 'Branch 2' },
-      { Code: 'BRANCH_B', Name: 'Branch B' }
-    ];
+    // Load branches and clients from API first, then load attendance data
+    this.loadBranches();
+    this.loadClients();
+  }
+  
+  private loadBranches(): void {
+    // Load branches based on user role
+    if (this.currentUser === 'admin' || this.currentUser === 'superadmin') {
+      // Admin gets all branches
+      this.masterService.getBranchMasterList().subscribe(
+        (data: any) => {
+          this.branches = data || [];
+          console.log('Loaded branches for admin:', this.branches);
+          this.branchesLoaded = true;
+          this.checkAndLoadAttendanceData();
+        },
+        (error: any) => {
+          console.error('Error loading branches:', error);
+          this.branches = []; // Empty array if API fails
+          this.branchesLoaded = true;
+          this.checkAndLoadAttendanceData();
+        }
+      );
+    } else {
+      // Regular users get branches assigned to them
+      this.masterService.GetBranchListByUserName(this.currentUser).subscribe(
+        (data: any) => {
+          this.branches = data || [];
+          console.log('Loaded branches for user:', this.currentUser, this.branches);
+          this.branchesLoaded = true;
+          this.checkAndLoadAttendanceData();
+        },
+        (error: any) => {
+          console.error('Error loading user branches:', error);
+          this.branches = []; // Empty array if API fails
+          this.branchesLoaded = true;
+          this.checkAndLoadAttendanceData();
+        }
+      );
+    }
+  }
+  
+  private loadClients(): void {
+    console.log('Starting client loading for user:', this.currentUser);
     
-    // Load attendance data directly (no need to load employees first)
-    this.loadAttendanceData();
+    // Load clients based on user role
+    if (this.currentUser === 'admin' || this.currentUser === 'superadmin') {
+      // Admin gets all active clients - try the correct API method
+      console.log('Loading clients with getClientMsterListByStatus...');
+      this.masterService.getClientMsterListByStatus('A').subscribe(
+        (data: any) => {
+          console.log('=== CLIENT API ANALYSIS ===');
+          console.log('Raw client API response:', data);
+          console.log('Response type:', typeof data);
+          console.log('Is array?', Array.isArray(data));
+          console.log('Response length:', data?.length);
+          
+          if (data && Array.isArray(data) && data.length > 0) {
+            console.log('✅ Clients found!');
+            console.log('Sample client record:', data[0]);
+            console.log('Available client fields:', Object.keys(data[0]));
+            console.log('Client field structure:');
+            Object.keys(data[0]).forEach(key => {
+              console.log(`  ${key}: ${typeof data[0][key]} = ${data[0][key]}`);
+            });
+          } else {
+            console.log('❌ No clients found with status A');
+            console.log('Trying with empty status to get all clients...');
+            
+            // Try with empty status to get all clients
+            this.masterService.getClientMsterListByStatus('').subscribe(
+              (allData: any) => {
+                console.log('=== ALL CLIENTS API ANALYSIS ===');
+                console.log('All clients response:', allData);
+                console.log('All clients length:', allData?.length);
+                
+                if (allData && Array.isArray(allData) && allData.length > 0) {
+                  console.log('✅ All clients found!');
+                  console.log('Sample all client record:', allData[0]);
+                  console.log('Available all client fields:', Object.keys(allData[0]));
+                } else {
+                  console.log('❌ No clients found at all');
+                  console.log('Trying alternative API method...');
+                  
+                  // Try the alternative method
+                  this.masterService.getClienthMaster('', '').subscribe(
+                    (altData: any) => {
+                      console.log('=== ALTERNATIVE CLIENT API ANALYSIS ===');
+                      console.log('Alternative API response:', altData);
+                      console.log('Alternative API length:', altData?.length);
+                      
+                      if (altData && Array.isArray(altData) && altData.length > 0) {
+                        console.log('✅ Alternative API found clients!');
+                        console.log('Sample alt client:', altData[0]);
+                        console.log('Alt client fields:', Object.keys(altData[0]));
+                      } else {
+                        console.log('❌ No clients found with any method');
+                      }
+                      
+                      this.clients = altData || [];
+                      this.clientsLoaded = true;
+                      this.checkAndLoadAttendanceData();
+                    },
+                    (altError: any) => {
+                      console.error('❌ Alternative client API error:', altError);
+                      this.clients = [];
+                      this.clientsLoaded = true;
+                      this.checkAndLoadAttendanceData();
+                    }
+                  );
+                  return;
+                }
+                
+                this.clients = allData || [];
+                this.clientsLoaded = true;
+                this.checkAndLoadAttendanceData();
+              },
+              (allError: any) => {
+                console.error('❌ All clients API error:', allError);
+                this.clients = [];
+                this.clientsLoaded = true;
+                this.checkAndLoadAttendanceData();
+              }
+            );
+            return;
+          }
+          
+          this.clients = data || [];
+          this.clientsLoaded = true;
+          this.checkAndLoadAttendanceData();
+        },
+        (error: any) => {
+          console.error('❌ Primary client API error:', error);
+          console.log('Error details:', error);
+          this.clients = [];
+          this.clientsLoaded = true;
+          this.checkAndLoadAttendanceData();
+        }
+      );
+    } else {
+      // Regular users get clients from their assigned branches
+      if (this.branches.length > 0) {
+        // Load clients for each branch the user has access to
+        const branchCodes = this.branches.map(b => b.Code);
+        this.loadClientsByBranches(branchCodes);
+      } else {
+        // If no branches yet, will load clients after branches are loaded
+        this.clients = [];
+        this.clientsLoaded = true;
+        this.checkAndLoadAttendanceData();
+      }
+    }
+  }
+  
+  private loadClientsByBranches(branchCodes: string[]): void {
+    // Load clients for the first branch (or implement multiple branch loading)
+    const branchCode = branchCodes[0];
+    this.masterService.getClientMsterListByBranch(branchCode).subscribe(
+      (data: any) => {
+        this.clients = data || [];
+        console.log('Loaded clients for branch:', branchCode, this.clients);
+        this.clientsLoaded = true;
+        this.checkAndLoadAttendanceData();
+      },
+      (error: any) => {
+        console.error('Error loading clients for branch:', branchCode, error);
+        this.clients = []; // Empty array if API fails
+        this.clientsLoaded = true;
+        this.checkAndLoadAttendanceData();
+      }
+    );
+  }
+  
+  private checkAndLoadAttendanceData(): void {
+    // Only load attendance data after both branches and clients are loaded
+    console.log('Checking load status - branchesLoaded:', this.branchesLoaded, 'clientsLoaded:', this.clientsLoaded);
+    if (this.branchesLoaded && this.clientsLoaded) {
+      console.log('Both branches and clients loaded, loading attendance data');
+      console.log('Branches count:', this.branches.length, 'Clients count:', this.clients.length);
+      
+      // If no clients loaded from API, we'll extract them from attendance data as fallback
+      if (this.clients.length === 0) {
+        console.log('⚠️ No clients from API, will extract from attendance data as fallback');
+        // We'll extract clients after attendance data loads
+      }
+      
+      this.loadAttendanceData();
+    }
+  }
+  
+  private extractClientsFromAttendance(): void {
+    // Extract unique clients from attendance data
+    const uniqueClients = new Map<string, any>();
+    
+    this.attendanceData.forEach(record => {
+      if (record.clientName && record.clientName !== 'Unknown' && record.clientName !== 'Not Assigned') {
+        if (!uniqueClients.has(record.clientName)) {
+          uniqueClients.set(record.clientName, {
+            Code: record.clientName,
+            Name: record.clientName
+          });
+        }
+      }
+    });
+    
+    if (uniqueClients.size > 0) {
+      this.clients = Array.from(uniqueClients.values());
+      console.log('✅ Extracted clients from attendance data:', this.clients.length);
+      console.log('Extracted clients:', this.clients);
+    } else {
+      console.log('❌ No clients found in attendance data either');
+    }
   }
   
   loadAttendanceData(): void {
@@ -333,6 +547,25 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     
     attendanceRecords.forEach((record: any, index: number) => {
       try {
+        // Debug: Log the record structure to identify available fields for today's attendance
+        console.log('Today\'s attendance record structure:', record);
+        console.log('Available fields:', Object.keys(record));
+        
+        // Check for client-related fields specifically
+        const clientFields = Object.keys(record).filter(key => 
+          key.toLowerCase().includes('client') || 
+          key.toLowerCase().includes('customer') ||
+          key.toLowerCase().includes('company')
+        );
+        if (clientFields.length > 0) {
+          console.log('🔍 Found client-related fields:', clientFields);
+          clientFields.forEach(field => {
+            console.log(`  ${field}: ${record[field]}`);
+          });
+        } else {
+          console.log('🔍 No client-related fields found in attendance record');
+        }
+        
         // Transform the attendance record to our interface
         const transformedData: AttendanceData = {
           id: record.ID || record.id || index + 1,
@@ -344,6 +577,10 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
           employeeName: record.EmployeeName || record.employeeName || 'Unknown',
           employeeCode: record.EmployeeCode || record.employeeCode || `EMP${index + 1}`,
           branch: record.Branch || record.branch || 'Unknown',
+          branchName: record.BranchName || record.branchName || this.getBranchName(record.Branch || record.branch),
+          // Try different possible client field names from API response
+          clientName: record.ClientName || record.clientName || record.Client || record.client || record.CompanyName || record.companyName || 'Not Assigned',
+          employeeType: record.EmployeeType || record.employeeType || 'Unknown',
           punchInTime: record.PunchInTime || '-',
           punchOutTime: record.PunchOutTime || '-',
           totalHours: record.TotalHours || 0,
@@ -362,6 +599,12 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     });
     
     this.attendanceData = attendanceDataList;
+    
+    // Extract clients from attendance data if no clients loaded from API
+    if (this.clients.length === 0) {
+      this.extractClientsFromAttendance();
+    }
+    
     this.applyFiltersInternal();
   }
 
@@ -377,6 +620,25 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     
     attendanceRecords.forEach((record: any, index: number) => {
       try {
+        // Debug: Log the record structure to identify available fields for historical attendance
+        console.log('Historical attendance record structure:', record);
+        console.log('Available fields:', Object.keys(record));
+        
+        // Check for client-related fields specifically
+        const clientFields = Object.keys(record).filter(key => 
+          key.toLowerCase().includes('client') || 
+          key.toLowerCase().includes('customer') ||
+          key.toLowerCase().includes('company')
+        );
+        if (clientFields.length > 0) {
+          console.log('🔍 Found client-related fields in historical:', clientFields);
+          clientFields.forEach(field => {
+            console.log(`  ${field}: ${record[field]}`);
+          });
+        } else {
+          console.log('🔍 No client-related fields found in historical attendance record');
+        }
+        
         // Transform the attendance record to our interface
         const transformedData: AttendanceData = {
           id: record.ID || record.id || index + 1,
@@ -388,6 +650,10 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
           employeeName: record.EmployeeName || record.employeeName || 'Unknown',
           employeeCode: record.EmployeeCode || record.employeeCode || `EMP${index + 1}`,
           branch: record.Branch || record.branch || 'Unknown',
+          branchName: record.BranchName || record.branchName || this.getBranchName(record.Branch || record.branch),
+          // Try different possible client field names from API response
+          clientName: record.ClientName || record.clientName || record.Client || record.client || record.CompanyName || record.companyName || 'Not Assigned',
+          employeeType: record.EmployeeType || record.employeeType || 'Unknown',
           punchInTime: record.PunchInTime || this.formatTime(record.TimeStart),
           punchOutTime: record.PunchOutTime || this.formatTime(record.TimeEnd),
           totalHours: record.TotalHours || this.calculateHours(record.TimeStart, record.TimeEnd),
@@ -406,6 +672,12 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     });
     
     this.attendanceData = attendanceDataList;
+    
+    // Extract clients from attendance data if no clients loaded from API
+    if (this.clients.length === 0) {
+      this.extractClientsFromAttendance();
+    }
+    
     this.applyFiltersInternal();
   }
 
@@ -476,6 +748,15 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     }
   }
 
+  private getBranchName(branchCode: string): string {
+    if (!branchCode || branchCode === 'Unknown') {
+      return 'Unknown';
+    }
+    
+    const branch = this.branches.find(b => b.Code === branchCode);
+    return branch ? branch.Name : branchCode;
+  }
+
   private applyFiltersInternal(): void {
     // Ensure form exists before accessing its values
     if (!this.attendanceFilterForm) {
@@ -492,6 +773,11 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
         return false;
       }
       
+      // Client filter
+      if (filters.clientCode && attendance.clientName !== filters.clientCode) {
+        return false;
+      }
+      
       // Employee filter
       if (filters.employeeCode && attendance.employeeCode !== filters.employeeCode) {
         return false;
@@ -502,11 +788,16 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
         return false;
       }
       
+      // Employee type filter (if implemented)
+      if (filters.employeeType && attendance.employeeType !== filters.employeeType) {
+        return false;
+      }
+      
       return true;
     });
     
     this.filteredAttendanceData = filteredData;
-    console.log('Filtered attendance records:', this.filteredAttendanceData.length);
+    console.log('Filtered attendance records:', this.filteredAttendanceData.length, 'from', this.attendanceData.length, 'total');
     
     this.dataSource = new MatTableDataSource<AttendanceData>(this.filteredAttendanceData);
     if (this.paginator) {
@@ -538,10 +829,26 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     
     const filters = this.attendanceFilterForm.value;
     
-    console.log('Filters applied for attendance date:', filters.attendanceDate);
+    console.log('Applying filters:', filters);
     
-    // Reload data for the selected attendance date
-    this.loadAttendanceData();
+    // For date changes or branch changes, reload data from server
+    // For other filters (employee code, status, employee type), apply client-side filtering
+    const previousFilters = this.previousFilters || {};
+    const dateChanged = previousFilters.attendanceDate !== filters.attendanceDate;
+    const branchChanged = previousFilters.branchCode !== filters.branchCode;
+    
+    // Store current filters for comparison
+    this.previousFilters = { ...filters };
+    
+    if (dateChanged || branchChanged || this.attendanceData.length === 0) {
+      // Reload data from server for new date or branch
+      console.log('Reloading data from server - date changed:', dateChanged, 'branch changed:', branchChanged);
+      this.loadAttendanceData();
+    } else {
+      // Apply client-side filters for other filter changes
+      console.log('Applying client-side filters');
+      this.applyFiltersInternal();
+    }
   }
   
   clearFilters(): void {
@@ -553,9 +860,13 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
       this.initializeForm();
     }
     
+    // Reset previous filters
+    this.previousFilters = {};
+    
     this.attendanceFilterForm.reset({
       attendanceDate: today,
       branchCode: '',
+      clientCode: '', // Add client filter reset
       employeeCode: '',
       status: '',
       employeeType: ''
@@ -564,15 +875,33 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
   }
   
   exportAttendanceData(): void {
-    const data = this.filteredAttendanceData;
-    const csvContent = this.convertToCSV(data);
-    this.downloadCSV(csvContent, 'attendance_data.csv');
+    // Use current filtered data, or all data if no filters applied
+    const dataToExport = this.filteredAttendanceData.length > 0 ? this.filteredAttendanceData : this.attendanceData;
+    
+    if (dataToExport.length === 0) {
+      this.snackBar.open('No data available to export', 'Warning', { duration: 3000 });
+      return;
+    }
+    
+    const csvContent = this.convertToCSV(dataToExport);
+    const filename = this.generateExportFilename();
+    this.downloadCSV(csvContent, filename);
+    
+    this.snackBar.open(`Exported ${dataToExport.length} records successfully`, 'Success', { duration: 3000 });
   }
   
   private convertToCSV(data: AttendanceData[]): string {
+    if (!data || data.length === 0) {
+      return '';
+    }
+    
     const headers = [
-      'Employee Name',
+      'ID',
       'Employee Code',
+      'Employee Name',
+      'Client Name',
+      'Branch Code',
+      'Branch Name',
       'Attendance Date',
       'Punch In',
       'Punch Out',
@@ -583,33 +912,80 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
       'Last Update'
     ];
     
-    const csvRows = [
-      headers.join(','),
-      ...data.map(row => [
-        `"${row.employeeName}"`,
+    const csvRows = [headers.join(',')];
+    
+    data.forEach(row => {
+      const csvRow = [
+        row.id,
         `"${row.employeeCode}"`,
+        `"${row.employeeName}"`,
+        `"${row.clientName}"`,
+        `"${row.branch}"`,
+        `"${row.branchName}"`,
         `"${row.attendanceDate}"`,
         `"${row.punchInTime}"`,
         `"${row.punchOutTime}"`,
-        row.totalHours,
-        row.overtimeHours,
+        row.totalHours || 0,
+        row.overtimeHours || 0,
         `"${row.behavior}"`,
         `"${row.status}"`,
         `"${row.lastUpdate}"`
-      ].join(','))
-    ];
+      ];
+      csvRows.push(csvRow.join(','));
+    });
+    
+    // Add summary row at the end
+    if (data.length > 0) {
+      const summaryRow = [
+        '',
+        '',
+        'TOTAL',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        data.reduce((sum, att) => sum + (att.totalHours || 0), 0).toFixed(2),
+        data.reduce((sum, att) => sum + (att.overtimeHours || 0), 0).toFixed(2),
+        '',
+        '',
+        ''
+      ];
+      csvRows.push(summaryRow.join(','));
+    }
     
     return csvRows.join('\n');
   }
   
   private downloadCSV(csvContent: string, filename: string): void {
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.click();
-    window.URL.revokeObjectURL(url);
+    try {
+      const BOM = '\uFEFF'; // UTF-8 BOM for Excel compatibility
+      const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      
+      if (link.download !== undefined) {
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading CSV:', error);
+      this.snackBar.open('Failed to export data', 'Error', { duration: 3000 });
+    }
+  }
+  
+  private generateExportFilename(): string {
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const timeStr = today.toTimeString().split(' ')[0].replace(/:/g, '-'); // HH-MM-SS format
+    return `attendance_export_${dateStr}_${timeStr}.csv`;
   }
   
   viewAttendanceDetails(attendance: AttendanceData): void {
@@ -631,7 +1007,8 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
       this.attendanceFilterForm.patchValue({
         attendanceDate: event.value
       });
-      this.applyFilters();
+      // For date changes, reload data from server
+      this.loadAttendanceData();
     }
   }
   
@@ -679,6 +1056,8 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
         (attendance.employeeName && attendance.employeeName.toLowerCase().includes(lowerSearchTerm)) ||
         (attendance.employeeCode && attendance.employeeCode.toLowerCase().includes(lowerSearchTerm)) ||
         (attendance.branch && attendance.branch.toLowerCase().includes(lowerSearchTerm)) ||
+        (attendance.branchName && attendance.branchName.toLowerCase().includes(lowerSearchTerm)) ||
+        (attendance.clientName && attendance.clientName.toLowerCase().includes(lowerSearchTerm)) ||
         (attendance.status && attendance.status.toLowerCase().includes(lowerSearchTerm))
       );
     }
