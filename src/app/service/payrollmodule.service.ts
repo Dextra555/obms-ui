@@ -506,7 +506,15 @@ export class PayrollModuleService {
 
   }
 
+  getTodayAttendanceList(branch: string = 'ALL'): Observable<any[]> {
 
+    return this.httpClient.get<any[]>(this.apiUrl + 'payroll/GetTodayAttendanceList', {
+
+      params: { branch: branch }
+
+    }).pipe(catchError(this.errorHandle));
+
+  }
 
   getIsSalaryProcessDoneForCurrentPeriod(branchCode: string, employeeType: string, period: string): Observable<boolean> {
 

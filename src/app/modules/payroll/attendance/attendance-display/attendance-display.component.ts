@@ -268,27 +268,101 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     
     console.log('Loading attendance data for date:', formattedDate, 'branch:', selectedBranch || 'ALL');
     
-    // Use the existing getEmployeeAttendanceList method with date as period
-    this.payrollService.getEmployeeAttendanceList(formattedDate, selectedBranch || 'ALL').pipe(
-      tap(attendanceRecords => {
-        console.log('Received attendance records:', attendanceRecords);
-        this.transformAttendanceData(attendanceRecords, formattedDate);
-      }),
-      catchError(error => {
-        console.error('Error loading attendance data:', error);
-        this.snackBar.open('Failed to load attendance data', 'Error', { duration: 3000 });
-        this.attendanceData = [];
-        this.filteredAttendanceData = [];
-        this.dataSource = new MatTableDataSource<AttendanceData>([]);
-        this.isLoading = false;
-        this.showLoadingSpinner = false;
-        return of(null);
-      }),
-      finalize(() => {
-        this.isLoading = false;
-        this.showLoadingSpinner = false;
-      })
-    ).subscribe();
+    // Check if the selected date is today
+    const today = new Date();
+    const isToday = attendanceDate.toDateString() === today.toDateString();
+    
+    if (isToday) {
+      // Use the new today's attendance endpoint
+      console.log('Using today\'s attendance endpoint');
+      this.payrollService.getTodayAttendanceList(selectedBranch || 'ALL').pipe(
+        tap(attendanceRecords => {
+          console.log('Received today\'s attendance records:', attendanceRecords);
+          this.transformTodayAttendanceData(attendanceRecords);
+        }),
+        catchError(error => {
+          console.error('Error loading today\'s attendance data:', error);
+          this.snackBar.open('Failed to load today\'s attendance data', 'Error', { duration: 3000 });
+          this.attendanceData = [];
+          this.filteredAttendanceData = [];
+          this.dataSource = new MatTableDataSource<AttendanceData>([]);
+          this.isLoading = false;
+          this.showLoadingSpinner = false;
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+          this.showLoadingSpinner = false;
+        })
+      ).subscribe();
+    } else {
+      // Use the existing endpoint for other dates
+      console.log('Using existing attendance endpoint for date:', formattedDate);
+      this.payrollService.getEmployeeAttendanceList(formattedDate, selectedBranch || 'ALL').pipe(
+        tap(attendanceRecords => {
+          console.log('Received attendance records:', attendanceRecords);
+          this.transformAttendanceData(attendanceRecords, formattedDate);
+        }),
+        catchError(error => {
+          console.error('Error loading attendance data:', error);
+          this.snackBar.open('Failed to load attendance data', 'Error', { duration: 3000 });
+          this.attendanceData = [];
+          this.filteredAttendanceData = [];
+          this.dataSource = new MatTableDataSource<AttendanceData>([]);
+          this.isLoading = false;
+          this.showLoadingSpinner = false;
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+          this.showLoadingSpinner = false;
+        })
+      ).subscribe();
+    }
+  }
+
+  private transformTodayAttendanceData(attendanceRecords: any[]): void {
+    const attendanceDataList: AttendanceData[] = [];
+    
+    if (!attendanceRecords || attendanceRecords.length === 0) {
+      console.log('No attendance records found for today');
+      this.attendanceData = attendanceDataList;
+      this.applyFiltersInternal();
+      return;
+    }
+    
+    attendanceRecords.forEach((record: any, index: number) => {
+      try {
+        // Transform the attendance record to our interface
+        const transformedData: AttendanceData = {
+          id: record.ID || record.id || index + 1,
+          period: record.Period || new Date().toISOString(),
+          attendanceDate: record.AttendanceDate || new Date().toISOString().split('T')[0],
+          timeStart: record.TimeStart || null,
+          timeEnd: record.TimeEnd || null,
+          employeeId: record.EmployeeID || record.employeeId || 0,
+          employeeName: record.EmployeeName || record.employeeName || 'Unknown',
+          employeeCode: record.EmployeeCode || record.employeeCode || `EMP${index + 1}`,
+          branch: record.Branch || record.branch || 'Unknown',
+          punchInTime: record.PunchInTime || '-',
+          punchOutTime: record.PunchOutTime || '-',
+          totalHours: record.TotalHours || 0,
+          overtimeHours: record.OvertimeHours || 0,
+          behavior: record.Behavior || 'Unknown',
+          status: record.Status || 'Unknown',
+          lastUpdate: record.LastUpdate ? new Date(record.LastUpdate).toISOString() : new Date().toISOString(),
+          details: []
+        };
+        
+        console.log('Transformed today\'s attendance data:', transformedData);
+        attendanceDataList.push(transformedData);
+      } catch (error) {
+        console.error('Error transforming attendance record:', record, error);
+      }
+    });
+    
+    this.attendanceData = attendanceDataList;
+    this.applyFiltersInternal();
   }
 
   private transformAttendanceData(attendanceRecords: any[], attendanceDate: string): void {
