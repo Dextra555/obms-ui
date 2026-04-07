@@ -8,7 +8,8 @@ import { DatasharingService } from "../../../../service/datasharing.service";
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
 import { IndianComplianceService } from 'src/app/service/indian-compliance.service';
-import { INDIAN_STATES, SALARY_GROUPS, INDIAN_BANKS } from 'src/app/model/indian-employee.model';
+import { CommercialBreakdownDialogComponent } from '../../../quotation-and-agreement/quotations/new-quotation/commercial-breakdown-dialog/commercial-breakdown-dialog.component';
+import { INDIAN_STATES, SALARY_GROUPS, INDIAN_BANKS, INDIAN_RELIGIONS } from 'src/app/model/indian-employee.model';
 
 @Component({
   selector: 'app-new-employee',
@@ -41,6 +42,7 @@ export class NewEmployeeComponent implements OnInit {
   indianStates: string[] = INDIAN_STATES;
   salaryGroups: any[] = SALARY_GROUPS;
   indianBanks: any[] = INDIAN_BANKS;
+  indianReligions: string[] = INDIAN_RELIGIONS;
 
   checkList: any = [
     {
@@ -171,7 +173,35 @@ export class NewEmployeeComponent implements OnInit {
       KDNVetting: [],
       EMP_CHECKLIST: [],
       EMPPAY_ID: [0],
-      EMPFL_ID: [0]
+      EMPFL_ID: [0],
+      
+      // Commercial Breakdown Fields
+      CB_Basic: [0],
+      CB_DA: [0],
+      CB_HRA: [0],
+      CB_HRAPercentage: [0],
+      CB_Leaves: [0],
+      CB_LeavesPercentage: [0],
+      CB_ProfessionalTax: [0],
+      CB_Bonus: [0],
+      CB_BonusPercentage: [0],
+      CB_RelieverCharges: [0],
+      CB_RelieverChargesPercentage: [0],
+      CB_PF: [0],
+      CB_PFPercentage: [0],
+      CB_ESI: [0],
+      CB_ESIPercentage: [0],
+      CB_UniformCost: [0],
+      CB_Others: [0],
+      CB_OthersPercentage: [0],
+      CB_AdministrationCharges: [0],
+      CB_AdministrationChargesPercentage: [0],
+      CB_ManagementFee: [0],
+      CB_ManagementFeePercentage: [0],
+      CB_SubTotal: [0],
+      CB_TotalPlusStatutory: [0],
+      CB_TotalDirectCost: [0],
+      CB_MonthlyChargedCost: [0]
     });
 
     this.checklistItems.forEach((item) => {
@@ -321,13 +351,13 @@ export class NewEmployeeComponent implements OnInit {
 
   nationalityChange(value: any) {
     this.isForeigner = value == 1;
-    this.isIndianCitizen = value == 0;
+    this.isIndianCitizen = value == 0 || value == 3; // Include Migrate People as Indian citizen type
 
     if (this.isForeigner) {
       // For foreigners, passport is required
       this.frm.get('EMP_PASSPORT_NO')?.setValidators([Validators.required]);
     } else {
-      // For Indian citizens, remove passport requirement
+      // For Indian citizens and Migrate People, remove passport requirement
       this.frm.get('EMP_PASSPORT_NO')?.clearValidators();
       this.frm.get('EMP_PASSPORT_NO')?.setValue('');
     }
@@ -376,6 +406,32 @@ export class NewEmployeeComponent implements OnInit {
     }
   }
 
+  formatDateInput(event: any, formControlName: string): void {
+    let value = event.target.value.replace(/\D/g, ''); // Remove non-numeric characters
+    
+    if (value.length >= 8) {
+      // Format as DD-MM-YYYY
+      const day = value.substring(0, 2);
+      const month = value.substring(2, 4);
+      const year = value.substring(4, 8);
+      
+      // Create a valid date string for the datepicker
+      const formattedDate = `${day}-${month}-${year}`;
+      event.target.value = formattedDate;
+      
+      // Parse and set the date value
+      const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      if (!isNaN(dateObj.getTime())) {
+        this.frm.get(formControlName)?.setValue(dateObj);
+        
+        // Calculate age if it's the date of birth field
+        if (formControlName === 'EMP_DATE_OF_BIRTH') {
+          this.calculateAge();
+        }
+      }
+    }
+  }
+
 
   changePaymentMode(value: any) {
     this.isBank = value === "Bank";
@@ -420,6 +476,43 @@ export class NewEmployeeComponent implements OnInit {
     data['NewStructureATTENDANCEALLOWANCE'] = parseFloat(data['NewStructureATTENDANCEALLOWANCE']) || 0;
     data['SpecialAllowance'] = parseFloat(data['SpecialAllowance']) || 0;
     data['AttendanceAllowanceWorkingDays'] = parseFloat(data['AttendanceAllowanceWorkingDays']) || 0;
+
+    // Convert Commercial Breakdown fields to numbers
+    data['CB_Basic'] = parseFloat(data['CB_Basic']) || 0;
+    data['CB_DA'] = parseFloat(data['CB_DA']) || 0;
+    data['CB_HRA'] = parseFloat(data['CB_HRA']) || 0;
+    data['CB_HRAPercentage'] = parseFloat(data['CB_HRAPercentage']) || 0;
+    data['CB_Leaves'] = parseFloat(data['CB_Leaves']) || 0;
+    data['CB_LeavesPercentage'] = parseFloat(data['CB_LeavesPercentage']) || 0;
+    data['CB_ProfessionalTax'] = parseFloat(data['CB_ProfessionalTax']) || 0;
+    data['CB_Bonus'] = parseFloat(data['CB_Bonus']) || 0;
+    data['CB_BonusPercentage'] = parseFloat(data['CB_BonusPercentage']) || 0;
+    data['CB_RelieverCharges'] = parseFloat(data['CB_RelieverCharges']) || 0;
+    data['CB_RelieverChargesPercentage'] = parseFloat(data['CB_RelieverChargesPercentage']) || 0;
+    data['CB_PF'] = parseFloat(data['CB_PF']) || 0;
+    data['CB_PFPercentage'] = parseFloat(data['CB_PFPercentage']) || 0;
+    data['CB_ESI'] = parseFloat(data['CB_ESI']) || 0;
+    data['CB_ESIPercentage'] = parseFloat(data['CB_ESIPercentage']) || 0;
+    data['CB_UniformCost'] = parseFloat(data['CB_UniformCost']) || 0;
+    data['CB_Others'] = parseFloat(data['CB_Others']) || 0;
+    data['CB_OthersPercentage'] = parseFloat(data['CB_OthersPercentage']) || 0;
+    data['CB_AdministrationCharges'] = parseFloat(data['CB_AdministrationCharges']) || 0;
+    data['CB_AdministrationChargesPercentage'] = parseFloat(data['CB_AdministrationChargesPercentage']) || 0;
+    data['CB_ManagementFee'] = parseFloat(data['CB_ManagementFee']) || 0;
+    data['CB_ManagementFeePercentage'] = parseFloat(data['CB_ManagementFeePercentage']) || 0;
+    data['CB_SubTotal'] = parseFloat(data['CB_SubTotal']) || 0;
+    data['CB_TotalPlusStatutory'] = parseFloat(data['CB_TotalPlusStatutory']) || 0;
+    data['CB_TotalDirectCost'] = parseFloat(data['CB_TotalDirectCost']) || 0;
+    data['CB_MonthlyChargedCost'] = parseFloat(data['CB_MonthlyChargedCost']) || 0;
+
+    // DEBUG: Log data being sent to backend
+    console.log('=== COMMERCIAL BREAKDOWN DATA SENT TO BACKEND ===');
+    console.log('CB_Basic:', data['CB_Basic']);
+    console.log('CB_DA:', data['CB_DA']);
+    console.log('CB_HRA:', data['CB_HRA']);
+    console.log('CB_MonthlyChargedCost:', data['CB_MonthlyChargedCost']);
+    console.log('=== FULL DATA OBJECT ===');
+    console.log(data);
 
     if (data['EMP_NO_CHILD'] !== undefined) {
       data['EMP_NO_CHILD'] = parseInt(data['EMP_NO_CHILD'], 10) || 0;
@@ -525,12 +618,13 @@ export class NewEmployeeComponent implements OnInit {
 
   salaryStructureChange(event: any) {
     if (event.value == 'N') {
-      this.frm.get('EMPPAY_BASIC_RATE')?.enable({ onlySelf: true });
+      // Salary is set via Commercial Breakdown only - keep disabled
       this.frm.get('EMPPAY_BASIC_RATE')?.setValue("");
     } else {
       this.frm.get('EMPPAY_BASIC_RATE')?.setValue("0");
-      this.frm.get('EMPPAY_BASIC_RATE')?.disable({ onlySelf: true });
     }
+    // Salary field always remains disabled - only editable via Commercial Breakdown
+    this.frm.get('EMPPAY_BASIC_RATE')?.disable({ onlySelf: true });
   }
 
   isTemporaryEmployeeChange(value: any) {
@@ -605,7 +699,7 @@ export class NewEmployeeComponent implements OnInit {
 
     let da = this.salaryStructureList.filter((x: any) => x.SalaryId == data.value)
     console.log(da);
-    this.frm.get("EMPPAY_BASIC_RATE")?.setValue(da[0]['SalaryBand'])
+    // Set working days but salary is set via Commercial Breakdown only
     this.frm.get("AttendanceAllowanceWorkingDays")?.setValue(da[0]['WorkingDays'])
 
   }
@@ -655,4 +749,76 @@ export class NewEmployeeComponent implements OnInit {
       this.hideSpinner();
     }
   };
+
+  openCommercialDetails(): void {
+    // Get existing commercial breakdown data if available
+    const existingData = {
+      NoOfGuards: 1,
+      NoOfDays: this.frm.get('AttendanceAllowanceWorkingDays')?.value || 30,
+      Basic: this.frm.get('CB_Basic')?.value || 0,
+      DA: this.frm.get('CB_DA')?.value || 0,
+      HRA: this.frm.get('CB_HRA')?.value || 0,
+      HRAPercentage: this.frm.get('CB_HRAPercentage')?.value || 0,
+      Leaves: this.frm.get('CB_Leaves')?.value || 0,
+      LeavesPercentage: this.frm.get('CB_LeavesPercentage')?.value || 0,
+      ProfessionalTax: this.frm.get('CB_ProfessionalTax')?.value || 0,
+      Bonus: this.frm.get('CB_Bonus')?.value || 0,
+      BonusPercentage: this.frm.get('CB_BonusPercentage')?.value || 0,
+      RelieverCharges: this.frm.get('CB_RelieverCharges')?.value || 0,
+      RelieverChargesPercentage: this.frm.get('CB_RelieverChargesPercentage')?.value || 0,
+      PF: this.frm.get('CB_PF')?.value || 0,
+      PFPercentage: this.frm.get('CB_PFPercentage')?.value || 0,
+      ESI: this.frm.get('CB_ESI')?.value || 0,
+      ESIPercentage: this.frm.get('CB_ESIPercentage')?.value || 0,
+      UniformCost: this.frm.get('CB_UniformCost')?.value || 0,
+      Others: this.frm.get('CB_Others')?.value || 0,
+      OthersPercentage: this.frm.get('CB_OthersPercentage')?.value || 0,
+      AdministrationCharges: this.frm.get('CB_AdministrationCharges')?.value || 0,
+      AdministrationChargesPercentage: this.frm.get('CB_AdministrationChargesPercentage')?.value || 0,
+      ManagementFee: this.frm.get('CB_ManagementFee')?.value || 0,
+      ManagementFeePercentage: this.frm.get('CB_ManagementFeePercentage')?.value || 0
+    };
+
+    const dialogRef = this.dialog.open(CommercialBreakdownDialogComponent, {
+      width: '600px',
+      data: existingData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Update the basic rate with the calculated monthly charged cost
+        if (result.MonthlyChargedCost) {
+          this.frm.get('EMPPAY_BASIC_RATE')?.setValue(result.MonthlyChargedCost.toFixed(2));
+        }
+        
+        // Store all commercial breakdown data
+        this.frm.get('CB_Basic')?.setValue(result.Basic || 0);
+        this.frm.get('CB_DA')?.setValue(result.DA || 0);
+        this.frm.get('CB_HRA')?.setValue(result.HRA || 0);
+        this.frm.get('CB_HRAPercentage')?.setValue(result.HRAPercentage || 0);
+        this.frm.get('CB_Leaves')?.setValue(result.Leaves || 0);
+        this.frm.get('CB_LeavesPercentage')?.setValue(result.LeavesPercentage || 0);
+        this.frm.get('CB_ProfessionalTax')?.setValue(result.ProfessionalTax || 0);
+        this.frm.get('CB_Bonus')?.setValue(result.Bonus || 0);
+        this.frm.get('CB_BonusPercentage')?.setValue(result.BonusPercentage || 0);
+        this.frm.get('CB_RelieverCharges')?.setValue(result.RelieverCharges || 0);
+        this.frm.get('CB_RelieverChargesPercentage')?.setValue(result.RelieverChargesPercentage || 0);
+        this.frm.get('CB_PF')?.setValue(result.PF || 0);
+        this.frm.get('CB_PFPercentage')?.setValue(result.PFPercentage || 0);
+        this.frm.get('CB_ESI')?.setValue(result.ESI || 0);
+        this.frm.get('CB_ESIPercentage')?.setValue(result.ESIPercentage || 0);
+        this.frm.get('CB_UniformCost')?.setValue(result.UniformCost || 0);
+        this.frm.get('CB_Others')?.setValue(result.Others || 0);
+        this.frm.get('CB_OthersPercentage')?.setValue(result.OthersPercentage || 0);
+        this.frm.get('CB_AdministrationCharges')?.setValue(result.AdministrationCharges || 0);
+        this.frm.get('CB_AdministrationChargesPercentage')?.setValue(result.AdministrationChargesPercentage || 0);
+        this.frm.get('CB_ManagementFee')?.setValue(result.ManagementFee || 0);
+        this.frm.get('CB_ManagementFeePercentage')?.setValue(result.ManagementFeePercentage || 0);
+        this.frm.get('CB_SubTotal')?.setValue(result.SubTotal || 0);
+        this.frm.get('CB_TotalPlusStatutory')?.setValue(result.TotalPlusStatutory || 0);
+        this.frm.get('CB_TotalDirectCost')?.setValue(result.TotalDirectCost || 0);
+        this.frm.get('CB_MonthlyChargedCost')?.setValue(result.MonthlyChargedCost || 0);
+      }
+    });
+  }
 }

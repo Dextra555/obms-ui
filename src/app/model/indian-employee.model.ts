@@ -124,7 +124,20 @@ export class IndianEmployeeModel {
 export const SALARY_GROUPS = [
     { value: 'None', label: 'None' },
     { value: '8 Hours', label: '8 Hours' },
-    { value: '10 Hours', label: '10 Hours' }
+    { value: '9 Hours', label: '9 Hours' },
+    { value: '10 Hours', label: '10 Hours' },
+    { value: '12 Hours', label: '12 Hours' }
+];
+
+// Indian Religion Categories
+export const INDIAN_RELIGIONS = [
+    'Hindu',
+    'Muslim',
+    'Christian',
+    'Sikh',
+    'Buddhist',
+    'Jain',
+    'Other'
 ];
 
 // Indian Banks

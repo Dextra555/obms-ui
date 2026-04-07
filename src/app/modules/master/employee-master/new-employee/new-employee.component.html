@@ -72,8 +72,8 @@
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
-            <mat-label>Date of Birth</mat-label>
-            <input type="text" formControlName="EMP_DATE_OF_BIRTH" matInput [matDatepicker]="picker1" placeholder="" autocomplete="off" (dateChange)="calculateAge()">
+            <mat-label>Date of Birth (DDMMYYYY)</mat-label>
+            <input type="text" formControlName="EMP_DATE_OF_BIRTH" matInput [matDatepicker]="picker1" placeholder="DDMMYYYY" autocomplete="off" (dateChange)="calculateAge()" (input)="formatDateInput($event, 'EMP_DATE_OF_BIRTH')">
             <mat-datepicker-toggle matSuffix [for]="picker1">
             </mat-datepicker-toggle>
             <mat-datepicker #picker1></mat-datepicker>
@@ -97,6 +97,7 @@
             <mat-radio-button value="0">Indian Citizen</mat-radio-button>
             <mat-radio-button value="1">Foreigner</mat-radio-button>
             <mat-radio-button value="2">Permanent Resident</mat-radio-button>
+            <mat-radio-button value="3">Migrate People</mat-radio-button>
           </mat-radio-group>
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4" *ngIf="isForeigner">
@@ -120,9 +121,9 @@
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
-            <mat-label>Race</mat-label>
+            <mat-label>Religion</mat-label>
             <mat-select formControlName="EMP_RACE">
-              <mat-option *ngFor="let d of raceList" value="{{d}}">{{d}}</mat-option>
+              <mat-option *ngFor="let d of indianReligions" value="{{d}}">{{d}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -331,8 +332,8 @@
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
-            <mat-label>Join Date</mat-label>
-            <input type="text" formControlName="EMPPAY_DATE_JOINED" matInput [matDatepicker]="picker2" placeholder="" autocomplete="off">
+            <mat-label>Join Date (DDMMYYYY)</mat-label>
+            <input type="text" formControlName="EMPPAY_DATE_JOINED" matInput [matDatepicker]="picker2" placeholder="DDMMYYYY" autocomplete="off" (input)="formatDateInput($event, 'EMPPAY_DATE_JOINED')">
             <mat-datepicker-toggle matSuffix [for]="picker2">
             </mat-datepicker-toggle>
             <mat-datepicker #picker2></mat-datepicker>
@@ -340,8 +341,8 @@
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
-            <mat-label>Resigned Date</mat-label>
-            <input type="text" formControlName="EMPPAY_DATE_RESIGNED" [matDatepicker]="picker3" matInput placeholder="" autocomplete="off">
+            <mat-label>Resigned Date (DDMMYYYY)</mat-label>
+            <input type="text" formControlName="EMPPAY_DATE_RESIGNED" [matDatepicker]="picker3" matInput placeholder="DDMMYYYY" autocomplete="off" (input)="formatDateInput($event, 'EMPPAY_DATE_RESIGNED')">
             <mat-datepicker-toggle matSuffix [for]="picker3">
             </mat-datepicker-toggle>
             <mat-datepicker #picker3></mat-datepicker>
@@ -378,7 +379,10 @@
             <div class="col-6">
               <mat-form-field appearance="outline">
                 <mat-label>Salary</mat-label>
-                <input type="text" formControlName="EMPPAY_BASIC_RATE" matInput placeholder="" autocomplete="off">
+                <input type="text" formControlName="EMPPAY_BASIC_RATE" matInput placeholder="" autocomplete="off" readonly>
+                <button type="button" mat-icon-button matSuffix (click)="openCommercialDetails()" matTooltip="Commercial Breakdown">
+                  <mat-icon>payments</mat-icon>
+                </button>
               </mat-form-field>
             </div>
           </div>
