@@ -97,16 +97,22 @@
             Action
           </th>
           <td mat-cell *matCellDef="let row" style="text-align:center;">
-            <a style="cursor:pointer;" class="mr-2" matTooltip="View" (click)="viewDetails(row.ID)">
-              <mat-icon aria-hidden="false" aria-label="view icon" style="color: grey;">visibility</mat-icon>
+            <a style="cursor:pointer;" class="mr-2" matTooltip="View" (click)="viewDetails(row.ID)"
+               [style.opacity]="row.Status === 'Cancelled' ? '0.5' : '1'"
+               [style.pointer-events]="row.Status === 'Cancelled' ? 'none' : 'auto'">
+              <mat-icon aria-hidden="false" aria-label="view icon" [style.color]="row.Status === 'Cancelled' ? 'grey' : 'inherit'">visibility</mat-icon>
             </a>
             <a style="cursor:pointer;" class="wlt-c-furg-text-primary mr-2" matTooltip="Edit"
-              [routerLink]="['/quotation-and-agreement/agreements/edit-agreement',row.ID]">
-              <mat-icon aria-hidden="false" aria-label="edit icon">edit</mat-icon>
+              [routerLink]="row.Status === 'Cancelled' ? [] : ['/quotation-and-agreement/agreements/edit-agreement',row.ID]"
+               [style.opacity]="row.Status === 'Cancelled' ? '0.5' : '1'"
+               [style.pointer-events]="row.Status === 'Cancelled' ? 'none' : 'auto'">
+              <mat-icon aria-hidden="false" aria-label="edit icon" [style.color]="row.Status === 'Cancelled' ? 'grey' : 'inherit'">edit</mat-icon>
             </a>
             <a style="cursor:pointer; color: maroon;" class="mr-2" matTooltip="Export PDF"
-              (click)="exportToPDF(row.ID)">
-              <mat-icon aria-hidden="false" aria-label="pdf icon">picture_as_pdf</mat-icon>
+              (click)="exportToPDF(row.ID)"
+               [style.opacity]="row.Status === 'Cancelled' ? '0.5' : '1'"
+               [style.pointer-events]="row.Status === 'Cancelled' ? 'none' : 'auto'">
+              <mat-icon aria-hidden="false" aria-label="pdf icon" [style.color]="row.Status === 'Cancelled' ? 'grey' : 'maroon'">picture_as_pdf</mat-icon>
             </a>
             <!-- Delete option hidden -->
             <!-- <a *ngIf="this.userAccessModel.deleteAccess == true || currentUser == 'superadmin'"
@@ -115,7 +121,8 @@
               <mat-icon aria-hidden="false" aria-label="delete icon">delete_outline</mat-icon>
             </a> -->
             <a style="cursor:pointer; color: orange;" class="mr-2" matTooltip="Cancel Agreement"
-              (click)="cancelAgreement(row.ID, row.ClientName)">
+              (click)="cancelAgreement(row.ID, row.ClientName)"
+              [style.display]="row.Status === 'Cancelled' ? 'none' : 'inline-block'">
               <mat-icon aria-hidden="false" aria-label="cancel icon">block</mat-icon>
             </a>
           </td>
