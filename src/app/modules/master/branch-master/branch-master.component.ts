@@ -28,7 +28,7 @@ export class BranchMasterComponent implements AfterViewInit {
   showLoadingSpinner: boolean = false;
   branchCode: string = 'null';
   errorMessage: string = '';
-  displayedColumns: string[] = ['code', 'ubsCode', 'name', 'address1', 'personIncharge', 'action'];
+  displayedColumns: string[] = ['code', 'ubsCode', 'name', 'address1', 'parentBranch', 'hqBranch', 'personIncharge', 'action'];
   dataSource: any;
   currentUser: string = '';
   warningMessage: string = '';
@@ -184,5 +184,17 @@ export class BranchMasterComponent implements AfterViewInit {
   }
   hideSpinner(){
     this.showLoadingSpinner = false;
+  }
+
+  getHQBranchName(element: any): string {
+    if (element.IsHeadQuarters) {
+      return 'HQ';
+    }
+    if (element.ParentBranch) {
+      // Find the parent branch name from the available branches
+      const parentBranch = this.dataSource?.data?.find((branch: any) => branch.Code === element.ParentBranch);
+      return parentBranch ? parentBranch.Name : element.ParentBranch;
+    }
+    return 'HQ';
   }
 }
