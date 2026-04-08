@@ -56,6 +56,7 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     'id',
     'employeeCode',
     'employeeName',
+    'clientName',
     'branchName',
     'attendanceDate',
     'punchInTime',
@@ -78,10 +79,12 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
   filteredAttendanceData: AttendanceData[] = [];
   employees: any[] = [];
   branches: any[] = [];
+  clients: any[] = [];
   previousFilters: any = {}; // Track previous filter values
   
   // Loading flags
   branchesLoaded: boolean = false;
+  clientsLoaded: boolean = false;
   
   // Loading and status
   isLoading: boolean = false;
@@ -211,6 +214,7 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     this.attendanceFilterForm = this.fb.group({
       attendanceDate: [new Date(), Validators.required],
       branchCode: [''],
+      clientCode: [''],
       employeeCode: [''],
       status: [''],
       employeeType: ['']
@@ -240,8 +244,9 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     this.showLoadingSpinner = true;
     
-    // Load branches from API first, then load attendance data
+    // Load branches and clients from API first, then load attendance data
     this.loadBranches();
+    this.loadClients();
   }
   
   private loadBranches(): void {
@@ -253,13 +258,13 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
           this.branches = data || [];
           console.log('Loaded branches for admin:', this.branches);
           this.branchesLoaded = true;
-          this.loadAttendanceData();
+          this.checkAllDataLoaded();
         },
         (error: any) => {
           console.error('Error loading branches:', error);
           this.branches = []; // Empty array if API fails
           this.branchesLoaded = true;
-          this.loadAttendanceData();
+          this.checkAllDataLoaded();
         }
       );
     } else {
@@ -269,15 +274,40 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
           this.branches = data || [];
           console.log('Loaded branches for user:', this.currentUser, this.branches);
           this.branchesLoaded = true;
-          this.loadAttendanceData();
+          this.checkAllDataLoaded();
         },
         (error: any) => {
           console.error('Error loading user branches:', error);
           this.branches = []; // Empty array if API fails
           this.branchesLoaded = true;
-          this.loadAttendanceData();
+          this.checkAllDataLoaded();
         }
       );
+    }
+  }
+  
+  private loadClients(): void {
+    // Load all clients for the client filter
+    this.masterService.getClientMsterListByStatus('Active').subscribe(
+      (data: any) => {
+        this.clients = data || [];
+        console.log('Loaded clients:', this.clients);
+        this.clientsLoaded = true;
+        this.checkAllDataLoaded();
+      },
+      (error: any) => {
+        console.error('Error loading clients:', error);
+        this.clients = []; // Empty array if API fails
+        this.clientsLoaded = true;
+        this.checkAllDataLoaded();
+      }
+    );
+  }
+  
+  private checkAllDataLoaded(): void {
+    // Only load attendance data when both branches and clients are loaded
+    if (this.branchesLoaded && this.clientsLoaded) {
+      this.loadAttendanceData();
     }
   }
   
@@ -352,84 +382,7 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
     const attendanceDataList: AttendanceData[] = [];
     
     if (!attendanceRecords || attendanceRecords.length === 0) {
-      console.log('No attendance records found for today, creating sample data for testing');
-      
-      // Create sample attendance data for testing filters
-      const today = new Date().toISOString().split('T')[0];
-      const sampleData = [
-        {
-          id: 1,
-          period: today,
-          attendanceDate: today,
-          timeStart: '09:00',
-          timeEnd: '17:00',
-          employeeId: 1,
-          employeeName: 'John Doe',
-          employeeCode: 'EMP001',
-          branch: 'BR001',
-          branchName: 'Main Branch',
-          clientName: 'Test Client 1',
-          employeeType: 'Regular',
-          punchInTime: '09:00 AM',
-          punchOutTime: '05:00 PM',
-          totalHours: 8,
-          overtimeHours: 0,
-          behavior: 'regular',
-          status: 'Present',
-          lastUpdate: new Date().toISOString(),
-          details: []
-        },
-        {
-          id: 2,
-          period: today,
-          attendanceDate: today,
-          timeStart: '09:30',
-          timeEnd: '17:30',
-          employeeId: 2,
-          employeeName: 'Jane Smith',
-          employeeCode: 'EMP002',
-          branch: 'BR002',
-          branchName: 'Branch 2',
-          clientName: 'Test Client 2',
-          employeeType: 'Contract',
-          punchInTime: '09:30 AM',
-          punchOutTime: '05:30 PM',
-          totalHours: 8,
-          overtimeHours: 0.5,
-          behavior: 'late',
-          status: 'Present',
-          lastUpdate: new Date().toISOString(),
-          details: []
-        },
-        {
-          id: 3,
-          period: today,
-          attendanceDate: today,
-          timeStart: null,
-          timeEnd: null,
-          employeeId: 3,
-          employeeName: 'Bob Johnson',
-          employeeCode: 'EMP003',
-          branch: 'BR001',
-          branchName: 'Main Branch',
-          clientName: 'Test Client 3',
-          employeeType: 'Regular',
-          punchInTime: '-',
-          punchOutTime: '-',
-          totalHours: 0,
-          overtimeHours: 0,
-          behavior: 'unknown',
-          status: 'Absent',
-          lastUpdate: new Date().toISOString(),
-          details: []
-        }
-      ];
-      
-      sampleData.forEach(data => {
-        attendanceDataList.push(data);
-      });
-      
-      console.log('Created sample attendance data:', attendanceDataList);
+      console.log('No attendance records found for today');
     } else {
       attendanceRecords.forEach((record: any, index: number) => {
         try {
@@ -656,6 +609,14 @@ export class AttendanceDisplayComponent implements OnInit, AfterViewInit {
         }
       }
       
+      // Client filter
+      if (filters.clientCode && attendance.clientName) {
+        const filterClient = filters.clientCode.toString().trim().toLowerCase();
+        const attendanceClient = attendance.clientName.toString().trim().toLowerCase();
+        if (!attendanceClient.includes(filterClient)) {
+          return false;
+        }
+      }
       
       // Employee filter
       if (filters.employeeCode && attendance.employeeCode) {
