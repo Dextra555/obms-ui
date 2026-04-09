@@ -179,31 +179,20 @@ export class ClientMasterComponent implements OnInit {
       });
   }
 getOverallComplianceStatus(element: any): string {
-    const gstCompliant = element.IsGSTCompliant || false;
-    const panCompliant = element.IsPANCompliant || false;
-    const tanCompliant = element.IsTANCompliant || false;
-    const cinCompliant = element.IsCINCompliant || false;
-    const gstStatus = element.GSTRegistrationStatus || 'unregistered';
+    const complianceStatus = element.ClientComplianceStatus || 'non_compliance_client';
     
-    // If no GST required, consider GST compliant
-    const effectiveGSTCompliant = gstStatus === 'no_gst' ? true : gstCompliant;
-    
-    if (effectiveGSTCompliant && panCompliant && tanCompliant && cinCompliant) {
-      return 'Fully Compliant';
-    } else if (effectiveGSTCompliant && panCompliant) {
-      return 'Partially Compliant';
+    if (complianceStatus === 'compliance_client') {
+      return 'Compliance Client';
     } else {
-      return 'Non-Compliant';
+      return 'Non-Compliance Client';
     }
   }
 
   getComplianceBadgeClass(status: string): string {
     switch(status) {
-      case 'Fully Compliant':
+      case 'Compliance Client':
         return 'badge-success';
-      case 'Partially Compliant':
-        return 'badge-warning';
-      case 'Non-Compliant':
+      case 'Non-Compliance Client':
         return 'badge-danger';
       default:
         return 'badge-secondary';

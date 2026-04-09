@@ -139,13 +139,8 @@ export class NewClientMasterComponent implements OnInit {
       BillingState: this.fb.control(''),
       BillingPINCode: this.fb.control('', [Validators.pattern(PIN_CODE_PATTERN)]),
       
-      // Compliance Status Tracking
-      IsGSTCompliant: this.fb.control(false),
-      IsPANCompliant: this.fb.control(false),
-      IsTANCompliant: this.fb.control(false),
-      IsCINCompliant: this.fb.control(false),
-      ComplianceCheckDate: this.fb.control(null),
-      ComplianceRemarks: this.fb.control('')
+      // Simplified Compliance Field
+      ClientComplianceStatus: this.fb.control('non_compliance_client')
     });   
     this.userAccessModel = {
       readAccess: false,
@@ -397,99 +392,22 @@ export class NewClientMasterComponent implements OnInit {
       console.log('GST State Code detected:', stateCode);
     }
     
-    // Validate GSTIN format and update compliance status
-    this.validateGSTINCompliance(gstin);
+    // GSTIN validation logic removed - using simplified compliance
   }
   
-  validateGSTINCompliance(gstin: string) {
-    const gstinPattern = GSTIN_PATTERN;
-    const isCompliant = gstinPattern.test(gstin);
-    
-    this.clientForm.get('IsGSTCompliant')?.setValue(isCompliant);
-    
-    if (gstin && !isCompliant) {
-      this.clientForm.get('ComplianceRemarks')?.setValue(
-        (this.clientForm.get('ComplianceRemarks')?.value || '') + 'Invalid GSTIN format. '
-      );
-    }
-  }
-  
-  validatePANCompliance(pan: string) {
-    const panPattern = PAN_PATTERN;
-    const isCompliant = panPattern.test(pan);
-    
-    this.clientForm.get('IsPANCompliant')?.setValue(isCompliant);
-    
-    if (pan && !isCompliant) {
-      this.clientForm.get('ComplianceRemarks')?.setValue(
-        (this.clientForm.get('ComplianceRemarks')?.value || '') + 'Invalid PAN format. '
-      );
-    }
-  }
-  
-  validateTANCompliance(tan: string) {
-    const tanPattern = /^[A-Z]{4}[0-9]{5}[A-Z]{1}$/;
-    const isCompliant = tanPattern.test(tan);
-    
-    this.clientForm.get('IsTANCompliant')?.setValue(isCompliant);
-    
-    if (tan && !isCompliant) {
-      this.clientForm.get('ComplianceRemarks')?.setValue(
-        (this.clientForm.get('ComplianceRemarks')?.value || '') + 'Invalid TAN format. '
-      );
-    }
-  }
-  
-  validateCINCompliance(cin: string) {
-    const cinPattern = /^[A-Z]{3}[0-9]{4}[A-Z]{2}[0-9]{6}$/;
-    const isCompliant = cinPattern.test(cin);
-    
-    this.clientForm.get('IsCINCompliant')?.setValue(isCompliant);
-    
-    if (cin && !isCompliant) {
-      this.clientForm.get('ComplianceRemarks')?.setValue(
-        (this.clientForm.get('ComplianceRemarks')?.value || '') + 'Invalid CIN format. '
-      );
-    }
-  }
   
   onPANChange(event: any) {
-    const pan = event.target?.value || '';
-    this.validatePANCompliance(pan);
+    // PAN validation logic removed - using simplified compliance
   }
   
   onTANChange(event: any) {
-    const tan = event.target?.value || '';
-    this.validateTANCompliance(tan);
+    // TAN validation logic removed - using simplified compliance
   }
   
   onCINChange(event: any) {
-    const cin = event.target?.value || '';
-    this.validateCINCompliance(cin);
+    // CIN validation logic removed - using simplified compliance
   }
   
-  updateComplianceCheckDate() {
-    this.clientForm.get('ComplianceCheckDate')?.setValue(new Date());
-  }
-  
-  getOverallComplianceStatus(): string {
-    const gstCompliant = this.clientForm.get('IsGSTCompliant')?.value;
-    const panCompliant = this.clientForm.get('IsPANCompliant')?.value;
-    const tanCompliant = this.clientForm.get('IsTANCompliant')?.value;
-    const cinCompliant = this.clientForm.get('IsCINCompliant')?.value;
-    const gstStatus = this.clientForm.get('GSTRegistrationStatus')?.value;
-    
-    // If no GST required, consider GST compliant
-    const effectiveGSTCompliant = gstStatus === 'no_gst' ? true : gstCompliant;
-    
-    if (effectiveGSTCompliant && panCompliant && tanCompliant && cinCompliant) {
-      return 'Fully Compliant';
-    } else if (effectiveGSTCompliant && panCompliant) {
-      return 'Partially Compliant';
-    } else {
-      return 'Non-Compliant';
-    }
-  }
 
   
   
@@ -612,13 +530,8 @@ export class NewClientMasterComponent implements OnInit {
     this.clientModel.LastUpdatedDate = this.clientForm.get('LastUpdatedDate')?.value ? this.clientForm.get('LastUpdatedDate')?.value : null;
     this.clientModel.Email = (this.clientForm.value.UserEmail == '' || this.clientForm.value.UserEmail == 'null') ? '' : this.clientForm.value.UserEmail;
 
-      // Update compliance tracking
-      this.clientModel.IsGSTCompliant = this.clientForm.get('IsGSTCompliant')?.value || false;
-      this.clientModel.IsPANCompliant = this.clientForm.get('IsPANCompliant')?.value || false;
-      this.clientModel.IsTANCompliant = this.clientForm.get('IsTANCompliant')?.value || false;
-      this.clientModel.IsCINCompliant = this.clientForm.get('IsCINCompliant')?.value || false;
-      this.clientModel.ComplianceCheckDate = this.clientForm.get('ComplianceCheckDate')?.value || new Date();
-      this.clientModel.ComplianceRemarks = this.clientForm.get('ComplianceRemarks')?.value || '';
+      // Update simplified compliance field
+      this.clientModel.ClientComplianceStatus = this.clientForm.get('ClientComplianceStatus')?.value || 'non_compliance_client';
 
       this._masterService.saveAndUpdateClientMaster(this.clientModel).subscribe((response: any) => {
         if (response.Success == 'Success') {

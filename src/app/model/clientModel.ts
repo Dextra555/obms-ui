@@ -45,13 +45,8 @@ export class ClientModel {
     BillingState: string | null = null;
     BillingPINCode: string | null = null;
     
-    // Compliance Status Tracking
-    IsGSTCompliant: boolean = false;
-    IsPANCompliant: boolean = false;
-    IsTANCompliant: boolean = false;
-    IsCINCompliant: boolean = false;
-    ComplianceCheckDate: Date | null = null;
-    ComplianceRemarks: string | null = null;
+    // Simplified Compliance Field
+    ClientComplianceStatus: string | null = null;
     
     constructor(data: Partial<ClientModel> = {}) {
         this.Id = data.Id || 0;
@@ -100,12 +95,7 @@ export class ClientModel {
         this.BillingState = data.BillingState || null;
         this.BillingPINCode = data.BillingPINCode || null;
         
-        // Compliance Status Tracking
-        this.IsGSTCompliant = data.IsGSTCompliant || false;
-        this.IsPANCompliant = data.IsPANCompliant || false;
-        this.IsTANCompliant = data.IsTANCompliant || false;
-        this.IsCINCompliant = data.IsCINCompliant || false;
-        this.ComplianceCheckDate = data.ComplianceCheckDate || null;
-        this.ComplianceRemarks = data.ComplianceRemarks || null;
+        // Simplified Compliance Field
+        this.ClientComplianceStatus = data.ClientComplianceStatus || 'non_compliance_client';
     }
 }

@@ -102,28 +102,7 @@
                         </mat-error>
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="alert alert-info" role="alert">
-                        <strong>Compliance Status:</strong> {{ getOverallComplianceStatus() }}
-                        <div class="mt-2">
-                            <small>
-                                <span class="badge" [ngClass]="clientForm.get('IsGSTCompliant')?.value ? 'badge-success' : 'badge-danger'">
-                                    GST: {{ clientForm.get('IsGSTCompliant')?.value ? 'Compliant' : 'Non-Compliant' }}
-                                </span>
-                                <span class="badge ml-2" [ngClass]="clientForm.get('IsPANCompliant')?.value ? 'badge-success' : 'badge-danger'">
-                                    PAN: {{ clientForm.get('IsPANCompliant')?.value ? 'Compliant' : 'Non-Compliant' }}
-                                </span>
-                                <span class="badge ml-2" [ngClass]="clientForm.get('IsTANCompliant')?.value ? 'badge-success' : 'badge-danger'">
-                                    TAN: {{ clientForm.get('IsTANCompliant')?.value ? 'Compliant' : 'Non-Compliant' }}
-                                </span>
-                                <span class="badge ml-2" [ngClass]="clientForm.get('IsCINCompliant')?.value ? 'badge-success' : 'badge-danger'">
-                                    CIN: {{ clientForm.get('IsCINCompliant')?.value ? 'Compliant' : 'Non-Compliant' }}
-                                </span>
-                            </small>
-                        </div>
-                    </div>
-                </div>
-                            </div>
+                                            </div>
             <div class="row">
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
                     <h2><span>Address</span></h2>
@@ -272,23 +251,34 @@
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
                     <h2><span>Compliance Details</span></h2>
                 </div>
-                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                    <mat-form-field appearance="outline" class="w-100">
-                        <mat-label>Compliance Check Date</mat-label>
-                        <input 
-                            matInput 
-                            [matDatepicker]="compliancePicker" 
-                            formControlName="ComplianceCheckDate"
-                            (dateChange)="updateComplianceCheckDate()">
-                        <mat-datepicker-toggle matSuffix [for]="compliancePicker"></mat-datepicker-toggle>
-                        <mat-datepicker #compliancePicker></mat-datepicker>
-                    </mat-form-field>
-                </div>
-                <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-                    <mat-form-field appearance="outline" class="w-100">
-                        <mat-label>Compliance Remarks</mat-label>
-                        <textarea matInput formControlName="ComplianceRemarks" placeholder="Enter any compliance-related remarks..." rows="3"></textarea>
-                    </mat-form-field>
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="mb-3">
+                        <label class="font-weight-bold">Client Compliance Status</label>
+                        <mat-radio-group aria-label="Compliance Status" formControlName="ClientComplianceStatus" class="mt-2">
+                            <div class="row">
+                                <div class="col-12 col-md-6">
+                                    <div class="border rounded p-3 mb-3">
+                                        <mat-radio-button value="compliance_client" class="mb-2">
+                                            <strong>Applicable</strong>
+                                        </mat-radio-button>
+                                        <div class="text-muted small">
+                                            All statutory compliance required including GST, PAN, TAN, CIN, PF/ESI, and labour laws.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <div class="border rounded p-3 mb-3">
+                                        <mat-radio-button value="non_compliance_client" class="mb-2">
+                                            <strong>Not Applicable</strong>
+                                        </mat-radio-button>
+                                        <div class="text-muted small">
+                                            Exempt from compliance requirements - government entities, non-profits, educational institutions.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-radio-group>
+                    </div>
                 </div>
             </div>
             <div class="row">
@@ -332,7 +322,7 @@
                         <mat-label>Super Client Code</mat-label>
                         <mat-select formControlName="SuperClientCode">
                             <mat-option *ngFor="let client of clientModelDropdown" [value]="client.Code">
-                                {{ client.Code }}
+                                {{ client.Code }} - {{ client.Name }}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
