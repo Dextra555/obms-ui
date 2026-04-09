@@ -1,0 +1,152 @@
+<div class="wlt-c-furg-content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+        <h1 class="mb-1">Designation Master</h1>
+      </div>
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 my-1">
+        <ol class="breadcrumb float-md-right">
+          <li class="breadcrumb-item"><a href="#">Master</a></li>
+          <li class="breadcrumb-item active">Designation Master</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<mat-card *ngIf="!showForm">
+  <mat-card-content>
+    <div class="row mb-3">
+      <div class="col-6 col-sm-6 col-md-6 col-lg-6">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Search designations...">
+        </mat-form-field>
+      </div>
+      <div class="col-6 col-sm-6 col-md-6 col-lg-6 text-right">
+        <button class="btn wlt-c-furg-btn-primary" (click)="onNew()">
+          <mat-icon>add</mat-icon>
+          <span>New Designation</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table mat-table [dataSource]="dataSource" class="wlt-table table-striped" matSort>
+        
+        <ng-container matColumnDef="DesignationId">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> ID</th>
+          <td mat-cell *matCellDef="let element"> {{element.DesignationId}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="DesignationCode">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Designation Code</th>
+          <td mat-cell *matCellDef="let element"> {{element.DesignationCode}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="DesignationName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Designation Name</th>
+          <td mat-cell *matCellDef="let element"> {{element.DesignationName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="Description">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Description</th>
+          <td mat-cell *matCellDef="let element">
+            <span *ngIf="element.Description">{{element.Description}}</span>
+            <span *ngIf="!element.Description" class="text-muted">-</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="IsActive">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Status</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="badge badge-success" *ngIf="element.IsActive">Active</span>
+            <span class="badge badge-danger" *ngIf="!element.IsActive">Inactive</span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="action" stickyEnd>
+          <th mat-header-cell *matHeaderCellDef style="text-align:center; width: 120px;"> Action </th>
+          <td mat-cell *matCellDef="let element" style="text-align:center;">
+            <a style="cursor:pointer;" class="wlt-c-furg-text-primary mr-2" matTooltip="Edit" (click)="onEdit(element)">
+              <mat-icon>edit</mat-icon>
+            </a>
+            <a style="cursor:pointer;" class="wlt-c-furg-text-danger" matTooltip="Delete" (click)="onDelete(element)">
+              <mat-icon>delete_outline</mat-icon>
+            </a>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+
+    <mat-paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 30, 50]" showFirstLastButtons
+      aria-label="Select page of designations">
+    </mat-paginator>
+  </mat-card-content>
+</mat-card>
+
+<!-- Designation Form -->
+<mat-card *ngIf="showForm">
+  <mat-card-content>
+    <div class="row mb-3">
+      <div class="col-12">
+        <h2>{{isEdit ? 'Edit' : 'Add'}} Designation</h2>
+      </div>
+    </div>
+
+    <form [formGroup]="frm" (ngSubmit)="onSave()">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Designation Code</mat-label>
+            <input matInput formControlName="DesignationCode" placeholder="Enter designation code" maxlength="100">
+            <mat-error *ngIf="frm.get('DesignationCode')?.hasError('required')">
+              Designation code is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Designation Name</mat-label>
+            <input matInput formControlName="DesignationName" placeholder="Enter designation name" maxlength="200">
+            <mat-error *ngIf="frm.get('DesignationName')?.hasError('required')">
+              Designation name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <input matInput formControlName="Description" placeholder="Enter description (optional)" maxlength="500">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-slide-toggle formControlName="IsActive" color="primary">
+            {{frm.get('IsActive')?.value ? 'Active' : 'Inactive'}}
+          </mat-slide-toggle>
+        </div>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-12 text-right">
+          <button type="button" class="btn btn-secondary mr-2" (click)="onCancel()">
+            <mat-icon>cancel</mat-icon>
+            <span>Cancel</span>
+          </button>
+          <button type="submit" class="btn wlt-c-furg-btn-primary">
+            <mat-icon>save</mat-icon>
+            <span>{{isEdit ? 'Update' : 'Save'}}</span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

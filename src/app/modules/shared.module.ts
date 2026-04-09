@@ -27,6 +27,8 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatChipsModule } from '@angular/material/chips';
 import { LoginComponent } from './user/login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -119,6 +121,8 @@ import { UserBankAccessComponent } from './administration/user-bank-access/user-
 import { NewUserBankAccessComponent } from './administration/user-bank-access/new-user-bank-access/new-user-bank-access.component';
 import { NewAttendanceComponent } from './payroll/attendance/new-attendance/new-attendance.component';
 import { CommercialBreakdownDialogComponent } from "./quotation-and-agreement/quotations/new-quotation/commercial-breakdown-dialog/commercial-breakdown-dialog.component";
+import { CommercialBreakdownEnhancedDialogComponent } from "./master/employee-master/new-employee/commercial-breakdown-enhanced-dialog.component";
+import { EmployeeImportDialogComponent } from "./master/employee-master/employee-import-dialog/employee-import-dialog.component";
 
 import { InvoiceComponent } from './finance/invoice/invoice.component';
 import { BatchInvoiceComponent } from './finance/batch-invoice/batch-invoice.component';
@@ -198,6 +202,8 @@ import { PrintInvoiceComputerGeneratedComponent } from './finance/invoice/print-
 import { PrintVoucherReportComponent } from './finance/payments/print-voucher-report/print-voucher-report.component';
 import { ReceiptVoucherReportComponent } from './finance/receipts/receipt-voucher-report/receipt-voucher-report.component';
 import { EmployeeHistoryComponent } from './master/employee-history/employee-history.component';
+import { DepartmentMasterComponent } from './master/department-master/department-master.component';
+import { DesignationMasterComponent } from './master/designation-master/designation-master.component';
 
 
 
@@ -354,7 +360,11 @@ import { EmployeeHistoryComponent } from './master/employee-history/employee-his
     GstSlabComponent,
     ServiceTypeComponent,
     NewServiceTypeComponent,
-    CommercialBreakdownDialogComponent
+    CommercialBreakdownDialogComponent,
+    CommercialBreakdownEnhancedDialogComponent,
+    EmployeeImportDialogComponent,
+    DepartmentMasterComponent,
+    DesignationMasterComponent
 
   ],
   imports: [
@@ -387,6 +397,8 @@ import { EmployeeHistoryComponent } from './master/employee-history/employee-his
     MatSidenavModule,
     MatListModule,
     MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatExpansionModule,
     MatChipsModule,
     NgApexchartsModule,
     MatTreeModule,
@@ -422,6 +434,8 @@ import { EmployeeHistoryComponent } from './master/employee-history/employee-his
     MatSidenavModule,
     MatListModule,
     MatProgressSpinnerModule,
+    MatProgressBarModule,
+    MatExpansionModule,
     MatChipsModule,
     NgApexchartsModule,
     MatTreeModule,

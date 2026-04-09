@@ -147,6 +147,8 @@ import { TdsSlabComponent } from '../../modules/master/tds-slab/tds-slab.compone
 import { GstSlabComponent } from "../../modules/master/gst-slab/gst-slab.component";
 import { ServiceTypeComponent } from "../../modules/master/service-type/service-type.component";
 import { ProfessionalTaxSlabComponent } from "../../modules/master/professional-tax-slab/professional-tax-slab.component";
+import { DepartmentMasterComponent } from 'src/app/modules/master/department-master/department-master.component';
+import { DesignationMasterComponent } from 'src/app/modules/master/designation-master/designation-master.component';
 
 const routes: Routes = [
   // { path: '', component: AdminLayoutComponent },
@@ -184,6 +186,8 @@ const routes: Routes = [
   { path: 'master/gst-slab', component: GstSlabComponent, canActivate: [AuthGuard] },
   { path: 'master/professional-tax-slab', component: ProfessionalTaxSlabComponent, canActivate: [AuthGuard] },
   { path: 'master/service-type', component: ServiceTypeComponent, canActivate: [AuthGuard] },
+  { path: 'master/department-master', component: DepartmentMasterComponent, canActivate: [AuthGuard] },
+  { path: 'master/designation-master', component: DesignationMasterComponent, canActivate: [AuthGuard] },
 
   //Quotation and agreement module
   { path: 'quotation-and-agreement/quotations', component: QuotationsComponent, canActivate: [AuthGuard] },

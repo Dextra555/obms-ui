@@ -1,0 +1,328 @@
+<h2 mat-dialog-title>Salary Breakdown - Commercial Details</h2>
+<div class="px-3 pb-2">
+  <div class="alert alert-info py-2 mb-0" style="font-size: 0.85rem;">
+    <i class="fas fa-external-link-alt mr-1"></i>
+    Reference: <a href="https://www.scribd.com/document/855246540/TN-Govt-Gazette-Notification-Security-Guards-Minimum-Wage-Revision-w-e-f-23rd-Oct-2024" target="_blank" class="font-weight-bold">TN Govt Gazette Notification - Minimum Wage Revision</a>
+  </div>
+</div>
+<mat-dialog-content [formGroup]="frm">
+  <!-- Basic Salary Components -->
+  <div class="card bg-primary text-white mb-3">
+    <div class="card-header">
+      <strong><i class="fas fa-coins mr-2"></i>BASIC SALARY COMPONENTS</strong>
+    </div>
+    <div class="card-body bg-light text-dark">
+      <!-- Core Salary Components -->
+      <h6 class="text-primary mb-3"><i class="fas fa-coins mr-2"></i>Core Salary Components</h6>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Minimum Wages (Govt)</mat-label>
+            <input type="number" formControlName="MinimumWages" matInput placeholder="0.00" readonly>
+            <mat-hint>Calculated as Basic + DA</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Basic Salary</mat-label>
+            <input type="number" formControlName="Basic" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Core salary component</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Dearness Allowance (DA)</mat-label>
+            <input type="number" formControlName="DA" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Cost of living adjustment</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Housing Allowance -->
+      <h6 class="text-primary mb-3"><i class="fas fa-home mr-2"></i>Housing Allowance</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>House Rent Allowance (HRA)</mat-label>
+            <input type="number" formControlName="HRA" matInput placeholder="0.00" readonly>
+            <mat-hint>Calculated automatically</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>HRA Percentage (%)</mat-label>
+            <input type="number" formControlName="HRAPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Usually 10-15% of Basic</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Benefits & Leave -->
+  <div class="card bg-success text-white mb-3">
+    <div class="card-header">
+      <strong><i class="fas fa-umbrella-beach mr-2"></i>EMPLOYEE BENEFITS & LEAVE</strong>
+    </div>
+    <div class="card-body bg-light text-dark">
+      <!-- Leave Benefits -->
+      <h6 class="text-success mb-3"><i class="fas fa-umbrella-beach mr-2"></i>Leave Benefits</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Leave Encashment</mat-label>
+            <input type="number" formControlName="Leaves" matInput placeholder="0.00" readonly>
+            <mat-hint>Annual leave benefit</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Leave Percentage (%)</mat-label>
+            <input type="number" formControlName="LeavesPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Usually 8.33% of Basic</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Tax & Bonus -->
+      <h6 class="text-success mb-3"><i class="fas fa-percentage mr-2"></i>Tax & Bonus</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Professional Tax</mat-label>
+            <input type="number" formControlName="ProfessionalTax" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>State tax deduction</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Statutory Bonus</mat-label>
+            <input type="number" formControlName="Bonus" matInput placeholder="0.00" readonly>
+            <mat-hint>As per Payment of Bonus Act</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Bonus & Reliever Costs -->
+      <h6 class="text-success mb-3"><i class="fas fa-user-clock mr-2"></i>Bonus & Reliever Costs</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Bonus Percentage (%)</mat-label>
+            <input type="number" formControlName="BonusPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Usually 8.33% of Basic</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Reliever/Replacement Cost</mat-label>
+            <input type="number" formControlName="RelieverCharges" matInput placeholder="0.00" readonly>
+            <mat-hint>For weekly off coverage</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Reliever Cost Configuration -->
+      <h6 class="text-success mb-3"><i class="fas fa-cogs mr-2"></i>Reliever Cost Configuration</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Reliever Cost Percentage (%)</mat-label>
+            <input type="number" formControlName="RelieverChargesPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Usually 25% of Basic</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <!-- Space for balance -->
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center p-2 bg-white rounded border">
+            <strong class="text-primary">GROSS SALARY SUBTOTAL:</strong>
+            <span class="badge bg-primary fs-6">{{ subTotal | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statutory Deductions -->
+  <div class="card bg-warning text-dark mb-3">
+    <div class="card-header">
+      <strong><i class="fas fa-gavel mr-2"></i>STATUTORY DEDUCTIONS (Employer Contribution)</strong>
+    </div>
+    <div class="card-body bg-light text-dark">
+      <!-- Provident Fund Section -->
+      <h6 class="text-warning mb-3"><i class="fas fa-piggy-bank mr-2"></i>Provident Fund (PF)</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Provident Fund (PF)</mat-label>
+            <input type="number" formControlName="PF" matInput placeholder="0.00" readonly>
+            <mat-hint class="mt-2">Employer PF contribution</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>PF Percentage (%)</mat-label>
+            <input type="number" formControlName="PFPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Usually 12% of Basic</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Employee State Insurance Section -->
+      <h6 class="text-warning mb-3"><i class="fas fa-heartbeat mr-2"></i>Employee State Insurance (ESI)</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Employee State Insurance (ESI)</mat-label>
+            <input type="number" formControlName="ESI" matInput placeholder="0.00" readonly>
+            <mat-hint>Employer ESI contribution</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>ESI Percentage (%)</mat-label>
+            <input type="number" formControlName="ESIPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Usually 3.25% of Gross</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center p-2 bg-white rounded border">
+            <strong class="text-warning">TOTAL COST TO COMPANY:</strong>
+            <span class="badge bg-warning text-dark fs-6">{{ totalPlusStatutory | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Operational Costs -->
+  <div class="card bg-info text-white mb-3">
+    <div class="card-header">
+      <strong><i class="fas fa-business-time mr-2"></i>OPERATIONAL COSTS</strong>
+    </div>
+    <div class="card-body bg-light text-dark">
+      <!-- Uniform & Equipment Costs -->
+      <h6 class="text-info mb-3"><i class="fas fa-tshirt mr-2"></i>Uniform & Equipment Costs</h6>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Uniform & Kit Cost</mat-label>
+            <input type="number" formControlName="UniformCost" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Monthly uniform cost</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Other Expenses</mat-label>
+            <input type="number" formControlName="Others" matInput placeholder="0.00" readonly>
+            <mat-hint>Miscellaneous costs</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Others Percentage (%)</mat-label>
+            <input type="number" formControlName="OthersPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Usually 2-3% of Basic</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Administrative Costs -->
+      <h6 class="text-info mb-3"><i class="fas fa-building mr-2"></i>Administrative Costs</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Administration Charges</mat-label>
+            <input type="number" formControlName="AdministrationCharges" matInput placeholder="0.00" readonly>
+            <mat-hint>Office & admin costs</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Admin Charges Percentage (%)</mat-label>
+            <input type="number" formControlName="AdministrationChargesPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Usually 5-10% of Basic</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Final Summary -->
+  <div class="card bg-dark text-white mb-3">
+    <div class="card-header">
+      <strong><i class="fas fa-calculator mr-2"></i>SALARY SUMMARY & BILLING</strong>
+    </div>
+    <div class="card-body bg-light text-dark">
+      <!-- Cost Analysis -->
+      <h6 class="text-dark mb-3"><i class="fas fa-chart-line mr-2"></i>Cost Analysis</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="d-flex justify-content-between align-items-center mb-2 p-3 rounded border border-2" [ngClass]="totalDirectCostClass">
+            <strong class="fs-5" [ngClass]="totalDirectCost <= 0 ? 'text-warning' : 'text-success'">TOTAL DIRECT COST (A):</strong>
+            <span class="badge fs-5 p-2" [ngClass]="totalDirectCostBadgeClass">{{ totalDirectCost | number:'1.2-2' }}</span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Management & Profit Margin (%)</mat-label>
+            <input type="number" formControlName="ManagementFeePercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Usually 10-20% margin</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Management Fee -->
+      <h6 class="text-dark mb-3"><i class="fas fa-hand-holding-usd mr-2"></i>Management Fee</h6>
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center mb-2 p-3 bg-white rounded border">
+            <strong class="text-dark">Management Fee Amount:</strong>
+            <span class="badge bg-secondary fs-6">{{ managementFee | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Final Billing -->
+      <h6 class="text-dark mb-3"><i class="fas fa-file-invoice-dollar mr-2"></i>Final Billing</h6>
+      <div class="row mb-3">
+        <div class="col-12">
+          <div class="d-flex justify-content-between align-items-center p-3 bg-success text-white rounded">
+            <strong class="fs-5">MONTHLY BILLABLE COST (B):</strong>
+            <span class="badge bg-light text-success fs-4">{{ monthlyChargedCost | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Multi-Guard Calculation -->
+      <div class="row mt-2" *ngIf="noOfGuards > 1">
+        <div class="col-12 border-top pt-3">
+          <h6 class="text-primary mb-3"><i class="fas fa-users mr-2"></i>Multi-Guard Calculation</h6>
+          <div class="d-flex justify-content-between align-items-center text-primary p-3 bg-light rounded border">
+            <strong>Estimated Monthly Total ({{noOfGuards}} Guards):</strong>
+            <span class="badge bg-primary fs-5">{{ grandTotal | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="p-3">
+  <button mat-button (click)="onCancel()">
+    <mat-icon>close</mat-icon>
+    <span class="ml-1">Cancel</span>
+  </button>
+  <button mat-raised-button color="primary" (click)="onSave()" [disabled]="frm.invalid">
+    <mat-icon>save</mat-icon>
+    <span class="ml-1">Save Salary Breakdown</span>
+  </button>
+</mat-dialog-actions>

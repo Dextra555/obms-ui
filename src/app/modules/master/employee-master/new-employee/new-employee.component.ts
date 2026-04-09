@@ -8,8 +8,9 @@ import { DatasharingService } from "../../../../service/datasharing.service";
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
 import { IndianComplianceService } from 'src/app/service/indian-compliance.service';
-import { CommercialBreakdownDialogComponent } from '../../../quotation-and-agreement/quotations/new-quotation/commercial-breakdown-dialog/commercial-breakdown-dialog.component';
+import { CommercialBreakdownEnhancedDialogComponent } from './commercial-breakdown-enhanced-dialog.component';
 import { INDIAN_STATES, SALARY_GROUPS, INDIAN_BANKS, INDIAN_RELIGIONS } from 'src/app/model/indian-employee.model';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-new-employee',
@@ -44,6 +45,10 @@ export class NewEmployeeComponent implements OnInit {
   indianBanks: any[] = INDIAN_BANKS;
   indianReligions: string[] = INDIAN_RELIGIONS;
 
+  // Department and Designation Data
+  departmentList: any[] = [];
+  designationList: any[] = [];
+
   checkList: any = [
     {
       id: 0,
@@ -71,8 +76,8 @@ export class NewEmployeeComponent implements OnInit {
   payMode: string = '';
 
 
-  constructor(private fb: FormBuilder, public dialog: MatDialog, public service: EmployeeService, private activatedRoute: ActivatedRoute, private route: Router, private _dataService: DatasharingService,
-    private _masterService: MastermoduleService, private _indianComplianceService: IndianComplianceService) {
+  constructor(private _employeeService: EmployeeService, private fb: FormBuilder, private router: Router, private activatedRoute: ActivatedRoute, private _dataService: DatasharingService, public dialog: MatDialog,
+    private _masterService: MastermoduleService, private _indianComplianceService: IndianComplianceService, private http: HttpClient) {
 
     // Set default nationality to Indian Citizen
     this.isIndianCitizen = true;
@@ -201,7 +206,11 @@ export class NewEmployeeComponent implements OnInit {
       CB_SubTotal: [0],
       CB_TotalPlusStatutory: [0],
       CB_TotalDirectCost: [0],
-      CB_MonthlyChargedCost: [0]
+      CB_MonthlyChargedCost: [0],
+      
+      // Department and Designation Fields
+      DepartmentId: [null],
+      DesignationId: [null]
     });
 
     this.checklistItems.forEach((item) => {
@@ -211,7 +220,7 @@ export class NewEmployeeComponent implements OnInit {
     if (this.empId != 0 && this.empId != undefined) {
       this.isEdit = true;
 
-      service.getEmployeeById(this.empId).subscribe((d: any) => {
+      this._employeeService.getEmployeeById(this.empId).subscribe((d: any) => {
         let result = d['Result'];
         let employee = result['employee'];
         let employment = result['employment'];
@@ -232,6 +241,43 @@ export class NewEmployeeComponent implements OnInit {
         if (salaryDetail != null) {
           this.frm.patchValue(salaryDetail);
         }
+
+        // Load Commercial Breakdown data from salaryDetail record
+        // DEBUG: Log the raw data received from backend
+        console.log('=== COMMERCIAL BREAKDOWN DATA FROM BACKEND ===');
+        console.log('Raw salaryDetail:', salaryDetail);
+        console.log('Raw salaryDetail CB_Basic:', salaryDetail?.CB_Basic);
+        console.log('Raw salaryDetail CB_DA:', salaryDetail?.CB_DA);
+        console.log('Raw salaryDetail CB_HRA:', salaryDetail?.CB_HRA);
+        console.log('==============================================');
+        
+        this.frm.get('CB_Basic')?.setValue(salaryDetail?.CB_Basic || 0);
+        this.frm.get('CB_DA')?.setValue(salaryDetail?.CB_DA || 0);
+        this.frm.get('CB_HRA')?.setValue(salaryDetail?.CB_HRA || 0);
+        this.frm.get('CB_HRAPercentage')?.setValue(salaryDetail?.CB_HRAPercentage || 0);
+        this.frm.get('CB_Leaves')?.setValue(salaryDetail?.CB_Leaves || 0);
+        this.frm.get('CB_LeavesPercentage')?.setValue(salaryDetail?.CB_LeavesPercentage || 0);
+        this.frm.get('CB_ProfessionalTax')?.setValue(salaryDetail?.CB_ProfessionalTax || 0);
+        this.frm.get('CB_Bonus')?.setValue(salaryDetail?.CB_Bonus || 0);
+        this.frm.get('CB_BonusPercentage')?.setValue(salaryDetail?.CB_BonusPercentage || 0);
+        this.frm.get('CB_RelieverCharges')?.setValue(salaryDetail?.CB_RelieverCharges || 0);
+        this.frm.get('CB_RelieverChargesPercentage')?.setValue(salaryDetail?.CB_RelieverChargesPercentage || 0);
+        this.frm.get('CB_PF')?.setValue(salaryDetail?.CB_PF || 0);
+        this.frm.get('CB_PFPercentage')?.setValue(salaryDetail?.CB_PFPercentage || 0);
+        this.frm.get('CB_ESI')?.setValue(salaryDetail?.CB_ESI || 0);
+        this.frm.get('CB_ESIPercentage')?.setValue(salaryDetail?.CB_ESIPercentage || 0);
+        this.frm.get('CB_UniformCost')?.setValue(salaryDetail?.CB_UniformCost || 0);
+        this.frm.get('CB_Others')?.setValue(salaryDetail?.CB_Others || 0);
+        this.frm.get('CB_OthersPercentage')?.setValue(salaryDetail?.CB_OthersPercentage || 0);
+        this.frm.get('CB_AdministrationCharges')?.setValue(salaryDetail?.CB_AdministrationCharges || 0);
+        this.frm.get('CB_AdministrationChargesPercentage')?.setValue(salaryDetail?.CB_AdministrationChargesPercentage || 0);
+        this.frm.get('CB_ManagementFee')?.setValue(salaryDetail?.CB_ManagementFee || 0);
+        this.frm.get('CB_ManagementFeePercentage')?.setValue(salaryDetail?.CB_ManagementFeePercentage || 0);
+        this.frm.get('CB_SubTotal')?.setValue(salaryDetail?.CB_SubTotal || 0);
+        this.frm.get('CB_TotalPlusStatutory')?.setValue(salaryDetail?.CB_TotalPlusStatutory || 0);
+        this.frm.get('CB_TotalDirectCost')?.setValue(salaryDetail?.CB_TotalDirectCost || 0);
+        this.frm.get('CB_MonthlyChargedCost')?.setValue(salaryDetail?.CB_MonthlyChargedCost || 0);
+        
         this.frm.get('EMP_CITIZEN')?.setValue(employee['EMP_CITIZEN'].toString());
         this.frm.get('SALARYLAB')?.setValue(employment['SALARYLAB'].toString() ?? 0);
         this.frm.get('EMP_SP_WORK')?.setValue(employee['EMP_SP_WORK'] == true ? "1" : "0");
@@ -297,12 +343,16 @@ export class NewEmployeeComponent implements OnInit {
   }
 
   loadInitialData(): void {
-    this.service.getEmployeeMaster(this.currentUser).subscribe((data: any) => {
+    this._employeeService.getEmployeeMaster(this.currentUser).subscribe((data: any) => {
       this.data = data;
       this.branchList = data['branchList'];
       this.bankList = data['bankList'];
       this.stateList = data['stateList'];
       this.icColorList = data['icColorList'];
+      
+      // Load Department and Designation data
+      this.loadDepartments();
+      this.loadDesignations();
       this.nationalityList = data['nationalityList'];
       this.raceList = data['raceList'];
       this.clientList = data['clientList'];
@@ -366,7 +416,7 @@ export class NewEmployeeComponent implements OnInit {
   }
 
   clientChange(value: any) {
-    this.service.getClientsFromBranchId(value, this.frm.get('EMP_ROLE')?.value).subscribe((data: any) => {
+    this._employeeService.getClientsFromBranchId(value, this.frm.get('EMP_ROLE')?.value).subscribe((data: any) => {
       // this.empCodeData = data.emp
       console.log(data);
       this.clientList = data['clientList'];
@@ -404,6 +454,31 @@ export class NewEmployeeComponent implements OnInit {
       const currentDate = new Date();
       this.frm.get('age')?.setValue(currentDate.getFullYear() - birthDate.getFullYear());
     }
+  }
+
+  // Department and Designation methods
+  loadDepartments(): void {
+    this.http.get('/api/Department').subscribe({
+      next: (response: any) => {
+        this.departmentList = response;
+      },
+      error: (error) => {
+        console.error('Error loading departments:', error);
+        this.showMessage('Error loading departments', 'error', 'Error Message');
+      }
+    });
+  }
+
+  loadDesignations(): void {
+    this.http.get('/api/Designation').subscribe({
+      next: (response: any) => {
+        this.designationList = response;
+      },
+      error: (error) => {
+        console.error('Error loading designations:', error);
+        this.showMessage('Error loading designations', 'error', 'Error Message');
+      }
+    });
   }
 
   formatDateInput(event: any, formControlName: string): void {
@@ -505,6 +580,16 @@ export class NewEmployeeComponent implements OnInit {
     data['CB_TotalDirectCost'] = parseFloat(data['CB_TotalDirectCost']) || 0;
     data['CB_MonthlyChargedCost'] = parseFloat(data['CB_MonthlyChargedCost']) || 0;
 
+    // DEBUG: Log CB values being sent
+    console.log('=== CB VALUES BEFORE SAVE ===');
+    console.log('CB_Basic:', data['CB_Basic'], typeof data['CB_Basic']);
+    console.log('CB_DA:', data['CB_DA'], typeof data['CB_DA']);
+    console.log('CB_HRA:', data['CB_HRA'], typeof data['CB_HRA']);
+    console.log('CB_MonthlyChargedCost:', data['CB_MonthlyChargedCost'], typeof data['CB_MonthlyChargedCost']);
+    console.log('Form CB_Basic:', this.frm.get('CB_Basic')?.value);
+    console.log('Form CB_DA:', this.frm.get('CB_DA')?.value);
+    console.log('================================');
+
     // DEBUG: Log data being sent to backend
     console.log('=== COMMERCIAL BREAKDOWN DATA SENT TO BACKEND ===');
     console.log('CB_Basic:', data['CB_Basic']);
@@ -563,7 +648,7 @@ export class NewEmployeeComponent implements OnInit {
     data['EMP_CONTACT_STATE'] = this.frm.get('EMP_CONTACT_STATE')?.value ?? "";
 
 
-    this.service.saveEmployee(data).subscribe({
+    this._employeeService.saveEmployee(data).subscribe({
       next: (d: any) => {
         if (d.Success == 'Success') {
           if (this.isEdit) {
@@ -571,7 +656,7 @@ export class NewEmployeeComponent implements OnInit {
           } else {
             this.showMessage('Successfully Saved Employee Details', 'success', 'Success Message')
           }
-          this.route.navigate(['/master/employee-master']);
+          this.router.navigate(['/master/employee-master']);
         } else {
           if (d.Success == 'Warning') {
             this.showMessage(d.Message || 'Form contains some errors', 'warning', 'Warning Message');
@@ -672,7 +757,7 @@ export class NewEmployeeComponent implements OnInit {
     }
 
     if (_trigger) {
-      this.service.checkEmployeeInfo(from, data).subscribe((d: any) => {
+      this._employeeService.checkEmployeeInfo(from, data).subscribe((d: any) => {
         var result = d['Result'];
         result.EMP_ID = result?.EMP_ID == 0 ? -1 : result?.EMP_ID;
         if (result?.EMP_ID != this.empId) {          
@@ -750,74 +835,76 @@ export class NewEmployeeComponent implements OnInit {
     }
   };
 
-  openCommercialDetails(): void {
-    // Get existing commercial breakdown data if available
-    const existingData = {
-      NoOfGuards: 1,
-      NoOfDays: this.frm.get('AttendanceAllowanceWorkingDays')?.value || 30,
-      Basic: this.frm.get('CB_Basic')?.value || 0,
-      DA: this.frm.get('CB_DA')?.value || 0,
-      HRA: this.frm.get('CB_HRA')?.value || 0,
-      HRAPercentage: this.frm.get('CB_HRAPercentage')?.value || 0,
-      Leaves: this.frm.get('CB_Leaves')?.value || 0,
-      LeavesPercentage: this.frm.get('CB_LeavesPercentage')?.value || 0,
-      ProfessionalTax: this.frm.get('CB_ProfessionalTax')?.value || 0,
-      Bonus: this.frm.get('CB_Bonus')?.value || 0,
-      BonusPercentage: this.frm.get('CB_BonusPercentage')?.value || 0,
-      RelieverCharges: this.frm.get('CB_RelieverCharges')?.value || 0,
-      RelieverChargesPercentage: this.frm.get('CB_RelieverChargesPercentage')?.value || 0,
-      PF: this.frm.get('CB_PF')?.value || 0,
-      PFPercentage: this.frm.get('CB_PFPercentage')?.value || 0,
-      ESI: this.frm.get('CB_ESI')?.value || 0,
-      ESIPercentage: this.frm.get('CB_ESIPercentage')?.value || 0,
-      UniformCost: this.frm.get('CB_UniformCost')?.value || 0,
-      Others: this.frm.get('CB_Others')?.value || 0,
-      OthersPercentage: this.frm.get('CB_OthersPercentage')?.value || 0,
-      AdministrationCharges: this.frm.get('CB_AdministrationCharges')?.value || 0,
-      AdministrationChargesPercentage: this.frm.get('CB_AdministrationChargesPercentage')?.value || 0,
-      ManagementFee: this.frm.get('CB_ManagementFee')?.value || 0,
-      ManagementFeePercentage: this.frm.get('CB_ManagementFeePercentage')?.value || 0
-    };
-
-    const dialogRef = this.dialog.open(CommercialBreakdownDialogComponent, {
-      width: '600px',
-      data: existingData
+  openCommercialDetails() {
+    const dialogRef = this.dialog.open(CommercialBreakdownEnhancedDialogComponent, {
+      width: '1200px',
+      data: {
+        NoOfGuards: 1,
+        NoOfDays: 30,
+        MinimumWages: this.frm.get('MinimumWages')?.value || 0,
+        Basic: this.frm.get('CB_Basic')?.value || 0,
+        DA: this.frm.get('CB_DA')?.value || 0,
+        HRA: this.frm.get('CB_HRA')?.value || 0,
+        HRAPercentage: this.frm.get('CB_HRAPercentage')?.value || 0,
+        Leaves: this.frm.get('CB_Leaves')?.value || 0,
+        LeavesPercentage: this.frm.get('CB_LeavesPercentage')?.value || 0,
+        ProfessionalTax: this.frm.get('CB_ProfessionalTax')?.value || 0,
+        Bonus: this.frm.get('CB_Bonus')?.value || 0,
+        BonusPercentage: this.frm.get('CB_BonusPercentage')?.value || 0,
+        RelieverCharges: this.frm.get('CB_RelieverCharges')?.value || 0,
+        RelieverChargesPercentage: this.frm.get('CB_RelieverChargesPercentage')?.value || 0,
+        PF: this.frm.get('CB_PF')?.value || 0,
+        PFPercentage: this.frm.get('CB_PFPercentage')?.value || 0,
+        ESI: this.frm.get('CB_ESI')?.value || 0,
+        ESIPercentage: this.frm.get('CB_ESIPercentage')?.value || 0,
+        UniformCost: this.frm.get('CB_UniformCost')?.value || 0,
+        Others: this.frm.get('CB_Others')?.value || 0,
+        OthersPercentage: this.frm.get('CB_OthersPercentage')?.value || 0,
+        AdministrationCharges: this.frm.get('CB_AdministrationCharges')?.value || 0,
+        AdministrationChargesPercentage: this.frm.get('CB_AdministrationChargesPercentage')?.value || 0,
+        ManagementFee: this.frm.get('CB_ManagementFee')?.value || 0,
+        ManagementFeePercentage: this.frm.get('CB_ManagementFeePercentage')?.value || 0,
+        SubTotal: this.frm.get('CB_SubTotal')?.value || 0,
+        TotalPlusStatutory: this.frm.get('CB_TotalPlusStatutory')?.value || 0,
+        TotalDirectCost: this.frm.get('CB_TotalDirectCost')?.value || 0,
+        MonthlyChargedCost: this.frm.get('CB_MonthlyChargedCost')?.value || 0
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Update the basic rate with the calculated monthly charged cost
-        if (result.MonthlyChargedCost) {
-          this.frm.get('EMPPAY_BASIC_RATE')?.setValue(result.MonthlyChargedCost.toFixed(2));
-        }
-        
-        // Store all commercial breakdown data
-        this.frm.get('CB_Basic')?.setValue(result.Basic || 0);
-        this.frm.get('CB_DA')?.setValue(result.DA || 0);
-        this.frm.get('CB_HRA')?.setValue(result.HRA || 0);
-        this.frm.get('CB_HRAPercentage')?.setValue(result.HRAPercentage || 0);
-        this.frm.get('CB_Leaves')?.setValue(result.Leaves || 0);
-        this.frm.get('CB_LeavesPercentage')?.setValue(result.LeavesPercentage || 0);
-        this.frm.get('CB_ProfessionalTax')?.setValue(result.ProfessionalTax || 0);
-        this.frm.get('CB_Bonus')?.setValue(result.Bonus || 0);
-        this.frm.get('CB_BonusPercentage')?.setValue(result.BonusPercentage || 0);
-        this.frm.get('CB_RelieverCharges')?.setValue(result.RelieverCharges || 0);
-        this.frm.get('CB_RelieverChargesPercentage')?.setValue(result.RelieverChargesPercentage || 0);
-        this.frm.get('CB_PF')?.setValue(result.PF || 0);
-        this.frm.get('CB_PFPercentage')?.setValue(result.PFPercentage || 0);
-        this.frm.get('CB_ESI')?.setValue(result.ESI || 0);
-        this.frm.get('CB_ESIPercentage')?.setValue(result.ESIPercentage || 0);
-        this.frm.get('CB_UniformCost')?.setValue(result.UniformCost || 0);
-        this.frm.get('CB_Others')?.setValue(result.Others || 0);
-        this.frm.get('CB_OthersPercentage')?.setValue(result.OthersPercentage || 0);
-        this.frm.get('CB_AdministrationCharges')?.setValue(result.AdministrationCharges || 0);
-        this.frm.get('CB_AdministrationChargesPercentage')?.setValue(result.AdministrationChargesPercentage || 0);
-        this.frm.get('CB_ManagementFee')?.setValue(result.ManagementFee || 0);
-        this.frm.get('CB_ManagementFeePercentage')?.setValue(result.ManagementFeePercentage || 0);
-        this.frm.get('CB_SubTotal')?.setValue(result.SubTotal || 0);
-        this.frm.get('CB_TotalPlusStatutory')?.setValue(result.TotalPlusStatutory || 0);
-        this.frm.get('CB_TotalDirectCost')?.setValue(result.TotalDirectCost || 0);
-        this.frm.get('CB_MonthlyChargedCost')?.setValue(result.MonthlyChargedCost || 0);
+        // Update the form with the new values
+        this.frm.patchValue({
+          CB_Basic: result.Basic || 0,
+          CB_DA: result.DA || 0,
+          CB_HRA: result.HRA || 0,
+          CB_HRAPercentage: result.HRAPercentage || 0,
+          CB_Leaves: result.Leaves || 0,
+          CB_LeavesPercentage: result.LeavesPercentage || 0,
+          CB_ProfessionalTax: result.ProfessionalTax || 0,
+          CB_Bonus: result.Bonus || 0,
+          CB_BonusPercentage: result.BonusPercentage || 0,
+          CB_RelieverCharges: result.RelieverCharges || 0,
+          CB_RelieverChargesPercentage: result.RelieverChargesPercentage || 0,
+          CB_PF: result.PF || 0,
+          CB_PFPercentage: result.PFPercentage || 0,
+          CB_ESI: result.ESI || 0,
+          CB_ESIPercentage: result.ESIPercentage || 0,
+          CB_UniformCost: result.UniformCost || 0,
+          CB_Others: result.Others || 0,
+          CB_OthersPercentage: result.OthersPercentage || 0,
+          CB_AdministrationCharges: result.AdministrationCharges || 0,
+          CB_AdministrationChargesPercentage: result.AdministrationChargesPercentage || 0,
+          CB_ManagementFee: result.ManagementFee || 0,
+          CB_ManagementFeePercentage: result.ManagementFeePercentage || 0,
+          CB_SubTotal: result.SubTotal || 0,
+          CB_TotalPlusStatutory: result.TotalPlusStatutory || 0,
+          CB_TotalDirectCost: result.TotalDirectCost || 0,
+          CB_MonthlyChargedCost: result.MonthlyChargedCost || 0
+        });
+
+        // Update the salary field with the monthly charged cost
+        this.frm.get('EMPPAY_BASIC_RATE')?.setValue(result.MonthlyChargedCost || 0);
       }
     });
   }

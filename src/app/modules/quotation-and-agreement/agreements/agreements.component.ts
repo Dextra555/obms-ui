@@ -340,4 +340,33 @@ export class AgreementsComponent implements OnInit, AfterViewInit {
       }
     });
   }
+
+  exportToWord(id: number) {
+    this.showLoadingSpinner = true;
+    this.service.getAgreementById(id).subscribe({
+      next: (res: any) => {
+        // Handle direct dict (after await fix), Task.Result wrapper, or camelCase task wrapper
+        const result = res.agreement ? res : (res.Result || res.result || res);
+        const agreement = result.agreement || result.Agreement;
+        const details = result.agreementDetails || result.AgreementDetails || result.details || [];
+
+        if (!agreement) {
+          Swal.fire('Error', 'Agreement data not found', 'error');
+          this.hideLoadingSpinner();
+          return;
+        }
+
+        const branchObj = this.branchList?.find((b: any) => b.Code == agreement.Branch);
+        const clientObj = this.clientList?.find((c: any) => c.Code == agreement.Client);
+
+        // Download Word file
+        this._pdfService.exportAgreementWord(details, branchObj, clientObj, this.serviceTypes, agreement.ID, agreement.AgreementDate, true);
+        this.hideLoadingSpinner();
+      },
+      error: (err: any) => {
+        this.handleErrors(err);
+        Swal.fire('Error', 'Failed to fetch agreement details', 'error');
+      }
+    });
+  }
 }

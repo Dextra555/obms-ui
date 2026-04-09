@@ -5,6 +5,7 @@ import { MatSort, Sort } from '@angular/material/sort';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { MatDialog } from '@angular/material/dialog';
 import { EmployeeService } from "../../../service/employee.service";
+import { EmployeeImportDialogComponent } from './employee-import-dialog/employee-import-dialog.component';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { DatasharingService } from 'src/app/service/datasharing.service';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
@@ -18,6 +19,8 @@ export interface IEmployee {
   EMP_ROLE: string;
   EMP_NAME: string;
   EMP_SEX: string;
+  DepartmentName?: string;
+  DesignationName?: string;
   AadhaarNumber: string;
   PANNumber: string;
   PFAccountNumber: string;
@@ -60,7 +63,7 @@ export class EmployeeMasterComponent implements OnInit {
   branchList: any = [];
 
   displayedColumns: string[] = [
-    'EMP_CODE', 'EMP_ROLE', 'EMP_NAME', 'EMP_SEX', 
+    'EMP_CODE', 'EMP_ROLE', 'EMP_NAME', 'DepartmentName', 'DesignationName', 'EMP_SEX', 
     'AadhaarNumber', 'PANNumber', 'EMP_PHONE', 'IndianState', 'action'
   ];
 
@@ -287,6 +290,26 @@ export class EmployeeMasterComponent implements OnInit {
     // Implementation for PDF export with Indian format
     this._snackBar.open('Export to PDF feature coming soon', 'Close', {
       duration: 3000
+    });
+  }
+
+  openImportDialog(): void {
+    const dialogRef = this.dialog.open(EmployeeImportDialogComponent, {
+      width: '900px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      disableClose: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        // Refresh the employee list if import was successful
+        this.loadEmployees();
+        this._snackBar.open('Employee list refreshed', 'Close', {
+          duration: 3000
+        });
+      }
     });
   }
 

@@ -114,6 +114,12 @@
                [style.pointer-events]="row.Status === 'Cancelled' ? 'none' : 'auto'">
               <mat-icon aria-hidden="false" aria-label="pdf icon" [style.color]="row.Status === 'Cancelled' ? 'grey' : 'maroon'">picture_as_pdf</mat-icon>
             </a>
+            <a style="cursor:pointer; color: #2b579a;" class="mr-2" matTooltip="Export Word"
+              (click)="exportToWord(row.ID)"
+               [style.opacity]="row.Status === 'Cancelled' ? '0.5' : '1'"
+               [style.pointer-events]="row.Status === 'Cancelled' ? 'none' : 'auto'">
+              <mat-icon aria-hidden="false" aria-label="word icon" [style.color]="row.Status === 'Cancelled' ? 'grey' : '#2b579a'">description</mat-icon>
+            </a>
             <!-- Delete option hidden -->
             <!-- <a *ngIf="this.userAccessModel.deleteAccess == true || currentUser == 'superadmin'"
                style="cursor:pointer; color: red;" class="mr-2" matTooltip="Delete Agreement"

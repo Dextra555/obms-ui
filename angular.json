@@ -23,7 +23,16 @@
             "allowedCommonJsDependencies": [
               "@boldreports/javascript-reporting-controls/Scripts/bold.report-viewer.min",
               "@boldreports/javascript-reporting-controls/Scripts/data-visualization/ej.bulletgraph.min",
-              "@boldreports/javascript-reporting-controls/Scripts/data-visualization/ej.chart.min"
+              "@boldreports/javascript-reporting-controls/Scripts/data-visualization/ej.chart.min",
+              "canvg",
+              "crypto-js",
+              "core-js/modules/es.string.match.js",
+              "core-js/modules/es.string.replace.js",
+              "core-js/modules/es.string.split.js",
+              "core-js/modules/es.string.starts-with.js",
+              "core-js/modules/es.string.trim.js",
+              "core-js/modules/web.dom-collections.iterator.js",
+              "raf"
             ],
             "outputPath": "dist/angularapp",
             "index": "src/index.html",
@@ -87,6 +96,9 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "browserTarget": "obms:build:production"

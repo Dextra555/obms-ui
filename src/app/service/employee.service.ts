@@ -91,6 +91,23 @@ export class EmployeeService {
     return this.httpClient.delete(this.apiUrl + 'Employee/DeleteEmployee/' + id);
   }
 
+  // Excel Import Methods
+  previewExcelImport(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.httpClient.post(this.apiUrl + 'Employee/PreviewExcelImport', formData);
+  }
+
+  bulkImportEmployees(request: any) {
+    return this.httpClient.post(this.apiUrl + 'Employee/BulkImportEmployees', request);
+  }
+
+  downloadImportTemplate() {
+    return this.httpClient.get(this.apiUrl + 'Employee/DownloadImportTemplate', {
+      responseType: 'blob'
+    });
+  }
+
   private errorHandle(error: HttpErrorResponse) {
     let errorMessage: string = '';
     if (error.error instanceof ErrorEvent) {

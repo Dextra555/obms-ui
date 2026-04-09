@@ -1,0 +1,289 @@
+// Enhanced Commercial Breakdown Dialog Styles
+::ng-deep .mat-dialog-container {
+  max-width: 95vw;
+  width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.card {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Form field styling
+::ng-deep .mat-form-field-appearance-outline {
+  .mat-form-field-outline {
+    border-radius: 6px;
+  }
+
+  .mat-form-field-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  &.mat-form-field-disabled {
+    .mat-form-field-outline {
+      background-color: #f5f5f5;
+    }
+  }
+
+  // Enhanced hint styling for Employer PF contribution
+  .mat-hint {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    
+    &.mt-2 {
+      margin-top: 0.5rem !important;
+    }
+  }
+}
+
+// Badge styling
+.badge {
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  min-width: 100px;
+  text-align: center;
+
+  &.fs-4 {
+    font-size: 1.2rem;
+    padding: 0.6rem 1.2rem;
+  }
+
+  &.fs-5 {
+    font-size: 1.1rem;
+    padding: 0.55rem 1.1rem;
+  }
+
+  &.fs-6 {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+  }
+}
+
+// Alert styling
+.alert {
+  border-radius: 6px;
+  border: none;
+
+  &.alert-info {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    
+    a {
+      color: #0d47a1;
+      text-decoration: none;
+      font-weight: 600;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Button styling
+::ng-deep .mat-dialog-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+
+  .mat-button {
+    margin-right: 0.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+
+    .mat-icon {
+      font-size: 1.1rem;
+      height: 1.1rem;
+      width: 1.1rem;
+      margin-right: 0.25rem;
+    }
+
+    span.ml-1 {
+      margin-left: 0.25rem;
+    }
+  }
+
+  .mat-raised-button {
+    border-radius: 6px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+
+    .mat-icon {
+      font-size: 1.1rem;
+      height: 1.1rem;
+      width: 1.1rem;
+      margin-right: 0.25rem;
+    }
+
+    span.ml-1 {
+      margin-left: 0.25rem;
+    }
+
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+// Summary boxes
+.d-flex {
+  &.justify-content-between {
+    .badge {
+      animation: pulse 2s infinite;
+      transition: all 0.3s ease;
+    }
+
+    // Enhanced styling for TOTAL DIRECT COST
+    &.border-warning {
+      background: linear-gradient(45deg, #fff3cd 0%, #ffffff 100%);
+      box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
+      
+      .badge {
+        background: linear-gradient(45deg, #ffc107 0%, #ff9800 100%) !important;
+        box-shadow: 0 4px 8px rgba(255, 193, 7, 0.4);
+        animation: warningPulse 1.5s infinite;
+      }
+    }
+
+    &.border-success {
+      background: linear-gradient(45deg, #d4edda 0%, #ffffff 100%);
+      box-shadow: 0 0 15px rgba(40, 167, 69, 0.3);
+      
+      .badge {
+        background: linear-gradient(45deg, #28a745 0%, #20c997 100%) !important;
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+        animation: successPulse 2s infinite;
+      }
+    }
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes warningPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.4);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 6px 12px rgba(255, 193, 7, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.4);
+  }
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.6);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  ::ng-deep .mat-dialog-container {
+    width: 95vw;
+    max-width: 95vw;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .row {
+    .col-md-4,
+    .col-md-6 {
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+// Loading state
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+// Icon styling
+.fas {
+  &.mr-1 {
+    margin-right: 0.25rem;
+  }
+
+  &.mr-2 {
+    margin-right: 0.5rem;
+  }
+}
+
+// Input validation
+::ng-deep .mat-form-field-invalid {
+  .mat-form-field-outline-thick {
+    color: #f44336 !important;
+  }
+}
+
+// Readonly fields styling
+::ng-deep .mat-form-field-disabled {
+  .mat-input-element {
+    color: #666;
+    background-color: #f5f5f5;
+    padding: 0.5rem;
+    border-radius: 4px;
+  }
+}

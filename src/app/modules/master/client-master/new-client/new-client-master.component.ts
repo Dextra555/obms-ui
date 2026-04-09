@@ -40,6 +40,10 @@ export class NewClientMasterComponent implements OnInit {
   shippingStateCode: string = '';
   gstCalculationResult: any = null;
 
+  // Address Copy Options
+  copyAddressToShipping: boolean = false;
+  copyAddressToBilling: boolean = false;
+
   private formatDate(date: any) {
     const d = new Date(date);
     let month = '' + (d.getMonth() + 1);
@@ -547,6 +551,38 @@ export class NewClientMasterComponent implements OnInit {
       'Ladakh': '38'
     };
     return stateCodeMap[stateName] || '';
+  }
+
+  // Copy Main Address to Shipping Address
+  onCopyAddressToShippingChange(event: MatCheckboxChange): void {
+    this.copyAddressToShipping = event.checked;
+    if (event.checked) {
+      this.copyMainAddressToShipping();
+    }
+  }
+
+  copyMainAddressToShipping(): void {
+    this.clientForm.get('ShippingAddress1')?.setValue(this.clientForm.get('Address1')?.value);
+    this.clientForm.get('ShippingAddress2')?.setValue(this.clientForm.get('Address2')?.value);
+    this.clientForm.get('ShippingPINCode')?.setValue(this.clientForm.get('PostCode')?.value);
+    this.clientForm.get('ShippingCity')?.setValue(this.clientForm.get('City')?.value);
+    this.clientForm.get('ShippingState')?.setValue(this.clientForm.get('IndianState')?.value);
+  }
+
+  // Copy Main Address to Billing Address
+  onCopyAddressToBillingChange(event: MatCheckboxChange): void {
+    this.copyAddressToBilling = event.checked;
+    if (event.checked) {
+      this.copyMainAddressToBilling();
+    }
+  }
+
+  copyMainAddressToBilling(): void {
+    this.clientForm.get('BillingAddress1')?.setValue(this.clientForm.get('Address1')?.value);
+    this.clientForm.get('BillingAddress2')?.setValue(this.clientForm.get('Address2')?.value);
+    this.clientForm.get('BillingPINCode')?.setValue(this.clientForm.get('PostCode')?.value);
+    this.clientForm.get('BillingCity')?.setValue(this.clientForm.get('City')?.value);
+    this.clientForm.get('BillingState')?.setValue(this.clientForm.get('IndianState')?.value);
   }
 
   savebuttonClick(): void {

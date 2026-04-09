@@ -1,0 +1,302 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon color="primary">cloud_upload</mat-icon>
+  Import Employees from Excel
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <!-- Step 1: Upload -->
+  <div *ngIf="currentStep === 'upload'" class="upload-step">
+    <div class="template-section">
+      <mat-card class="template-card">
+        <mat-card-content>
+          <mat-icon class="template-icon">description</mat-icon>
+          <h3>Download Template</h3>
+          <p>Get the standard Excel template with all required fields</p>
+          <button mat-stroked-button color="primary" (click)="downloadTemplate()">
+            <mat-icon>download</mat-icon>
+            Download Template
+          </button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <div class="upload-section">
+      <div 
+        class="drop-zone"
+        [class.dragging]="isDragging"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+      >
+        <input 
+          #fileInput
+          type="file" 
+          accept=".xlsx,.xls"
+          style="display: none"
+          (change)="onFileSelected($event)"
+        >
+        <mat-icon class="upload-icon">cloud_upload</mat-icon>
+        <h3>Drag & Drop your Excel file here</h3>
+        <p>or click to browse</p>
+        <p class="file-types">Supported formats: .xlsx, .xls (Max 5MB)</p>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-icon>info</mat-icon>
+            Import Instructions
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ul>
+          <li>Required fields: Employee Code, Name, Role, Branch Code, Gender</li>
+          <li>Aadhaar: 12 digits starting with 2-9</li>
+          <li>PAN: Format ABCDE1234F</li>
+          <li>IFSC: Format ABCD0XXXXXX</li>
+          <li>Dates: Use YYYY-MM-DD format</li>
+          <li>Department & Designation names must match existing records</li>
+        </ul>
+      </mat-expansion-panel>
+    </div>
+  </div>
+
+  <!-- Processing State -->
+  <div *ngIf="isProcessing && currentStep !== 'result'" class="processing-step">
+    <div class="progress-container">
+      <mat-spinner *ngIf="progressValue < 100" diameter="60"></mat-spinner>
+      <mat-icon *ngIf="progressValue === 100" class="success-icon">check_circle</mat-icon>
+      <h3>{{ progressMessage }}</h3>
+      <mat-progress-bar 
+        mode="determinate" 
+        [value]="progressValue"
+        class="progress-bar"
+      ></mat-progress-bar>
+      <p *ngIf="selectedFile">{{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})</p>
+    </div>
+  </div>
+
+  <!-- Step 2: Preview -->
+  <div *ngIf="currentStep === 'preview' && previewData" class="preview-step">
+    <div class="preview-summary">
+      <mat-card class="summary-card valid">
+        <mat-card-content>
+          <div class="summary-number">{{ previewData.ValidCount }}</div>
+          <div class="summary-label">Valid Records</div>
+          <mat-icon>check_circle</mat-icon>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="summary-card invalid" *ngIf="previewData.InvalidCount > 0">
+        <mat-card-content>
+          <div class="summary-number">{{ previewData.InvalidCount }}</div>
+          <div class="summary-label">Errors Found</div>
+          <mat-icon>error</mat-icon>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="summary-card total">
+        <mat-card-content>
+          <div class="summary-number">{{ previewData.TotalRecords }}</div>
+          <div class="summary-label">Total Records</div>
+          <mat-icon>list</mat-icon>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Validation Errors -->
+    <div *ngIf="previewData.ValidationErrors && previewData.ValidationErrors.length > 0" class="errors-section">
+      <h3>
+        <mat-icon color="warn">error</mat-icon>
+        Validation Errors
+      </h3>
+      <div class="error-list">
+        <div *ngFor="let error of previewData.ValidationErrors" class="error-item">
+          <mat-icon>{{ getErrorIcon(error.fieldName) }}</mat-icon>
+          <div class="error-details">
+            <span class="error-location">Row {{ error.rowNumber }}</span>
+            <span class="error-employee">{{ error.employeeCode }} - {{ error.employeeName }}</span>
+            <span class="error-message">{{ error.errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Valid Records Preview -->
+    <div *ngIf="previewData.ValidRecords && previewData.ValidRecords.length > 0" class="valid-records-section">
+      <h3>
+        <mat-icon color="primary">check_circle</mat-icon>
+        Valid Records Preview (First 5)
+      </h3>
+      <div class="records-table">
+        <table mat-table [dataSource]="previewData.ValidRecords.slice(0, 5)" class="mat-elevation-z2">
+          <ng-container matColumnDef="rowNumber">
+            <th mat-header-cell *matHeaderCellDef>Row</th>
+            <td mat-cell *matCellDef="let record">{{ record.rowNumber }}</td>
+          </ng-container>
+          
+          <ng-container matColumnDef="empCode">
+            <th mat-header-cell *matHeaderCellDef>Code</th>
+            <td mat-cell *matCellDef="let record">{{ record.emp_CODE }}</td>
+          </ng-container>
+          
+          <ng-container matColumnDef="empName">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let record">{{ record.emp_NAME }}</td>
+          </ng-container>
+          
+          <ng-container matColumnDef="branch">
+            <th mat-header-cell *matHeaderCellDef>Branch</th>
+            <td mat-cell *matCellDef="let record">{{ record.emp_BRANCH_CODE }}</td>
+          </ng-container>
+          
+          <ng-container matColumnDef="aadhaar">
+            <th mat-header-cell *matHeaderCellDef>Aadhaar</th>
+            <td mat-cell *matCellDef="let record">{{ record.aadhaarNumber || '-' }}</td>
+          </ng-container>
+          
+          <ng-container matColumnDef="pan">
+            <th mat-header-cell *matHeaderCellDef>PAN</th>
+            <td mat-cell *matCellDef="let record">{{ record.panNumber || '-' }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['rowNumber', 'empCode', 'empName', 'branch', 'aadhaar', 'pan']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['rowNumber', 'empCode', 'empName', 'branch', 'aadhaar', 'pan'];"></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="import-options" *ngIf="previewData.ValidCount > 0">
+      <mat-checkbox [(ngModel)]="updateExisting" color="primary">
+        Update existing employees (if Employee Code matches)
+      </mat-checkbox>
+    </div>
+  </div>
+
+  <!-- Step 3: Importing -->
+  <div *ngIf="currentStep === 'importing'" class="importing-step">
+    <div class="progress-container">
+      <mat-spinner diameter="80"></mat-spinner>
+      <h3>{{ progressMessage }}</h3>
+      <mat-progress-bar 
+        mode="determinate" 
+        [value]="progressValue"
+        class="progress-bar"
+      ></mat-progress-bar>
+      <p class="progress-details">
+        Importing {{ previewData?.ValidCount }} employees...
+      </p>
+    </div>
+  </div>
+
+  <!-- Step 4: Result -->
+  <div *ngIf="currentStep === 'result' && importResult" class="result-step">
+    <div class="result-header" [class.success]="importResult.successfulImports > 0" [class.error]="importResult.failedImports > 0 && importResult.successfulImports === 0">
+      <mat-icon *ngIf="importResult.successfulImports > 0">check_circle</mat-icon>
+      <mat-icon *ngIf="importResult.failedImports > 0 && importResult.successfulImports === 0">error</mat-icon>
+      <h2>{{ importResult.message }}</h2>
+    </div>
+
+    <div class="result-summary">
+      <mat-card class="result-card success">
+        <mat-card-content>
+          <div class="result-number">{{ importResult.successfulImports }}</div>
+          <div class="result-label">Successful</div>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="result-card error" *ngIf="importResult.failedImports > 0">
+        <mat-card-content>
+          <div class="result-number">{{ importResult.failedImports }}</div>
+          <div class="result-label">Failed</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="result-card total">
+        <mat-card-content>
+          <div class="result-number">{{ importResult.totalRecords }}</div>
+          <div class="result-label">Total</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Import Errors -->
+    <div *ngIf="importResult.errors && importResult.errors.length > 0" class="import-errors-section">
+      <h3>
+        <mat-icon color="warn">error</mat-icon>
+        Import Errors
+      </h3>
+      <div class="error-list">
+        <div *ngFor="let error of importResult.errors" class="error-item">
+          <mat-icon>{{ getErrorIcon(error.fieldName) }}</mat-icon>
+          <div class="error-details">
+            <span class="error-location">Row {{ error.rowNumber }}</span>
+            <span class="error-employee">{{ error.employeeCode }} - {{ error.employeeName }}</span>
+            <span class="error-message">{{ error.errorMessage }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success List -->
+    <div *ngIf="importResult.successfulEmployees && importResult.successfulEmployees.length > 0" class="success-list-section">
+      <h3>
+        <mat-icon color="primary">check_circle</mat-icon>
+        Successfully Imported (First 10)
+      </h3>
+      <div class="success-list">
+        <div *ngFor="let emp of importResult.successfulEmployees.slice(0, 10)" class="success-item">
+          <mat-icon class="action-icon">{{ emp.action === 'Created' ? 'add_circle' : 'edit' }}</mat-icon>
+          <span class="emp-code">{{ emp.employeeCode }}</span>
+          <span class="emp-name">{{ emp.employeeName }}</span>
+          <span class="action-badge" [class.created]="emp.action === 'Created'" [class.updated]="emp.action === 'Updated'">
+            {{ emp.action }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <!-- Upload Step Buttons -->
+  <ng-container *ngIf="currentStep === 'upload'">
+    <button mat-button (click)="closeDialog(false)">Cancel</button>
+  </ng-container>
+
+  <!-- Preview Step Buttons -->
+  <ng-container *ngIf="currentStep === 'preview'">
+    <button mat-button (click)="resetUpload()">
+      <mat-icon>refresh</mat-icon>
+      Upload Another
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="importEmployees()"
+      [disabled]="!previewData || previewData.ValidCount === 0"
+    >
+      <mat-icon>cloud_upload</mat-icon>
+      Import {{ previewData?.ValidCount }} Employees
+    </button>
+  </ng-container>
+
+  <!-- Result Step Buttons -->
+  <ng-container *ngIf="currentStep === 'result'">
+    <button mat-button (click)="resetUpload()" *ngIf="importResult?.failedImports && importResult!.failedImports > 0">
+      <mat-icon>refresh</mat-icon>
+      Try Again
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="closeDialog(importResult?.successfulImports ? importResult!.successfulImports > 0 : false)"
+    >
+      <mat-icon>{{ importResult?.successfulImports && importResult!.successfulImports > 0 ? 'done' : 'close' }}</mat-icon>
+      {{ importResult?.successfulImports && importResult!.successfulImports > 0 ? 'Done' : 'Close' }}
+    </button>
+  </ng-container>
+</mat-dialog-actions>
