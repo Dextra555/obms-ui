@@ -22,25 +22,44 @@ export class NewBranchComponent implements OnInit {
   errorMessage: string = '';
   currentUser: string = '';
   userAccessModel!: UserAccessModel;
+  availableBranches: any[] = [];
   statesList: any[] = [
-    { id: 1, name: 'Johar' },
-    { id: 2, name: 'Kedah' },
-    { id: 3, name: 'Kuala Lumpur' },
-    { id: 4, name: 'Kelantan' },
-    { id: 5, name: 'Labuan' },
-    { id: 6, name: 'Melaka' },
-    { id: 7, name: 'Negeri Sembilan' },
-    { id: 8, name: 'Pahang' },
-    { id: 9, name: 'Perak' },
-    { id: 10, name: 'Perlis' },
-    { id: 11, name: 'Pulau Pinang' },
-    { id: 12, name: 'PutraJaya' },
-    { id: 13, name: 'Sabah' },
-    { id: 14, name: 'Sarawak' },
-    { id: 15, name: 'Selangor' },
-    { id: 16, name: 'Terengganu' },
-    { id: 17, name: 'Wilayah Persekutuan' },
-
+    { id: 1, name: 'Andhra Pradesh' },
+    { id: 2, name: 'Arunachal Pradesh' },
+    { id: 3, name: 'Assam' },
+    { id: 4, name: 'Bihar' },
+    { id: 5, name: 'Chhattisgarh' },
+    { id: 6, name: 'Goa' },
+    { id: 7, name: 'Gujarat' },
+    { id: 8, name: 'Haryana' },
+    { id: 9, name: 'Himachal Pradesh' },
+    { id: 10, name: 'Jammu and Kashmir' },
+    { id: 11, name: 'Jharkhand' },
+    { id: 12, name: 'Karnataka' },
+    { id: 13, name: 'Kerala' },
+    { id: 14, name: 'Madhya Pradesh' },
+    { id: 15, name: 'Maharashtra' },
+    { id: 16, name: 'Manipur' },
+    { id: 17, name: 'Meghalaya' },
+    { id: 18, name: 'Mizoram' },
+    { id: 19, name: 'Nagaland' },
+    { id: 20, name: 'Odisha' },
+    { id: 21, name: 'Punjab' },
+    { id: 22, name: 'Rajasthan' },
+    { id: 23, name: 'Sikkim' },
+    { id: 24, name: 'Tamil Nadu' },
+    { id: 25, name: 'Telangana' },
+    { id: 26, name: 'Tripura' },
+    { id: 27, name: 'Uttar Pradesh' },
+    { id: 28, name: 'Uttarakhand' },
+    { id: 29, name: 'West Bengal' },
+    { id: 30, name: 'Andaman and Nicobar Islands' },
+    { id: 31, name: 'Chandigarh' },
+    { id: 32, name: 'Dadra and Nagar Haveli' },
+    { id: 33, name: 'Daman and Diu' },
+    { id: 34, name: 'Delhi' },
+    { id: 35, name: 'Lakshadweep' },
+    { id: 36, name: 'Puducherry' }
   ]
 
   constructor(private fb: FormBuilder, public dialog: MatDialog,
@@ -92,6 +111,7 @@ export class NewBranchComponent implements OnInit {
       });
     }
     this.getUserAccessRights(this.currentUser, 'Branch Master');
+    this.loadAvailableBranches();
     this._activatedRoute.queryParams.subscribe((params) => {
       if (params['code'] != undefined) {
         this.getBranchMasterList(params['code']);
@@ -162,6 +182,18 @@ export class NewBranchComponent implements OnInit {
     );
   }
 
+  loadAvailableBranches(): void {
+    this._masterService.getBranchMasterList().subscribe(
+      (data: any[]) => {
+        // Filter to show only HQ branches in parent dropdown
+        this.availableBranches = data.filter((branch: BranchModel) => branch.IsHeadQuarters === true);
+      },
+      (error) => {
+        console.error('Error loading branches:', error);
+      }
+    );
+  }
+
   savebuttonClick(): void {
     this.showLoadingSpinner = true;
     this.branchModel = {
@@ -195,7 +227,8 @@ export class NewBranchComponent implements OnInit {
     } else {
       this.branchModel.Email = '';
     }
-    this.branchModel.ParentBranch = this.branchForm.value.Code;
+    // Don't set ParentBranch to self, use the selected parent branch
+    this.branchModel.ParentBranch = this.branchForm.value.ParentBranch;
     this.branchModel.LastUpdatedBy = this.currentUser;
     this._masterService.saveAndUpdateBranchMaster(this.branchModel).subscribe((response) => {
       if (response.Success == 'Success') {

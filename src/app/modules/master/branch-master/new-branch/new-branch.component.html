@@ -44,6 +44,17 @@
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
+                        <mat-label>Parent Branch (HQ)</mat-label>
+                        <mat-select formControlName="ParentBranch">
+                            <mat-option value="">None (This is HQ)</mat-option>
+                            <mat-option *ngFor="let branch of availableBranches" [value]="branch.Code">
+                                {{branch.Name}} ({{branch.Code}})
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
                         <mat-label>Short Name</mat-label>
                         <input type="text" formControlName="ShortName" matInput placeholder="" autocomplete="off"
                         maxlength="10" [readonly] = "branchCodeStatus == 'edit'">
