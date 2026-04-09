@@ -72,6 +72,22 @@ export class MastermoduleService {
     return this.httpClient.get<any>(this.apiUrl + 'master/GetBranchMasterCode')
       .pipe(catchError(this.errorHandle));
   }
+
+  // State filtering methods
+  getBranchesByState(filter: any): Observable<any> {
+    return this.httpClient.post<any>(this.apiUrl + 'master/branches-by-state', filter)
+      .pipe(catchError(this.errorHandle));
+  }
+
+  getAllBranchStates(): Observable<any> {
+    return this.httpClient.get<any>(this.apiUrl + 'master/all-branch-states')
+      .pipe(catchError(this.errorHandle));
+  }
+
+  getBranchStateStatistics(): Observable<any> {
+    return this.httpClient.get<any>(this.apiUrl + 'master/branch-state-statistics')
+      .pipe(catchError(this.errorHandle));
+  }
   getClienthMaster(clientCode: string, status: string): Observable<any> {
     return this.httpClient.get<ClientModel[]>(this.apiUrl + 'master/GetClientMsterList', {
       params: { clientCode: clientCode.toString(), status: status.toString() }

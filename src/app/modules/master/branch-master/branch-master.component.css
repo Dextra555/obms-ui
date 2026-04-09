@@ -1,0 +1,11 @@
+/* Fix for State column text color issue */
+.badge.bg-secondary {
+  background: linear-gradient(135deg, #6c757d, #5a6268) !important;
+  color: white !important;
+}
+
+/* Ensure state badges are visible */
+.wlt-table td .badge {
+  color: white !important;
+  font-weight: 500;
+}

@@ -137,10 +137,14 @@ export class NewBranchComponent implements OnInit {
   }
   getBranchCode(): void {
     this._masterService.getBranchMasterCode().subscribe(
-      result => {        
-        this.branchForm.patchValue({
-          Code: result.ClientCode
-        });
+      (result: any) => {        
+        if (result && result.Success === 'Success' && result.ClientCode) {
+          this.branchForm.patchValue({
+            Code: result.ClientCode
+          });
+        } else {
+          this.errorMessage = 'Failed to generate branch code';
+        }
       },
       (error) => this.handleErrors(error)
     );
@@ -185,54 +189,59 @@ export class NewBranchComponent implements OnInit {
   loadAvailableBranches(): void {
     this._masterService.getBranchMasterList().subscribe(
       (data: any[]) => {
-        // Filter to show only HQ branches in parent dropdown
-        this.availableBranches = data.filter((branch: BranchModel) => branch.IsHeadQuarters === true);
+        // Filter to show only HQ branches in parent dropdown, but exclude current branch if editing
+        if (this.branchCodeStatus === 'edit') {
+          const currentBranchCode = this.branchForm.get('Code')?.value;
+          this.availableBranches = data.filter((branch: BranchModel) => 
+            branch.IsHeadQuarters === true && branch.Code !== currentBranchCode
+          );
+        } else {
+          this.availableBranches = data.filter((branch: BranchModel) => branch.IsHeadQuarters === true);
+        }
       },
       (error) => {
         console.error('Error loading branches:', error);
+        this.errorMessage = 'Failed to load available branches';
       }
     );
   }
 
   savebuttonClick(): void {
-    this.showLoadingSpinner = true;
-    this.branchModel = {
-      ID: 0,
-      Code: '',
-      Name: '',
-      UbsCode: '',
-      ShortName: '',
-      Address1: '',
-      Address2: '',
-      PostCode: '',
-      City: '',
-      State: '',
-      Phone: '',
-      Fax: '',
-      Email: '',
-      BankName: '',
-      BankBranch: '',
-      BankAccount: '',
-      PersonIncharge: '',
-      IsHeadQuarters: false,
-      Description: '',
-      LastUpdate: new Date(),
-      LastUpdatedBy: '',
-      ParentBranch: '',
+    if (this.branchForm.invalid) {
+      this.errorMessage = 'Please fill all required fields correctly';
+      return;
     }
 
-    this.branchModel = this.branchForm.value;
-    if (this.branchForm.value.UserEmail != undefined && this.branchForm.value.UserEmail != "") {
-      this.branchModel.Email = this.branchForm.value.UserEmail;
-    } else {
-      this.branchModel.Email = '';
-    }
-    // Don't set ParentBranch to self, use the selected parent branch
-    this.branchModel.ParentBranch = this.branchForm.value.ParentBranch;
-    this.branchModel.LastUpdatedBy = this.currentUser;
-    this._masterService.saveAndUpdateBranchMaster(this.branchModel).subscribe((response) => {
-      if (response.Success == 'Success') {
-        this.branchModel = response.Branch;
+    this.showLoadingSpinner = true;
+    
+    const formValues = this.branchForm.value;
+    this.branchModel = {
+      ID: formValues.ID || 0,
+      Code: formValues.Code || '',
+      Name: formValues.Name || '',
+      UbsCode: formValues.UbsCode || '',
+      ShortName: formValues.ShortName || '',
+      Address1: formValues.Address1 || '',
+      Address2: formValues.Address2 || '',
+      PostCode: formValues.PostCode || '',
+      City: formValues.City || '',
+      State: formValues.State || '',
+      Phone: formValues.Phone || '',
+      Fax: formValues.Fax || '',
+      Email: formValues.UserEmail || '',
+      BankName: formValues.BankName || '',
+      BankBranch: formValues.BankBranch || '',
+      BankAccount: formValues.BankAccount || '',
+      PersonIncharge: formValues.PersonIncharge || '',
+      IsHeadQuarters: formValues.IsHeadQuarters || false,
+      Description: formValues.Description || '',
+      LastUpdate: new Date(),
+      LastUpdatedBy: this.currentUser || '',
+      ParentBranch: formValues.ParentBranch || '',
+    };
+
+    this._masterService.saveAndUpdateBranchMaster(this.branchModel).subscribe((response: any) => {
+      if (response && response.Success === 'Success') {
         this._dataService.setUsername(this.currentUser);
         this._router.navigate(['/master/branch-master']);
         Swal.fire({
@@ -240,11 +249,13 @@ export class NewBranchComponent implements OnInit {
           position: 'top',
           showConfirmButton: false,
           title: 'Success',
-          text: 'Successfully save & update brnach deatials',
+          text: 'Successfully saved & updated branch details',
           icon: 'success',
           showCloseButton: false,
           timer: 3000,
         });
+      } else {
+        this.errorMessage = response?.Message || 'Failed to save branch details';
       }
       this.showLoadingSpinner = false;
     },
@@ -254,10 +265,19 @@ export class NewBranchComponent implements OnInit {
   clearBranchDetails(): void {
     this.branchForm.reset();
   }
-  handleErrors(error: string) {
-    if (error != null && error != '') {
-      this.errorMessage = error;
-      this.showLoadingSpinner = false;
+  handleErrors(error: any) {
+    console.error('Error occurred:', error);
+    if (error) {
+      if (typeof error === 'string') {
+        this.errorMessage = error;
+      } else if (error?.message) {
+        this.errorMessage = error.message;
+      } else if (error?.error?.message) {
+        this.errorMessage = error.error.message;
+      } else {
+        this.errorMessage = 'An unexpected error occurred. Please try again.';
+      }
     }
+    this.showLoadingSpinner = false;
   };
 }

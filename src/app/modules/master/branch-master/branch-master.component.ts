@@ -28,11 +28,17 @@ export class BranchMasterComponent implements AfterViewInit {
   showLoadingSpinner: boolean = false;
   branchCode: string = 'null';
   errorMessage: string = '';
-  displayedColumns: string[] = ['code', 'ubsCode', 'name', 'address1', 'parentBranch', 'hqBranch', 'personIncharge', 'action'];
+  displayedColumns: string[] = ['code', 'ubsCode', 'name', 'address1', 'state', 'parentBranch', 'personIncharge', 'action'];
   dataSource: any;
   currentUser: string = '';
   warningMessage: string = '';
   userAccessModel!: UserAccessModel;
+
+  // State filtering properties
+  availableStates: any[] = [];
+  selectedState: string = '';
+  originalBranchData: any[] = [];
+  isStateFilterActive: boolean = false;
 
   constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog,
     private _masterService: MastermoduleService, private _router: Router
@@ -129,11 +135,19 @@ export class BranchMasterComponent implements AfterViewInit {
     );
   }
   handleDataBinding(data: any) {
-    if(data.length  > 0){
+    console.log('Data received in handleDataBinding:', data);
+    console.log('Data type:', typeof data);
+    console.log('Data length:', data.length);
+    
+    if(data && Array.isArray(data) && data.length > 0){
+      this.originalBranchData = data;
       this.dataSource = new MatTableDataSource<BranchModel>(data);
-      this.ngAfterViewInit();          
+      this.ngAfterViewInit();
+      this.loadAvailableStates();          
+    }else if(data && Array.isArray(data) && data.length === 0){
+      this.errorMessage = `No branch data available for <span style="color: black;">${this.currentUser}</span>.`;
     }else{
-      this.errorMessage = `No data available for <span style="color: black;">${this.currentUser}</span>. Please try again later.`;
+      this.errorMessage = `Invalid data received from server. Please try again later.`;
     }
     this.hideSpinner();
     
@@ -152,7 +166,7 @@ export class BranchMasterComponent implements AfterViewInit {
       .afterClosed()
       .subscribe((result: { confirmDialog: boolean; remarks: any }) => {       
         if (result.confirmDialog) {
-          this._masterService.deleteBranchMasterByCode(this.branchCode).subscribe((response) => {
+          this._masterService.deleteBranchMasterByCode(this.branchCode).subscribe((response: any) => {
             this.getBranchMasterListByUser(this.currentUser);
             this._dataService.setUsername(this.currentUser);
             Swal.fire({
@@ -160,7 +174,7 @@ export class BranchMasterComponent implements AfterViewInit {
               position: 'top',
               showConfirmButton: false,
               title: 'Success',
-              text: response.headers[0].value,
+              text: response.Message || 'Successfully deleted branch details',
               icon: 'success',
               showCloseButton: false,
               timer: 3000,
@@ -186,15 +200,60 @@ export class BranchMasterComponent implements AfterViewInit {
     this.showLoadingSpinner = false;
   }
 
-  getHQBranchName(element: any): string {
-    if (element.IsHeadQuarters) {
+  getParentBranchName(element: any): string {
+    if (!element.ParentBranch || element.ParentBranch === 'HQ') {
       return 'HQ';
     }
-    if (element.ParentBranch) {
-      // Find the parent branch name from the available branches
-      const parentBranch = this.dataSource?.data?.find((branch: any) => branch.Code === element.ParentBranch);
-      return parentBranch ? parentBranch.Name : element.ParentBranch;
+    // Find the parent branch name from the available branches
+    const parentBranch = this.dataSource?.data?.find((branch: any) => branch.Code === element.ParentBranch);
+    return parentBranch ? parentBranch.Name : element.ParentBranch;
+  }
+
+  // State filtering methods
+  loadAvailableStates(): void {
+    // Extract unique states from branch data
+    const states = [...new Set(this.originalBranchData.map((branch: any) => branch.State).filter((state: string) => state && state.trim() !== ''))];
+    this.availableStates = states.sort();
+  }
+
+  onStateFilterChange(event: any): void {
+    // Extract the actual value from MatSelectChange object
+    this.selectedState = event.value || (event && event.target ? event.target.value : event);
+    this.applyStateFilter();
+  }
+
+  applyStateFilter(): void {
+    if (!this.selectedState || this.selectedState === '') {
+      // Show all branches
+      this.dataSource.data = this.originalBranchData;
+      this.isStateFilterActive = false;
+    } else {
+      // Filter by selected state
+      const filteredData = this.originalBranchData.filter((branch: any) => 
+        branch.State === this.selectedState
+      );
+      this.dataSource.data = filteredData;
+      this.isStateFilterActive = true;
     }
-    return 'HQ';
+    
+    // Reapply pagination and sorting
+    this.ngAfterViewInit();
+  }
+
+  clearStateFilter(): void {
+    this.selectedState = '';
+    this.applyStateFilter();
+  }
+
+  getStateFilterCount(): number {
+    if (!this.selectedState || this.selectedState === '') {
+      return this.originalBranchData.length;
+    }
+    return this.originalBranchData.filter((branch: any) => branch.State === this.selectedState).length;
+  }
+
+  getStateDisplayName(state: string): string {
+    const count = this.originalBranchData.filter((branch: any) => branch.State === state).length;
+    return `${state} (${count})`;
   }
 }
