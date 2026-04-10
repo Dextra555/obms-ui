@@ -259,9 +259,9 @@ export class EditInvoiceComponent implements AfterViewInit {
     this.frm.get('details.YearTotal')?.setValue(this.formatCurrency(vMonthTotal * 12));
 
     if (this.frm.get('details.IsTaxable')?.value) {
-      const FiveOrSix = 8;
+      const taxRate = 18;
       this.frm.get('details.TaxAmount')?.setValue(
-        this.formatCurrency((vMonthTotal - parseFloat(this.frm.get('details.DiscountAmount')?.value)) * (FiveOrSix / 100))
+        this.formatCurrency((vMonthTotal - parseFloat(this.frm.get('details.DiscountAmount')?.value)) * (taxRate / 100))
       );
     } else {
       this.frm.get('details.TaxAmount')?.setValue(0);
@@ -273,7 +273,7 @@ export class EditInvoiceComponent implements AfterViewInit {
     }
 
     if (this.frm.get('details.IsTaxable')?.value) {
-      this.frm.get('details.total')?.setValue(this.formatCurrency((vMonthTotal - vDiscount) * (108 / 100)));
+      this.frm.get('details.total')?.setValue(this.formatCurrency((vMonthTotal - vDiscount) * (118 / 100)));
     } else {
       this.frm.get('details.total')?.setValue(this.formatCurrency(vMonthTotal - vDiscount));
     }
@@ -328,13 +328,8 @@ export class EditInvoiceComponent implements AfterViewInit {
       }
 
       if (d.IsTaxable) {
-        let pa;
-        if (agreementPeriod.getFullYear() <= 2010) {
-          pa = 0.05;
-        } else {
-          pa = 0.08;
-        }
-        this.TaxAmount += (d.MonthTotal - d.DiscountAmount) * pa;
+        const taxRate = 0.18; // 18% GST
+        this.TaxAmount += (d.MonthTotal - d.DiscountAmount) * taxRate;
       }
 
     });

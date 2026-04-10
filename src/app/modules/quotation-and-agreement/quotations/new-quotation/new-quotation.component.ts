@@ -34,7 +34,7 @@ export interface IQuotation {
   styleUrls: ['./new-quotation.component.css']
 })
 export class NewQuotationComponent {
-  displayedColumns: string[] = ['SNo', 'ServiceType', 'Description', 'NoOfGuards', 'Rate', 'NoOfHours', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
+  displayedColumns: string[] = ['SNo', 'ServiceType', 'Description', 'NoOfGuards', 'PerDay', 'Rate', 'NoOfHours', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
   dataSource!: MatTableDataSource<IQuotationDetail>;
 
   quotationDisplayedColumns: string[] = ['SNo', 'QuotationID', 'BranchName', 'ClientName', 'WorkPlace', 'QuotationDate', 'action'];
@@ -103,6 +103,7 @@ export class NewQuotationComponent {
         ServiceTypeID: [null],
         Description: [''],
         NoOfGuards: [0],
+        PerDay: [0],
         Rate: [0],
         NoOfHours: [8],
         NoOfDays: [0],
@@ -561,6 +562,7 @@ export class NewQuotationComponent {
       ServiceTypeID: null,
       Description: '',
       NoOfGuards: 0,
+      PerDay: 0,
       Rate: 0,
       NoOfHours: 8,
       NoOfDays: 0,
@@ -762,6 +764,17 @@ export class NewQuotationComponent {
     this.DetailRowChange();
   }
 
+  onPerDayChange(): void {
+    const perDay = parseFloat(this.frm.get('details.PerDay')?.value || 0);
+    const noOfHours = parseFloat(this.frm.get('details.NoOfHours')?.value || 8);
+    
+    if (perDay > 0 && noOfHours > 0) {
+      const perHourRate = perDay / noOfHours;
+      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHourRate));
+      this.DetailRowChange();
+    }
+  }
+
   DetailRowChange(): void {
     const _description = this.frm.get('details.Description')?.value;
     if (_description != "") {
@@ -790,11 +803,12 @@ export class NewQuotationComponent {
     }
 
     if (parseInt("0" + tNoOfGuards, 10) === 0) {
-      vMonthTotal = parseFloat(tRate) * parseFloat(tNoOfDays);
+      vMonthTotal = parseFloat(tRate) * parseFloat(tNoOfHours) * parseFloat(tNoOfDays);
     } else {
       vMonthTotal = (
         parseFloat(tNoOfGuards) *
         parseFloat(tRate) *
+        parseFloat(tNoOfHours) *
         parseFloat(tNoOfDays)
       );
     }

@@ -68,7 +68,7 @@ export interface IAgreement {
   styleUrls: ['./new-agreement.component.css']
 })
 export class NewAgreementComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['ServiceType', 'Description', 'NoOfGuards', 'Rate', 'NoOfHours', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
+  displayedColumns: string[] = ['ServiceType', 'Description', 'NoOfGuards', 'PerDay', 'Rate', 'NoOfHours', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
   dataSource!: MatTableDataSource<IItemDetails>;
 
   agreementDisplayedColumns: string[] = ['BranchName', 'ClientName', 'WorkPlace', 'AgreementDate', 'action'];
@@ -134,6 +134,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
         ServiceTypeID: [null],
         Description: [''],
         NoOfGuards: [0],
+        PerDay: [0],
         Rate: [0],
         NoOfHours: [8],
         NoOfDays: [0],
@@ -517,6 +518,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
       ServiceTypeID: null, // Added missing control
       Description: '',
       NoOfGuards: 0,
+      PerDay: 0,
       Rate: 0,
       NoOfHours: 8,
       NoOfDays: 0,
@@ -815,6 +817,17 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
     this.DetailRowChange();
   }
 
+  onPerDayChange(): void {
+    const perDay = parseFloat(this.frm.get('details.PerDay')?.value || 0);
+    const noOfHours = parseFloat(this.frm.get('details.NoOfHours')?.value || 8);
+    
+    if (perDay > 0 && noOfHours > 0) {
+      const perHourRate = perDay / noOfHours;
+      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHourRate));
+      this.DetailRowChange();
+    }
+  }
+
   DetailRowChange(): void {
 
     const _description = this.frm.get('details.Description')?.value;
@@ -848,11 +861,12 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
     }
 
     if (parseInt("0" + tNoOfGuards, 10) === 0) {
-      vMonthTotal = parseFloat(tRate) * parseFloat(tNoOfDays);
+      vMonthTotal = parseFloat(tRate) * parseFloat(tNoOfHours) * parseFloat(tNoOfDays);
     } else {
       vMonthTotal = (
         parseFloat(tNoOfGuards) *
         parseFloat(tRate) *
+        parseFloat(tNoOfHours) *
         parseFloat(tNoOfDays)
       );
     }
