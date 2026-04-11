@@ -76,6 +76,7 @@ import { AttendanceDisplayComponent } from 'src/app/modules/payroll/attendance/a
 import { UtilityBillsComponent } from "../../modules/inventory/utility-bills/utility-bills.component";
 import { FinanceChequeMasterComponent } from "../../modules/finance/finance-cheque-master/finance-cheque-master.component";
 import { SalaryProcessingComponent } from 'src/app/modules/payroll/salary-processing/salary-processing.component';
+import { RbiBankSalaryProcessComponent } from 'src/app/modules/payroll/rbi-bank-salary-process/rbi-bank-salary-process.component';
 import { PrintInvoiceComponent } from "../../modules/finance/invoice/print-invoice/print-invoice.component";
 import { ReportComponent } from "../../modules/report/report/report.component";
 import { UserReportComponent } from "../../modules/report/user-report/user-report.component";
@@ -235,6 +236,7 @@ const routes: Routes = [
   { path: 'payroll/new-attendance', component: NewAttendanceComponent, canActivate: [AuthGuard] },
   { path: 'payroll/attendance-display', component: AttendanceDisplayComponent, canActivate: [AuthGuard] },
   { path: 'payroll/salary-processing', component: SalaryProcessingComponent, canActivate: [AuthGuard] },
+  { path: 'payroll/rbi-bank-salary-process', component: RbiBankSalaryProcessComponent, canActivate: [AuthGuard] },
 
   //Administration module
   { path: 'administration/user-registration', component: UserRegistrationComponent, canActivate: [AuthGuard] },

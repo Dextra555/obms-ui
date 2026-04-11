@@ -410,7 +410,21 @@ export class NonComplianceReportComponent implements OnInit {
       case 'form-xxviii': {
         const severityClass2 = `severity-${severity.toLowerCase()}`;
         const statusClass2   = `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
-        const basicWages = row.basicWages ?? 0;
+        // Salary breakdown fields
+        const basic = row.basic ?? 0;
+        const da = row.da ?? 0;
+        const hra = row.hra ?? 0;
+        const others = row.others ?? 0;
+        const bonus = row.bonus ?? 0;
+        const ot = row.ot ?? 0;
+        const basicDA = row.basicDA ?? 0;
+        const gross = row.gross ?? 0;
+        const pf = row.pf ?? 0;
+        const esi = row.esi ?? 0;
+        const pt = row.pt ?? 0;
+        const advanceDed = row.advanceDed ?? 0;
+        const net = row.net ?? 0;
+        const daysWorked = row.daysWorked ?? 0;
         return `
           <tr>
             <td class="text-center">${row.sno || index + 1}</td>
@@ -418,7 +432,20 @@ export class NonComplianceReportComponent implements OnInit {
             <td>${row.employeeName ?? ''}</td>
             <td>${row.branch ?? ''}</td>
             <td>${row.client ?? ''}</td>
-            <td class="text-right">₹${basicWages.toLocaleString()}</td>
+            <td class="text-center">${daysWorked}</td>
+            <td class="text-right">₹${basic.toLocaleString()}</td>
+            <td class="text-right">₹${da.toLocaleString()}</td>
+            <td class="text-right">₹${hra.toLocaleString()}</td>
+            <td class="text-right">₹${others.toLocaleString()}</td>
+            <td class="text-right">₹${bonus.toLocaleString()}</td>
+            <td class="text-right">₹${ot.toLocaleString()}</td>
+            <td class="text-right">₹${basicDA.toLocaleString()}</td>
+            <td class="text-right">₹${gross.toLocaleString()}</td>
+            <td class="text-right">₹${pf.toLocaleString()}</td>
+            <td class="text-right">₹${esi.toLocaleString()}</td>
+            <td class="text-right">₹${pt.toLocaleString()}</td>
+            <td class="text-right">₹${advanceDed.toLocaleString()}</td>
+            <td class="text-right">₹${net.toLocaleString()}</td>
             <td class="text-center ${row.minimumWageViolation ? 'violation-yes' : 'violation-no'}">${row.minimumWageViolation ? 'YES' : 'NO'}</td>
             <td class="text-center ${row.pfDeductionIssue ? 'violation-yes' : 'violation-no'}">${row.pfDeductionIssue ? 'YES' : 'NO'}</td>
             <td class="text-center ${row.esiDeductionIssue ? 'violation-yes' : 'violation-no'}">${row.esiDeductionIssue ? 'YES' : 'NO'}</td>

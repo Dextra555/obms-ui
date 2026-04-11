@@ -24,7 +24,11 @@
             <th rowspan="2">Employee Name</th>
             <th rowspan="2">Branch</th>
             <th rowspan="2">Client</th>
-            <th rowspan="2">Basic Wages (₹)</th>
+            <th rowspan="2">Days Worked</th>
+            <th colspan="7">Earnings (₹)</th>
+            <th rowspan="2">Gross (₹)</th>
+            <th colspan="4">Deductions (₹)</th>
+            <th rowspan="2">Net (₹)</th>
             <th colspan="5">Compliance Issues</th>
             <th rowspan="2">Description</th>
             <th rowspan="2">Severity</th>
@@ -34,10 +38,21 @@
             <th rowspan="2">Penalty (₹)</th>
         </tr>
         <tr>
-            <th>Min Wage Violation</th>
-            <th>PF Issue</th>
-            <th>ESI Issue</th>
-            <th>PT Issue</th>
+            <th>Basic</th>
+            <th>DA</th>
+            <th>HRA</th>
+            <th>Others</th>
+            <th>Bonus</th>
+            <th>OT</th>
+            <th>Basic+DA</th>
+            <th>PF</th>
+            <th>ESI</th>
+            <th>PT</th>
+            <th>Adv.Ded</th>
+            <th>Min Wage</th>
+            <th>PF</th>
+            <th>ESI</th>
+            <th>PT</th>
             <th>Salary Delay</th>
         </tr>
     </thead>
@@ -46,7 +61,22 @@
     </tbody>
     <tfoot>
         <tr class="total-row">
-            <td colspan="16" style="text-align: right; font-weight: bold;">Total Penalties:</td>
+            <td colspan="6" style="text-align: right; font-weight: bold;">TOTAL:</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalBasic || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalDA || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalHRA || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalOthers || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalBonus || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalOT || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalBasic || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalGross || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalPF || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalESI || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalPT || 0}}</td>
+            <td style="text-align: right; font-weight: bold;">0</td>
+            <td style="text-align: right; font-weight: bold;">{{TotalNet || 0}}</td>
+            <td colspan="5"></td>
+            <td colspan="5" style="text-align: right; font-weight: bold;">Total Penalties:</td>
             <td style="text-align: right; font-weight: bold;">{{TotalPenalties}}</td>
         </tr>
     </tfoot>

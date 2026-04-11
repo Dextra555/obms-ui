@@ -139,27 +139,27 @@
           
           <ng-container matColumnDef="empCode">
             <th mat-header-cell *matHeaderCellDef>Code</th>
-            <td mat-cell *matCellDef="let record">{{ record.emp_CODE }}</td>
+            <td mat-cell *matCellDef="let record">{{ record.Employee?.EMP_CODE || '-' }}</td>
           </ng-container>
-          
+
           <ng-container matColumnDef="empName">
             <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let record">{{ record.emp_NAME }}</td>
+            <td mat-cell *matCellDef="let record">{{ record.Employee?.EMP_NAME || '-' }}</td>
           </ng-container>
-          
+
           <ng-container matColumnDef="branch">
             <th mat-header-cell *matHeaderCellDef>Branch</th>
-            <td mat-cell *matCellDef="let record">{{ record.emp_BRANCH_CODE }}</td>
+            <td mat-cell *matCellDef="let record">{{ record.Employee?.EMP_BRANCH_CODE || '-' }}</td>
           </ng-container>
-          
+
           <ng-container matColumnDef="aadhaar">
             <th mat-header-cell *matHeaderCellDef>Aadhaar</th>
-            <td mat-cell *matCellDef="let record">{{ record.aadhaarNumber || '-' }}</td>
+            <td mat-cell *matCellDef="let record">{{ record.Employee?.AadhaarNumber || '-' }}</td>
           </ng-container>
-          
+
           <ng-container matColumnDef="pan">
             <th mat-header-cell *matHeaderCellDef>PAN</th>
-            <td mat-cell *matCellDef="let record">{{ record.panNumber || '-' }}</td>
+            <td mat-cell *matCellDef="let record">{{ record.Employee?.PANNumber || '-' }}</td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="['rowNumber', 'empCode', 'empName', 'branch', 'aadhaar', 'pan']"></tr>
@@ -194,66 +194,66 @@
 
   <!-- Step 4: Result -->
   <div *ngIf="currentStep === 'result' && importResult" class="result-step">
-    <div class="result-header" [class.success]="importResult.successfulImports > 0" [class.error]="importResult.failedImports > 0 && importResult.successfulImports === 0">
-      <mat-icon *ngIf="importResult.successfulImports > 0">check_circle</mat-icon>
-      <mat-icon *ngIf="importResult.failedImports > 0 && importResult.successfulImports === 0">error</mat-icon>
-      <h2>{{ importResult.message }}</h2>
+    <div class="result-header" [class.success]="importResult.SuccessfulImports > 0" [class.error]="importResult.FailedImports > 0 && importResult.SuccessfulImports === 0">
+      <mat-icon *ngIf="importResult.SuccessfulImports > 0">check_circle</mat-icon>
+      <mat-icon *ngIf="importResult.FailedImports > 0 && importResult.SuccessfulImports === 0">error</mat-icon>
+      <h2>{{ importResult.Message }}</h2>
     </div>
 
     <div class="result-summary">
       <mat-card class="result-card success">
         <mat-card-content>
-          <div class="result-number">{{ importResult.successfulImports }}</div>
+          <div class="result-number">{{ importResult.SuccessfulImports }}</div>
           <div class="result-label">Successful</div>
         </mat-card-content>
       </mat-card>
       
-      <mat-card class="result-card error" *ngIf="importResult.failedImports > 0">
+      <mat-card class="result-card error" *ngIf="importResult.FailedImports > 0">
         <mat-card-content>
-          <div class="result-number">{{ importResult.failedImports }}</div>
+          <div class="result-number">{{ importResult.FailedImports }}</div>
           <div class="result-label">Failed</div>
         </mat-card-content>
       </mat-card>
 
       <mat-card class="result-card total">
         <mat-card-content>
-          <div class="result-number">{{ importResult.totalRecords }}</div>
+          <div class="result-number">{{ importResult.TotalRecords }}</div>
           <div class="result-label">Total</div>
         </mat-card-content>
       </mat-card>
     </div>
 
     <!-- Import Errors -->
-    <div *ngIf="importResult.errors && importResult.errors.length > 0" class="import-errors-section">
+    <div *ngIf="importResult.Errors && importResult.Errors.length > 0" class="import-errors-section">
       <h3>
         <mat-icon color="warn">error</mat-icon>
         Import Errors
       </h3>
       <div class="error-list">
-        <div *ngFor="let error of importResult.errors" class="error-item">
-          <mat-icon>{{ getErrorIcon(error.fieldName) }}</mat-icon>
+        <div *ngFor="let error of importResult.Errors" class="error-item">
+          <mat-icon>{{ getErrorIcon(error.FieldName) }}</mat-icon>
           <div class="error-details">
-            <span class="error-location">Row {{ error.rowNumber }}</span>
-            <span class="error-employee">{{ error.employeeCode }} - {{ error.employeeName }}</span>
-            <span class="error-message">{{ error.errorMessage }}</span>
+            <span class="error-location">Row {{ error.RowNumber }}</span>
+            <span class="error-employee">{{ error.EmployeeCode }} - {{ error.EmployeeName }}</span>
+            <span class="error-message">{{ error.ErrorMessage }}</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Success List -->
-    <div *ngIf="importResult.successfulEmployees && importResult.successfulEmployees.length > 0" class="success-list-section">
+    <div *ngIf="importResult.SuccessfulEmployees && importResult.SuccessfulEmployees.length > 0" class="success-list-section">
       <h3>
         <mat-icon color="primary">check_circle</mat-icon>
         Successfully Imported (First 10)
       </h3>
       <div class="success-list">
-        <div *ngFor="let emp of importResult.successfulEmployees.slice(0, 10)" class="success-item">
-          <mat-icon class="action-icon">{{ emp.action === 'Created' ? 'add_circle' : 'edit' }}</mat-icon>
-          <span class="emp-code">{{ emp.employeeCode }}</span>
-          <span class="emp-name">{{ emp.employeeName }}</span>
-          <span class="action-badge" [class.created]="emp.action === 'Created'" [class.updated]="emp.action === 'Updated'">
-            {{ emp.action }}
+        <div *ngFor="let emp of importResult.SuccessfulEmployees.slice(0, 10)" class="success-item">
+          <mat-icon class="action-icon">{{ emp.Action === 'Created' ? 'add_circle' : 'edit' }}</mat-icon>
+          <span class="emp-code">{{ emp.EmployeeCode }}</span>
+          <span class="emp-name">{{ emp.EmployeeName }}</span>
+          <span class="action-badge" [class.created]="emp.Action === 'Created'" [class.updated]="emp.Action === 'Updated'">
+            {{ emp.Action }}
           </span>
         </div>
       </div>
@@ -273,9 +273,9 @@
       <mat-icon>refresh</mat-icon>
       Upload Another
     </button>
-    <button 
-      mat-raised-button 
-      color="primary" 
+    <button
+      mat-raised-button
+      color="primary"
       (click)="importEmployees()"
       [disabled]="!previewData || previewData.ValidCount === 0"
     >
@@ -286,17 +286,17 @@
 
   <!-- Result Step Buttons -->
   <ng-container *ngIf="currentStep === 'result'">
-    <button mat-button (click)="resetUpload()" *ngIf="importResult?.failedImports && importResult!.failedImports > 0">
+    <button mat-button (click)="resetUpload()" *ngIf="importResult?.FailedImports && importResult!.FailedImports > 0">
       <mat-icon>refresh</mat-icon>
       Try Again
     </button>
-    <button 
-      mat-raised-button 
-      color="primary" 
-      (click)="closeDialog(importResult?.successfulImports ? importResult!.successfulImports > 0 : false)"
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="closeDialog(importResult?.SuccessfulImports ? importResult!.SuccessfulImports > 0 : false)"
     >
-      <mat-icon>{{ importResult?.successfulImports && importResult!.successfulImports > 0 ? 'done' : 'close' }}</mat-icon>
-      {{ importResult?.successfulImports && importResult!.successfulImports > 0 ? 'Done' : 'Close' }}
+      <mat-icon>{{ importResult?.SuccessfulImports && importResult!.SuccessfulImports > 0 ? 'done' : 'close' }}</mat-icon>
+      {{ importResult?.SuccessfulImports && importResult!.SuccessfulImports > 0 ? 'Done' : 'Close' }}
     </button>
   </ng-container>
 </mat-dialog-actions>
