@@ -654,6 +654,28 @@ export class PayrollModuleService {
 
   }
 
+  getRbiBankSalaryExport(dtSalaryPeriod: string, branch: string, employeeType: string): Observable<any[]> {
+    const params = new HttpParams()
+      .set('dtSalaryPeriod', encodeURIComponent(dtSalaryPeriod))
+      .set('branch', encodeURIComponent(branch))
+      .set('employeeType', encodeURIComponent(employeeType));
+
+    return this.httpClient.get<any[]>(`${this.apiUrl}payroll/GetRbiBankSalaryExport`, { params })
+      .pipe(catchError(this.errorHandle));
+  }
+
+  getRbiBankSalaryExportCsv(dtSalaryPeriod: string, branch: string, employeeType: string): Observable<Blob> {
+    const params = new HttpParams()
+      .set('dtSalaryPeriod', encodeURIComponent(dtSalaryPeriod))
+      .set('branch', encodeURIComponent(branch))
+      .set('employeeType', encodeURIComponent(employeeType));
+
+    return this.httpClient.get(`${this.apiUrl}payroll/GetRbiBankSalaryExportCsv`, { 
+      params, 
+      responseType: 'blob' 
+    }).pipe(catchError(this.errorHandle));
+  }
+
   getSOCSOToExcel(dtSalaryPeriod: string, branch: string): Observable<any[]> {
 
     const params = new HttpParams()

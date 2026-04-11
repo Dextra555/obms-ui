@@ -5,13 +5,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import Swal from 'sweetalert2';
 
 interface ImportResult {
-  success: boolean;
-  message: string;
-  totalRecords: number;
-  successfulImports: number;
-  failedImports: number;
-  errors: any[];
-  successfulEmployees: any[];
+  Success: boolean;
+  Message: string;
+  TotalRecords: number;
+  SuccessfulImports: number;
+  FailedImports: number;
+  Errors: any[];
+  SuccessfulEmployees: any[];
 }
 
 interface PreviewResult {
@@ -174,9 +174,12 @@ export class EmployeeImportDialogComponent implements OnInit {
     this.progressMessage = 'Preparing import...';
 
     const request = {
-      employees: this.previewData.ValidRecords,
-      updateExisting: this.updateExisting,
-      importedBy: sessionStorage.getItem('username') || 'admin'
+      Employees: this.previewData.ValidRecords,
+      UpdateExisting: this.updateExisting,
+      ImportedBy: sessionStorage.getItem('username') || 'admin',
+      FilePath: '',
+      Branch: '',
+      CreatedBy: sessionStorage.getItem('username') || 'admin'
     };
 
     // Simulate progress
@@ -189,17 +192,17 @@ export class EmployeeImportDialogComponent implements OnInit {
 
     console.log('=== FRONTEND IMPORT DEBUG ===');
         console.log('Sending bulk import request:', request);
-        console.log('Number of employees to import:', request.employees.length);
+        console.log('Number of employees to import:', request.Employees.length);
         console.log('============================');
         
         this.employeeService.bulkImportEmployees(request).subscribe({
       next: (result: any) => {
         console.log('=== FRONTEND IMPORT RESULT ===');
         console.log('Import result:', result);
-        console.log('Successful imports:', result.successfulImports);
-        console.log('Failed imports:', result.failedImports);
+        console.log('Successful imports:', result.SuccessfulImports);
+        console.log('Failed imports:', result.FailedImports);
         console.log('============================');
-        
+
         clearInterval(progressInterval);
         this.importResult = result;
         this.progressValue = 100;
@@ -208,9 +211,9 @@ export class EmployeeImportDialogComponent implements OnInit {
         this.currentStep = 'result';
 
         // Show success notification
-        if (result.successfulImports > 0) {
+        if (result.SuccessfulImports > 0) {
           this.snackBar.open(
-            `Successfully imported ${result.successfulImports} employees`,
+            `Successfully imported ${result.SuccessfulImports} employees`,
             'Close',
             { duration: 5000 }
           );
