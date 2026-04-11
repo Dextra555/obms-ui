@@ -12,6 +12,7 @@ export interface CommercialBreakdownData {
   HRAPercentage?: number;
   Leaves?: number;
   LeavesPercentage?: number;
+  NFH?: number;
   ProfessionalTax?: number;
   Bonus?: number;
   BonusPercentage?: number;
@@ -19,11 +20,16 @@ export interface CommercialBreakdownData {
   RelieverChargesPercentage?: number;
   PF?: number;
   PFPercentage?: number;
+  EmployeePF?: number;
+  EmployeePFPercentage?: number;
   ESI?: number;
   ESIPercentage?: number;
+  EmployeeESI?: number;
+  EmployeeESIPercentage?: number;
   UniformCost?: number;
   Others?: number;
   OthersPercentage?: number;
+  OtherAllowances?: number;
   AdministrationCharges?: number;
   AdministrationChargesPercentage?: number;
   ManagementFee?: number;
@@ -67,9 +73,11 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
     return this.minimumWages +
       (this.frm.get('HRA')?.value || 0) +
       (this.frm.get('Leaves')?.value || 0) +
+      (this.frm.get('NFH')?.value || 0) +
       (this.frm.get('ProfessionalTax')?.value || 0) +
       (this.frm.get('Bonus')?.value || 0) +
-      (this.frm.get('RelieverCharges')?.value || 0);
+      (this.frm.get('RelieverCharges')?.value || 0) +
+      (this.frm.get('OtherAllowances')?.value || 0);
   }
 
   // Statutory Costs (same as Quotation page)
@@ -133,6 +141,7 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
       HRAPercentage: [10, [Validators.required, Validators.min(0), Validators.max(100)]],
       Leaves: [{value: 0, disabled: true}, Validators.required],
       LeavesPercentage: [8.33, [Validators.required, Validators.min(0), Validators.max(100)]],
+      NFH: [0, [Validators.required, Validators.min(0)]],
       ProfessionalTax: [0, [Validators.required, Validators.min(0)]],
       Bonus: [{value: 0, disabled: true}, Validators.required],
       BonusPercentage: [8.33, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -140,11 +149,16 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
       RelieverChargesPercentage: [25, [Validators.required, Validators.min(0), Validators.max(100)]],
       PF: [{value: 0, disabled: true}, Validators.required],
       PFPercentage: [12, [Validators.required, Validators.min(0), Validators.max(100)]],
+      EmployeePF: [{value: 0, disabled: true}, Validators.required],
+      EmployeePFPercentage: [12, [Validators.required, Validators.min(0), Validators.max(100)]],
       ESI: [{value: 0, disabled: true}, Validators.required],
       ESIPercentage: [3.25, [Validators.required, Validators.min(0), Validators.max(100)]],
+      EmployeeESI: [{value: 0, disabled: true}, Validators.required],
+      EmployeeESIPercentage: [0.75, [Validators.required, Validators.min(0), Validators.max(100)]],
       UniformCost: [0, [Validators.required, Validators.min(0)]],
       Others: [{value: 0, disabled: true}, Validators.required],
       OthersPercentage: [2, [Validators.required, Validators.min(0), Validators.max(100)]],
+      OtherAllowances: [0, [Validators.required, Validators.min(0)]],
       AdministrationCharges: [{value: 0, disabled: true}, Validators.required],
       AdministrationChargesPercentage: [5, [Validators.required, Validators.min(0), Validators.max(100)]],
       ManagementFee: [{value: 0, disabled: true}, Validators.required],
@@ -165,26 +179,30 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
 
   private loadExistingData(): void {
     if (this.data) {
-      this.noOfGuards = this.data.NoOfGuards || 1;
-      this.noOfDays = this.data.NoOfDays || 30;
-      
+      this.noOfGuards = this.data.NoOfGuards ?? 1;
+      this.noOfDays = this.data.NoOfDays ?? 30;
+
       this.frm.patchValue({
         NoOfGuards: this.noOfGuards,
         NoOfDays: this.noOfDays,
-        MinimumWages: this.data.MinimumWages || 0,
-        Basic: this.data.Basic || 0,
-        DA: this.data.DA || 0,
-        HRAPercentage: this.data.HRAPercentage || 10,
-        LeavesPercentage: this.data.LeavesPercentage || 8.33,
-        ProfessionalTax: this.data.ProfessionalTax || 0,
-        BonusPercentage: this.data.BonusPercentage || 8.33,
-        RelieverChargesPercentage: this.data.RelieverChargesPercentage || 25,
-        PFPercentage: this.data.PFPercentage || 12,
-        ESIPercentage: this.data.ESIPercentage || 3.25,
-        UniformCost: this.data.UniformCost || 0,
-        OthersPercentage: this.data.OthersPercentage || 2,
-        AdministrationChargesPercentage: this.data.AdministrationChargesPercentage || 5,
-        ManagementFeePercentage: this.data.ManagementFeePercentage || 15
+        MinimumWages: this.data.MinimumWages ?? 0,
+        Basic: this.data.Basic ?? 0,
+        DA: this.data.DA ?? 0,
+        HRAPercentage: this.data.HRAPercentage ?? 10,
+        LeavesPercentage: this.data.LeavesPercentage ?? 8.33,
+        NFH: this.data.NFH ?? 0,
+        ProfessionalTax: this.data.ProfessionalTax ?? 0,
+        BonusPercentage: this.data.BonusPercentage ?? 8.33,
+        RelieverChargesPercentage: this.data.RelieverChargesPercentage ?? 25,
+        PFPercentage: this.data.PFPercentage ?? 12,
+        EmployeePFPercentage: this.data.EmployeePFPercentage ?? 12,
+        ESIPercentage: this.data.ESIPercentage ?? 3.25,
+        EmployeeESIPercentage: this.data.EmployeeESIPercentage ?? 0.75,
+        UniformCost: this.data.UniformCost ?? 0,
+        OthersPercentage: this.data.OthersPercentage ?? 2,
+        OtherAllowances: this.data.OtherAllowances ?? 0,
+        AdministrationChargesPercentage: this.data.AdministrationChargesPercentage ?? 5,
+        ManagementFeePercentage: this.data.ManagementFeePercentage ?? 15
       });
     }
   }
@@ -200,7 +218,9 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
     const bonusPercentage = (this.frm.get('BonusPercentage')?.value || 0) / 100;
     const relieverChargesPercentage = (this.frm.get('RelieverChargesPercentage')?.value || 0) / 100;
     const pfPercentage = (this.frm.get('PFPercentage')?.value || 0) / 100;
+    const employeePFPercentage = (this.frm.get('EmployeePFPercentage')?.value || 0) / 100;
     const esiPercentage = (this.frm.get('ESIPercentage')?.value || 0) / 100;
+    const employeeESIPercentage = (this.frm.get('EmployeeESIPercentage')?.value || 0) / 100;
     const othersPercentage = (this.frm.get('OthersPercentage')?.value || 0) / 100;
     const adminChargesPercentage = (this.frm.get('AdministrationChargesPercentage')?.value || 0) / 100;
 
@@ -210,7 +230,9 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
     const bonus = bonusPercentage === 0 ? 0 : Math.round(basicPlusDA * bonusPercentage * 100) / 100;
     const relieverCharges = relieverChargesPercentage === 0 ? 0 : Math.round(basicPlusDA * relieverChargesPercentage * 100) / 100;
     const pf = pfPercentage === 0 ? 0 : Math.round(basicPlusDA * pfPercentage * 100) / 100;
+    const employeePF = employeePFPercentage === 0 ? 0 : Math.round(basicPlusDA * employeePFPercentage * 100) / 100;
     const esi = esiPercentage === 0 ? 0 : Math.round(basicPlusDA * esiPercentage * 100) / 100;
+    const employeeESI = employeeESIPercentage === 0 ? 0 : Math.round(basicPlusDA * employeeESIPercentage * 100) / 100;
     const others = othersPercentage === 0 ? 0 : Math.round(this.subTotal * othersPercentage * 100) / 100;
     const adminCharges = adminChargesPercentage === 0 ? 0 : Math.round(this.subTotal * adminChargesPercentage * 100) / 100;
     const managementFeePercentage = (this.frm.get('ManagementFeePercentage')?.value || 0) / 100;
@@ -224,7 +246,9 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
       Bonus: bonus,
       RelieverCharges: relieverCharges,
       PF: pf,
+      EmployeePF: employeePF,
       ESI: esi,
+      EmployeeESI: employeeESI,
       Others: others,
       AdministrationCharges: adminCharges,
       ManagementFee: managementFee
