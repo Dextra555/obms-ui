@@ -271,17 +271,8 @@ export class InvoiceComponent implements AfterViewInit {
       }
 
       if (d.IsTaxable) {
-        let pa;
-        if (agreementPeriod.getFullYear() <= 2010) {
-          pa = 0.05;
-        } else if ((agreementPeriod >= new Date(TAX.GSTStart6) && agreementPeriod <= new Date(TAX.GSTEnd6)) || (agreementPeriod >= new Date(TAX.SSTStart6) && agreementPeriod <= new Date(TAX.SSTEnd6))) {
-          pa = 0.08;
-        } else if (agreementPeriod >= new Date(TAX.GSTStart0) && agreementPeriod <= new Date(TAX.GSTEnd0)) {
-          pa = 0.00;
-        } else {
-          pa = 0.08;
-        }
-        this.TaxAmount += (d.MonthTotal - d.DiscountAmount) * pa;
+        const taxRate = 0.18; // 18% GST
+        this.TaxAmount += (d.MonthTotal - d.DiscountAmount) * taxRate;
       }
 
     });

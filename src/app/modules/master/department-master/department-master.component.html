@@ -89,7 +89,7 @@
 </mat-card>
 
 <!-- Department Form -->
-<mat-card *ngIf="showForm">
+<mat-card *ngIf="showForm && frm">
   <mat-card-content>
     <div class="row mb-3">
       <div class="col-12">
@@ -129,9 +129,13 @@
 
       <div class="row">
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-          <mat-slide-toggle formControlName="IsActive" color="primary">
-            {{frm.get('IsActive')?.value ? 'Active' : 'Inactive'}}
-          </mat-slide-toggle>
+          <div class="d-flex align-items-center">
+            <mat-slide-toggle formControlName="IsActive" color="primary" class="mr-2">
+            </mat-slide-toggle>
+            <span class="badge" [ngClass]="frm.get('IsActive')?.value ? 'badge-success' : 'badge-danger'">
+              {{frm.get('IsActive')?.value ? 'Active' : 'Inactive'}}
+            </span>
+          </div>
         </div>
       </div>
 

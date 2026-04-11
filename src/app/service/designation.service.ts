@@ -12,6 +12,8 @@ export interface Designation {
   CreatedBy?: string;
   UpdatedDate?: string;
   UpdatedBy?: string;
+  DepartmentId?: number;
+  DepartmentName?: string;
 }
 
 @Injectable({
@@ -22,8 +24,9 @@ export class DesignationService {
 
   constructor(private http: HttpClient) { }
 
-  getAll(): Observable<Designation[]> {
-    return this.http.get<Designation[]>(this.baseUrl);
+  getAll(departmentId?: number): Observable<Designation[]> {
+    const params = departmentId ? `?departmentId=${departmentId}` : '';
+    return this.http.get<Designation[]>(`${this.baseUrl}${params}`);
   }
 
   getById(id: number): Observable<Designation> {

@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { DesignationService, Designation } from '../../../service/designation.service';
+import { DepartmentService, Department } from '../../../service/department.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -14,24 +15,29 @@ import Swal from 'sweetalert2';
 export class DesignationMasterComponent implements OnInit {
   designations: Designation[] = [];
   dataSource!: MatTableDataSource<Designation>;
-  displayedColumns: string[] = ['DesignationId', 'DesignationCode', 'DesignationName', 'Description', 'IsActive', 'action'];
+  displayedColumns: string[] = ['DesignationId', 'DesignationCode', 'DesignationName', 'DepartmentName', 'Description', 'IsActive', 'action'];
   
   frm!: FormGroup;
   isEdit: boolean = false;
   currentDesignationId: number = 0;
   showForm: boolean = false;
   
+  departments: Department[] = [];
+  selectedDepartmentId: number | null = null;
+  
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private designationService: DesignationService,
+    private departmentService: DepartmentService,
     private fb: FormBuilder
   ) {
     this.initializeForm();
   }
 
   ngOnInit(): void {
+    this.loadDepartments();
     this.loadDesignations();
   }
 
@@ -41,12 +47,25 @@ export class DesignationMasterComponent implements OnInit {
       DesignationCode: ['', [Validators.required, Validators.maxLength(100)]],
       DesignationName: ['', [Validators.required, Validators.maxLength(200)]],
       Description: ['', Validators.maxLength(500)],
+      DepartmentId: [null],
       IsActive: [true]
     });
   }
 
+  loadDepartments(): void {
+    this.departmentService.getAll().subscribe({
+      next: (data) => {
+        this.departments = data;
+      },
+      error: (error) => {
+        console.error('Error loading departments:', error);
+      }
+    });
+  }
+
   loadDesignations(): void {
-    this.designationService.getAll().subscribe({
+    const departmentId = this.selectedDepartmentId ?? undefined;
+    this.designationService.getAll(departmentId).subscribe({
       next: (data) => {
         this.designations = data;
         this.dataSource = new MatTableDataSource(this.designations);
@@ -65,6 +84,10 @@ export class DesignationMasterComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+  onDepartmentFilterChange(): void {
+    this.loadDesignations();
+  }
+
   onNew(): void {
     this.isEdit = false;
     this.currentDesignationId = 0;
@@ -73,6 +96,7 @@ export class DesignationMasterComponent implements OnInit {
       DesignationCode: '',
       DesignationName: '',
       Description: '',
+      DepartmentId: this.selectedDepartmentId,
       IsActive: true
     });
     this.showForm = true;
@@ -86,6 +110,7 @@ export class DesignationMasterComponent implements OnInit {
       DesignationCode: designation.DesignationCode,
       DesignationName: designation.DesignationName,
       Description: designation.Description || '',
+      DepartmentId: designation.DepartmentId,
       IsActive: designation.IsActive
     });
     this.showForm = true;

@@ -67,6 +67,7 @@
               <th class="mat-header-cell">Type</th>
               <th class="mat-header-cell">Guards</th>
               <th class="mat-header-cell">Per Day</th>
+              <th class="mat-header-cell">Per Hours</th>
               <th class="mat-header-cell">Working<br/> Hours</th>
               <th class="mat-header-cell">Working<br/> Days</th>
               <th class="mat-header-cell">Follow <br/>Calendar</th>
@@ -95,6 +96,12 @@
               <td class="mat-cell">
                 <mat-form-field appearance="outline" style="width: 45px !important;">
                   <input type="text" formControlName="NoOfGuards" (input)="DetailRowChange()" matInput placeholder=""
+                         autocomplete="off">
+                </mat-form-field>
+              </td>
+              <td class="mat-cell">
+                <mat-form-field appearance="outline" style="width: 80px !important;">
+                  <input type="text" formControlName="PerDay" (input)="onPerDayChange()" matInput placeholder=""
                          autocomplete="off">
                 </mat-form-field>
               </td>
@@ -228,6 +235,10 @@
               <ng-container matColumnDef="NoOfGuards">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Guards</th>
                 <td mat-cell *matCellDef="let element" class="text-left"> {{element.NoOfGuards}} </td>
+              </ng-container>
+              <ng-container matColumnDef="PerDay">
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Per Day</th>
+                <td mat-cell *matCellDef="let element" class="text-left"> {{element.PerDay}} </td>
               </ng-container>
               <ng-container matColumnDef="Rate">
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Per Head</th>
