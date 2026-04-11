@@ -920,14 +920,6 @@ export class PdfExportService {
     doc.setTextColor(0, 0, 0);
     doc.text('Securing Global Trade', margin + 45, 23);
 
-    // --- ID and Date (Top Right) ---
-    doc.setFontSize(9);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(maroon[0], maroon[1], maroon[2]);
-    const formattedDate = date ? new Date(date).toLocaleDateString('en-GB') : ''; // DD/MM/YYYY
-    doc.text(`${title} ID: ${id}`, margin + contentWidth - 2, 18, { align: 'right' });
-    doc.text(`${title} Date: ${formattedDate}`, margin + contentWidth - 2, 23, { align: 'right' });
-
     doc.setDrawColor(maroon[0], maroon[1], maroon[2]);
     doc.line(margin, 30, margin + contentWidth, 30);
 
@@ -937,8 +929,16 @@ export class PdfExportService {
     doc.text(title, pageCenter, 38, { align: 'center' });
     doc.setTextColor(0, 0, 0);
 
-    doc.line(margin, 43, margin + contentWidth, 43);
-    doc.line(pageCenter, 43, pageCenter, 75);
+    // --- ID and Date (Both on right side below QUOTATION headline) ---
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(maroon[0], maroon[1], maroon[2]);
+    const formattedDate = date ? new Date(date).toLocaleDateString('en-GB') : ''; // DD/MM/YYYY
+    doc.text(`${title} ID: ${id}`, margin + contentWidth - 2, 44, { align: 'right' });
+    doc.text(`${title} Date: ${formattedDate}`, margin + contentWidth - 2, 49, { align: 'right' });
+
+    doc.line(margin, 55, margin + contentWidth, 55);
+    doc.line(pageCenter, 55, pageCenter, 95);
 
     // --- TO section (Client) - Robust Mapping ---
     const clientName = clientObj?.Name || clientObj?.ClientName || clientObj?.clientName || clientObj?.name || 'Client Name Missing';
@@ -948,7 +948,7 @@ export class PdfExportService {
     const clientState = clientObj?.State || clientObj?.IndianState || clientObj?.state || '';
     const clientGSTIN = clientObj?.GSTIN || clientObj?.gstin || '';
 
-    let y = 48;
+    let y = 60;
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.text('TO:', margin + 2, y);
@@ -970,7 +970,7 @@ export class PdfExportService {
     const branchState = branchObj?.State || branchObj?.state || '';
     const branchGSTIN = branchObj?.GSTIN || branchObj?.gstin || '';
 
-    let y_branch = 48;
+    let y_branch = 60;
     doc.setFont('helvetica', 'bold');
     doc.text('FROM:', margin + contentWidth - 2, y_branch, { align: 'right' });
     doc.setFont('helvetica', 'normal');
@@ -983,94 +983,10 @@ export class PdfExportService {
     }
     if (branchGSTIN) { doc.text(`GSTIN: ${branchGSTIN}`, margin + contentWidth - 2, y_branch, { align: 'right' }); y_branch += 4; }
 
-    doc.line(margin, 75, margin + contentWidth, 75);
+    doc.line(margin, 95, margin + contentWidth, 95);
 
-    // --- Commercial Breakdown Summary Section ---
-    let mainTableStartY: number;
-    if (details.length > 0 && (details[0].Basic || details[0].DA || details[0].PF || details[0].ESI || details[0].HRA)) {
-      let y_cb = 80;
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(maroon[0], maroon[1], maroon[2]);
-      doc.text('Commercial Breakdown Summary', pageCenter, y_cb, { align: 'center' });
-      y_cb += 8;
-
-      // Create commercial breakdown table
-      const cbHeaders = [['Component', 'Basic', 'DA', 'HRA', 'PF', 'ESI', 'Other', 'Total/Month']];
-      const cbRows: any[] = [];
-
-      details.forEach((detail: any, index: number) => {
-        const basic = this.getCommercialValue(detail, 'Basic');
-        const da = this.getCommercialValue(detail, 'DA');
-        const hra = this.getCommercialValue(detail, 'HRA');
-        const pf = this.getCommercialValue(detail, 'PF');
-        const esi = this.getCommercialValue(detail, 'ESI');
-        const others = this.getCommercialValue(detail, 'Leaves') +
-          this.getCommercialValue(detail, 'Bonus') +
-          this.getCommercialValue(detail, 'Uniform') +
-          this.getCommercialValue(detail, 'ProfessionalTax') +
-          this.getCommercialValue(detail, 'RelieverCharges');
-        const total = basic + da + hra + pf + esi + others;
-
-        cbRows.push([
-          detail.Description || `Service ${index + 1}`,
-          basic.toFixed(2),
-          da.toFixed(2),
-          hra.toFixed(2),
-          pf.toFixed(2),
-          esi.toFixed(2),
-          others.toFixed(2),
-          total.toFixed(2)
-        ]);
-      });
-
-      // Add totals row
-      const totals = cbRows.reduce((acc, row) => {
-        for (let i = 1; i < row.length; i++) {
-          acc[i] = (acc[i] || 0) + parseFloat(row[i]);
-        }
-        return acc;
-      }, new Array(cbHeaders[0].length).fill(0));
-
-      cbRows.push([
-        'TOTAL',
-        totals[1].toFixed(2),
-        totals[2].toFixed(2),
-        totals[3].toFixed(2),
-        totals[4].toFixed(2),
-        totals[5].toFixed(2),
-        totals[6].toFixed(2),
-        totals[7].toFixed(2)
-      ]);
-
-      autoTable(doc, {
-        startY: y_cb,
-        margin: { left: margin, right: margin },
-        head: cbHeaders,
-        body: cbRows,
-        theme: 'grid',
-        headStyles: { fillColor: maroon, textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8 },
-        styles: { fontSize: 7, cellPadding: 1.5, lineWidth: 0.1, lineColor: maroon },
-        columnStyles: { 0: { fontStyle: 'bold' } },
-        didParseCell: function (data) {
-          if (data.section === 'body' && data.row.index === cbRows.length - 1) {
-            data.cell.styles.fontStyle = 'bold';
-            data.cell.styles.fillColor = maroon;
-            data.cell.styles.textColor = [255, 255, 255];
-          }
-        }
-      });
-
-      const finalCbY = (doc as any).lastAutoTable.finalY + 5;
-      doc.line(margin, finalCbY, margin + contentWidth, finalCbY);
-
-      // Update the starting Y position for the main table
-      mainTableStartY = finalCbY + 5;
-    } else {
-      mainTableStartY = 80;
-    }
-
-    // --- Table Data ---
+    // --- Table Data (Main Summary Table on Page 1) ---
+    let mainTableStartY = 100;
     let totalMonth = 0;
     let totalTax = 0;
     const bState = (branchObj?.State || branchObj?.state || '').toString().toLowerCase().trim();
@@ -1087,31 +1003,31 @@ export class PdfExportService {
       totalMonth += monthAmt;
       totalTax += taxAmt;
 
-      return [index + 1, serviceName, description, hsnCode, item.NoOfGuards ?? '-', Math.round(item.Rate).toLocaleString('en-IN') ?? '-', Math.round(monthAmt).toLocaleString('en-IN')];
+      const noOfHours = item.NoOfHours || 8;
+      const rate = item.Rate || 0;
+      const perDayValue = 1 * rate * noOfHours;
+
+      return [index + 1, serviceName, description, hsnCode, item.NoOfGuards ?? '-', noOfHours, Math.round(perDayValue).toLocaleString('en-IN'), Math.round(rate).toLocaleString('en-IN') ?? '-', Math.round(monthAmt).toLocaleString('en-IN')];
     });
 
     const summaryData = [
-      ['', '', '', '', '', 'Sub Total', Math.round(totalMonth).toLocaleString('en-IN')],
-      ['', '', '', '', '', isSameState ? 'CGST (9%)' : 'IGST (18%)', isSameState ? Math.round(totalTax / 2).toLocaleString('en-IN') : Math.round(totalTax).toLocaleString('en-IN')]
+      ['', '', '', '', '', '', '', '', 'Sub Total', Math.round(totalMonth).toLocaleString('en-IN')],
+      ['', '', '', '', '', '', '', '', isSameState ? 'CGST (9%)' : 'IGST (18%)', isSameState ? Math.round(totalTax / 2).toLocaleString('en-IN') : Math.round(totalTax).toLocaleString('en-IN')]
     ];
     if (isSameState) {
-      summaryData.push(['', '', '', '', '', 'SGST (9%)', Math.round(totalTax / 2).toLocaleString('en-IN')]);
+      summaryData.push(['', '', '', '', '', '', '', '', 'SGST (9%)', Math.round(totalTax / 2).toLocaleString('en-IN')]);
     }
-    summaryData.push(['', '', '', '', '', 'Grand Total', Math.round(totalMonth + totalTax).toLocaleString('en-IN')]);
-    
-    // Add a final TOTAL row that sums all values
-    const grandTotal = Math.round(totalMonth + totalTax);
-    summaryData.push(['', '', '', '', '', 'TOTAL ALL VALUES', grandTotal.toLocaleString('en-IN')]);
+    summaryData.push(['', '', '', '', '', '', '', '', 'Grand Total', Math.round(totalMonth + totalTax).toLocaleString('en-IN')]);
 
     autoTable(doc, {
       startY: mainTableStartY,
       margin: { left: margin, right: margin },
-      head: [['S.No', 'Service Name', 'Description', 'HSN Code', 'Qty', 'Rate', 'Amount']],
+      head: [['S.No', 'Service Name', 'Description', 'HSN Code', 'Qty', 'Hours', 'PerDay', 'Rate', 'Amount']],
       body: [...tableData, ...summaryData],
       theme: 'grid',
       headStyles: { fillColor: maroon, textColor: [255, 255, 255], fontStyle: 'bold', lineWidth: 0.1 },
       styles: { fontSize: 8, cellPadding: 2, lineWidth: 0.1, lineColor: maroon },
-      columnStyles: { 6: { halign: 'right' } },
+      columnStyles: { 6: { halign: 'right' }, 8: { halign: 'right' } },
       didParseCell: function (data) {
         // Make summary rows bold
         if (data.section === 'body' && data.row.index >= tableData.length) {
@@ -1143,6 +1059,65 @@ export class PdfExportService {
     doc.setTextColor(maroon[0], maroon[1], maroon[2]);
     doc.text('For FreightWatch G Security Service', margin + contentWidth - 2, finalY, { align: 'right' });
     doc.text('Authorized Signatory', margin + contentWidth - 2, finalY + 20, { align: 'right' });
+
+    // --- Add new page for Commercial Breakdown Summary ---
+    doc.addPage();
+    doc.setDrawColor(maroon[0], maroon[1], maroon[2]);
+    doc.setLineWidth(0.5);
+    doc.rect(margin, 10, contentWidth, 277);
+
+    let y_cb = 20;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(maroon[0], maroon[1], maroon[2]);
+    doc.text('Commercial Breakdown Summary', pageCenter, y_cb, { align: 'center' });
+    y_cb += 10;
+
+    const d = date ? new Date(date) : new Date();
+    const monthYearStr = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    const headers2 = [['Description']];
+    details.forEach((detail: any) => { headers2[0].push(detail.Description || 'Service'); });
+
+    const rows2: any[] = [
+      [`Minimum Wages ( ${monthYearStr} )`, ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'Basic') + this.getCommercialValue(d, 'DA')).toLocaleString('en-IN'))],
+      ['Basic', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'Basic')).toLocaleString('en-IN'))],
+      ['DA', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'DA')).toLocaleString('en-IN'))],
+      ['HRA', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'HRA')).toLocaleString('en-IN'))],
+      ['Leaves', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'Leaves')).toLocaleString('en-IN'))],
+      ['Allowance', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'Allowance')).toLocaleString('en-IN'))],
+      ['Bonus', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'Bonus')).toLocaleString('en-IN'))],
+      ['NFH', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'NFH')).toLocaleString('en-IN'))],
+      ['TOTAL - Wages + Allowances', ...details.map((d: any) => Math.round(this.calculateWagesTotal(d)).toLocaleString('en-IN'))],
+      ['PF', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'PF')).toLocaleString('en-IN'))],
+      ['ESI', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'ESI')).toLocaleString('en-IN'))],
+      ['Professional Tax', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'ProfessionalTax')).toLocaleString('en-IN'))],
+      ['TOTAL - Statutory', ...details.map((d: any) => Math.round(this.calculateStatutoryTotal(d)).toLocaleString('en-IN'))],
+      ['Uniform Cost', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'UniformCost')).toLocaleString('en-IN'))],
+      ['Others', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'Others')).toLocaleString('en-IN'))],
+      ['Administration Charges', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'AdministrationCharges')).toLocaleString('en-IN'))],
+      ['Total Direct Cost', ...details.map((d: any) => Math.round(this.calculateDirectCost(d)).toLocaleString('en-IN'))],
+      ['Service Fee', ...details.map((d: any) => Math.round(this.getCommercialValue(d, 'ServiceFee')).toLocaleString('en-IN'))],
+      ['Per Unit cost', ...details.map((d: any) => d.Rate ? Math.round(d.Rate).toLocaleString('en-IN') : '0')]
+    ];
+
+    const columnStyles: any = {
+      0: { halign: 'left' }
+    };
+    
+    details.forEach((_, index) => {
+      columnStyles[index + 1] = { halign: 'right' };
+    });
+
+    autoTable(doc, {
+      startY: y_cb,
+      head: headers2,
+      body: rows2,
+      theme: 'grid',
+      headStyles: { fillColor: maroon, textColor: [255, 255, 255], fontStyle: 'bold' },
+      styles: { fontSize: 9, cellPadding: 2, lineWidth: 0.1, lineColor: maroon },
+      columnStyles: columnStyles
+    });
 
     if (save) {
       doc.save(`${title === 'QUOTATION' ? 'Quotation' : 'Agreement'}_${clientObj?.Code || clientObj?.code || 'Document'}.pdf`);
