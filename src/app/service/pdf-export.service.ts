@@ -1011,13 +1011,13 @@ export class PdfExportService {
     });
 
     const summaryData = [
-      ['', '', '', '', '', '', '', '', 'Sub Total', Math.round(totalMonth).toLocaleString('en-IN')],
-      ['', '', '', '', '', '', '', '', isSameState ? 'CGST (9%)' : 'IGST (18%)', isSameState ? Math.round(totalTax / 2).toLocaleString('en-IN') : Math.round(totalTax).toLocaleString('en-IN')]
+      ['', '', '', '', '', '', '', 'Sub Total', Math.round(totalMonth).toLocaleString('en-IN')],
+      ['', '', '', '', '', '', '', isSameState ? 'CGST (9%)' : 'IGST (18%)', isSameState ? Math.round(totalTax / 2).toLocaleString('en-IN') : Math.round(totalTax).toLocaleString('en-IN')]
     ];
     if (isSameState) {
-      summaryData.push(['', '', '', '', '', '', '', '', 'SGST (9%)', Math.round(totalTax / 2).toLocaleString('en-IN')]);
+      summaryData.push(['', '', '', '', '', '', '', 'SGST (9%)', Math.round(totalTax / 2).toLocaleString('en-IN')]);
     }
-    summaryData.push(['', '', '', '', '', '', '', '', 'Grand Total', Math.round(totalMonth + totalTax).toLocaleString('en-IN')]);
+    summaryData.push(['', '', '', '', '', '', '', 'Grand Total', Math.round(totalMonth + totalTax).toLocaleString('en-IN')]);
 
     autoTable(doc, {
       startY: mainTableStartY,
