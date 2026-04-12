@@ -187,8 +187,8 @@ export class NewEmployeeComponent implements OnInit {
       CB_HRAPercentage: [0],
       CB_Leaves: [0],
       CB_LeavesPercentage: [0],
-      CB_NH: [0],
-      CB_NHPercentage: [0],
+      CB_NFH: [0],
+      CB_NFHPercentage: [0],
       CB_Advance: [0],
       CB_AdvancePercentage: [0],
       CB_ProfessionalTax: [0],
@@ -261,8 +261,8 @@ export class NewEmployeeComponent implements OnInit {
         this.frm.get('CB_HRAPercentage')?.setValue(salaryDetail?.CB_HRAPercentage || 0);
         this.frm.get('CB_Leaves')?.setValue(salaryDetail?.CB_Leaves || 0);
         this.frm.get('CB_LeavesPercentage')?.setValue(salaryDetail?.CB_LeavesPercentage || 0);
-        this.frm.get('CB_NH')?.setValue(salaryDetail?.CB_NH || 0);
-        this.frm.get('CB_NHPercentage')?.setValue(salaryDetail?.CB_NHPercentage || 0);
+        this.frm.get('CB_NFH')?.setValue(salaryDetail?.CB_NFH || 0);
+        this.frm.get('CB_NFHPercentage')?.setValue(salaryDetail?.CB_NFHPercentage || 0);
         this.frm.get('CB_Advance')?.setValue(salaryDetail?.CB_Advance || 0);
         this.frm.get('CB_AdvancePercentage')?.setValue(salaryDetail?.CB_AdvancePercentage || 0);
         this.frm.get('CB_ProfessionalTax')?.setValue(salaryDetail?.CB_ProfessionalTax || 0);
@@ -856,6 +856,10 @@ export class NewEmployeeComponent implements OnInit {
         HRAPercentage: this.frm.get('CB_HRAPercentage')?.value || 0,
         Leaves: this.frm.get('CB_Leaves')?.value || 0,
         LeavesPercentage: this.frm.get('CB_LeavesPercentage')?.value || 0,
+        NFH: this.frm.get('CB_NFH')?.value || 0,
+        NFHPercentage: this.frm.get('CB_NFHPercentage')?.value || 0,
+        Advance: this.frm.get('CB_Advance')?.value || 0,
+        AdvancePercentage: this.frm.get('CB_AdvancePercentage')?.value || 0,
         ProfessionalTax: this.frm.get('CB_ProfessionalTax')?.value || 0,
         Bonus: this.frm.get('CB_Bonus')?.value || 0,
         BonusPercentage: this.frm.get('CB_BonusPercentage')?.value || 0,
@@ -889,6 +893,10 @@ export class NewEmployeeComponent implements OnInit {
           CB_HRAPercentage: result.HRAPercentage || 0,
           CB_Leaves: result.Leaves || 0,
           CB_LeavesPercentage: result.LeavesPercentage || 0,
+          CB_NFH: result.NFH || 0,
+          CB_NFHPercentage: result.NFHPercentage || 0,
+          CB_Advance: result.Advance || 0,
+          CB_AdvancePercentage: result.AdvancePercentage || 0,
           CB_ProfessionalTax: result.ProfessionalTax || 0,
           CB_Bonus: result.Bonus || 0,
           CB_BonusPercentage: result.BonusPercentage || 0,

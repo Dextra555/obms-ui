@@ -13,6 +13,9 @@ export interface CommercialBreakdownData {
   Leaves?: number;
   LeavesPercentage?: number;
   NFH?: number;
+  NFHPercentage?: number;
+  Advance?: number;
+  AdvancePercentage?: number;
   ProfessionalTax?: number;
   Bonus?: number;
   BonusPercentage?: number;
@@ -74,6 +77,7 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
       (this.frm.get('HRA')?.value || 0) +
       (this.frm.get('Leaves')?.value || 0) +
       (this.frm.get('NFH')?.value || 0) +
+      (this.frm.get('Advance')?.value || 0) +
       (this.frm.get('ProfessionalTax')?.value || 0) +
       (this.frm.get('Bonus')?.value || 0) +
       (this.frm.get('RelieverCharges')?.value || 0) +
@@ -142,6 +146,9 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
       Leaves: [{value: 0, disabled: true}, Validators.required],
       LeavesPercentage: [8.33, [Validators.required, Validators.min(0), Validators.max(100)]],
       NFH: [0, [Validators.required, Validators.min(0)]],
+      NFHPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      Advance: [0, [Validators.required, Validators.min(0)]],
+      AdvancePercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
       ProfessionalTax: [0, [Validators.required, Validators.min(0)]],
       Bonus: [{value: 0, disabled: true}, Validators.required],
       BonusPercentage: [8.33, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -191,6 +198,9 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
         HRAPercentage: this.data.HRAPercentage ?? 10,
         LeavesPercentage: this.data.LeavesPercentage ?? 8.33,
         NFH: this.data.NFH ?? 0,
+        NFHPercentage: this.data.NFHPercentage ?? 0,
+        Advance: this.data.Advance ?? 0,
+        AdvancePercentage: this.data.AdvancePercentage ?? 0,
         ProfessionalTax: this.data.ProfessionalTax ?? 0,
         BonusPercentage: this.data.BonusPercentage ?? 8.33,
         RelieverChargesPercentage: this.data.RelieverChargesPercentage ?? 25,

@@ -99,11 +99,37 @@
       <!-- National Festival Allowance (NFH) -->
       <h6 class="text-success mb-3"><i class="fas fa-flag mr-2"></i>National Festival Allowance (NFH)</h6>
       <div class="row mb-3">
-        <div class="col-md-12">
+        <div class="col-md-6">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>National Festival Allowance (NFH)</mat-label>
             <input type="number" formControlName="NFH" matInput placeholder="0.00" (input)="calculatePercentages()">
             <mat-hint>Festival allowance (direct input)</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>NFH Percentage (%)</mat-label>
+            <input type="number" formControlName="NFHPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>NFH as percentage of Basic + DA</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Advance Allowance -->
+      <h6 class="text-success mb-3"><i class="fas fa-money-bill-wave mr-2"></i>Advance Allowance</h6>
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Advance Allowance</mat-label>
+            <input type="number" formControlName="Advance" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Advance allowance amount (direct input)</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Advance Percentage (%)</mat-label>
+            <input type="number" formControlName="AdvancePercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Advance as percentage of Basic + DA</mat-hint>
           </mat-form-field>
         </div>
       </div>
