@@ -187,6 +187,10 @@ export class NewEmployeeComponent implements OnInit {
       CB_HRAPercentage: [0],
       CB_Leaves: [0],
       CB_LeavesPercentage: [0],
+      CB_NH: [0],
+      CB_NHPercentage: [0],
+      CB_Advance: [0],
+      CB_AdvancePercentage: [0],
       CB_ProfessionalTax: [0],
       CB_Bonus: [0],
       CB_BonusPercentage: [0],
@@ -257,6 +261,10 @@ export class NewEmployeeComponent implements OnInit {
         this.frm.get('CB_HRAPercentage')?.setValue(salaryDetail?.CB_HRAPercentage || 0);
         this.frm.get('CB_Leaves')?.setValue(salaryDetail?.CB_Leaves || 0);
         this.frm.get('CB_LeavesPercentage')?.setValue(salaryDetail?.CB_LeavesPercentage || 0);
+        this.frm.get('CB_NH')?.setValue(salaryDetail?.CB_NH || 0);
+        this.frm.get('CB_NHPercentage')?.setValue(salaryDetail?.CB_NHPercentage || 0);
+        this.frm.get('CB_Advance')?.setValue(salaryDetail?.CB_Advance || 0);
+        this.frm.get('CB_AdvancePercentage')?.setValue(salaryDetail?.CB_AdvancePercentage || 0);
         this.frm.get('CB_ProfessionalTax')?.setValue(salaryDetail?.CB_ProfessionalTax || 0);
         this.frm.get('CB_Bonus')?.setValue(salaryDetail?.CB_Bonus || 0);
         this.frm.get('CB_BonusPercentage')?.setValue(salaryDetail?.CB_BonusPercentage || 0);

@@ -479,253 +479,6 @@ export class ClientComplianceReportComponent implements OnInit {
     return nameMap[reportType] || reportType;
   }
 
-  private generateSampleData(reportType: string): any {
-    const sampleRows = [
-      {
-        sno: 1,
-        name: 'John Doe',
-        empId: 'EMP001',
-        designation: 'Security Guard',
-        basic: 9031,
-        da: 10192,
-        hra: 3615,
-        others: 0,
-        bonus: 1601,
-        pf: 1800,
-        esi: 0,
-        pt: 208,
-        net: 22431,
-        sex: 'M',
-        uan: '10191802',
-        attendance: 28,
-        gross: 24439,
-        advBonus: 1601,
-        otHours: 5,
-        otRate: 450,
-        otAmount: 2250,
-        leaveWages: 0,
-        nh: 0,
-        advance: 0,
-        actualDays: 28,
-        fixedSalary: 24439,
-        workDays: 28,
-        advanceDed: 0,
-        lwf: 0,
-        mobile: 0,
-        arrear: 0,
-        remarks: 'Regular',
-        signature: 'J.Doe',
-        // Form XXVI specific fields
-        age: 30,
-        fatherName: 'Robert Doe',
-        workerSignature: 'John Doe',
-        reportDate: '28-02-2026',
-        submissionDate: '01-03-2026',
-        terminationDate: '',
-        inchargeSignature: 'Manager',
-        // Form XXIX specific fields
-        advance1Date: '15-02-2026',
-        advance1Amount: 5000,
-        advance2Date: '10-02-2026',
-        advance2Amount: 3000,
-        advance3Date: '05-02-2026',
-        advance3Amount: 2000,
-        deduction1Date: '20-02-2026',
-        deduction1Amount: 500,
-        deduction2Amount: 200,
-        fine1Date: '25-02-2026',
-        fine1Amount: 100,
-        fine2Amount: 50
-      },
-      {
-        sno: 2,
-        name: 'Jane Smith',
-        empId: 'EMP002',
-        designation: 'Security Officer',
-        basic: 9031,
-        da: 10192,
-        hra: 3615,
-        others: 0,
-        bonus: 1601,
-        pf: 1800,
-        esi: 0,
-        pt: 208,
-        net: 22431,
-        sex: 'F',
-        uan: '10192102',
-        attendance: 27,
-        gross: 24439,
-        advBonus: 1601,
-        otHours: 3,
-        otRate: 450,
-        otAmount: 1350,
-        leaveWages: 0,
-        nh: 0,
-        advance: 0,
-        actualDays: 27,
-        fixedSalary: 24439,
-        workDays: 27,
-        advanceDed: 0,
-        lwf: 0,
-        mobile: 0,
-        arrear: 0,
-        remarks: 'Regular',
-        signature: 'J.Smith',
-        // Form XXVI specific fields
-        age: 28,
-        fatherName: 'William Smith',
-        workerSignature: 'Jane Smith',
-        reportDate: '28-02-2026',
-        submissionDate: '01-03-2026',
-        terminationDate: '',
-        inchargeSignature: 'Manager',
-        // Form XXIX specific fields
-        advance1Date: '12-02-2026',
-        advance1Amount: 4000,
-        advance2Date: '08-02-2026',
-        advance2Amount: 2500,
-        advance3Date: '03-02-2026',
-        advance3Amount: 1500,
-        deduction1Date: '18-02-2026',
-        deduction1Amount: 300,
-        deduction2Amount: 150,
-        fine1Date: '22-02-2026',
-        fine1Amount: 80,
-        fine2Amount: 40
-      }
-    ];
-
-    // Add day columns for Form XXVI
-    sampleRows.forEach((row: any) => {
-      for (let i = 1; i <= 28; i++) {
-        row[`day${i}`] = i <= (row.attendance || 28) ? 'P' : 'A';
-      }
-      row.daysWorked = row.attendance || 28;
-    });
-
-    const totals: { [key: string]: any } = {
-      totalBasic: 18062,
-      totalDA: 20384,
-      totalHRA: 7230,
-      totalOthers: 0,
-      totalBonus: 3202,
-      totalPF: 3600,
-      totalESI: 0,
-      totalPT: 416,
-      totalNet: 44862,
-      totalGross: 48878,
-      totalAdvBonus: 3202,
-      totalDays: 55,
-      totalLeaveWages: 0,
-      totalNH: 0,
-      totalAdvance: 0,
-      totalActualDays: 55,
-      totalFixedSalary: 48878,
-      totalWorkDays: 55,
-      totalOT: 8,
-      totalOTAmount: 3600,
-      totalAdvanceDed: 0,
-      totalLWF: 0,
-      totalDeductions: 4016,
-      totalMobile: 0,
-      totalArrear: 0,
-      // Form XXIX totals
-      advance1Total: 9000,
-      advance2Total: 5500,
-      advance3Total: 3500,
-      deduction1Total: 800,
-      deduction2Total: 350,
-      fine1Total: 180,
-      fine2Total: 90
-    };
-
-    return {
-      rows: sampleRows,
-      totals: totals,
-      components: [
-        { label: 'Basic', amount: 9031 },
-        { label: 'DA', amount: 10192 },
-        { label: 'HRA', amount: 3615 },
-        { label: 'Bonus', amount: 1601 }
-      ],
-      deductions: [
-        { label: 'PF', amount: 1800 },
-        { label: 'PT', amount: 208 },
-        { label: 'ESI', amount: 0 }
-      ],
-      employee: {
-        name: 'John Doe',
-        code: 'EMP001',
-        designation: 'Security Guard',
-        fatherName: 'Robert Doe',
-        age: 30,
-        sex: 'M',
-        uan: '10191802'
-      },
-      totalEarnings: 24439,
-      totalDeductions: 2008,
-      netAmount: 22431,
-      summary: 'Total employees in report: 2'
-    };
-  }
-
-  private generateAPSampleData(reportType: string): any {
-    // AP sample rows based on EXACT real data from Andhra Pradesh Excel documents (FORM XVI.xlsx)
-    const apRowsRaw = [
-      { sno: 1, empId: 26983, name: 'BALACHANDRA', fatherName: 'THONDAMANADU', sex: 'M', designation: 'SG',
-        basic: 18317, gross: 19379, pf: 1800, esi: 137.3775, pt: 0, net: 17441.6225, actualDays: 31, bonus: 0, others: 0,
-        days: ['P','W/O','P','P','P','P','P','P','W/O','P','P','P','P','P','H','W/O','P','P','P','P','P','P','W/O','P','P','NH','P','P','P','W/O','P'] },
-      { sno: 2, empId: 34595, name: 'Vinod', fatherName: 'kotapolluru', sex: 'M', designation: 'SG',
-        basic: 18317, gross: 17503.61, pf: 1800, esi: 124.08, pt: 0, net: 15579.53, actualDays: 28, bonus: 0, others: 0,
-        days: ['P','P','W/O','L','P','P','P','P','P','W/O','P','L','L','P','H','P','W/O','P','P','P','P','P','P','W/O','P','NH','P','P','P','P','W/O'] },
-      { sno: 3, empId: 34596, name: 'Dilli Kumar', fatherName: 'Nadipaiah', sex: 'M', designation: 'MST',
-        basic: 18317, gross: 19716, pf: 1800, esi: 139.74, pt: 0, net: 17776.26, actualDays: 31, bonus: 0, others: 0,
-        days: ['P','P','P','P','W/O','P','P','P','P','P','P','W/O','P','P','H','P','P','P','W/O','P','P','P','P','P','P','NH','W/O','P','P','P','P'] },
-      { sno: 4, empId: 34602, name: 'Nagarjuna', fatherName: 'Mallam Rathnaiah', sex: 'M', designation: 'MST',
-        basic: 18632, gross: 19716, pf: 1800, esi: 139.74, pt: 0, net: 17776.26, actualDays: 31, bonus: 0, others: 0,
-        days: ['P','P','P','P','P','P','W/O','P','P','P','P','P','P','W/O','H','P','P','P','P','P','W/O','P','P','P','P','NH','P','W/O','P','P','P'] },
-      { sno: 5, empId: 34600, name: 'Srinivasulu', fatherName: 'chithukati venkaresa', sex: 'M', designation: 'MST',
-        basic: 18632, gross: 16536, pf: 1800, esi: 117.20, pt: 0, net: 14618.80, actualDays: 26, bonus: 0, others: 0,
-        days: ['L','L','P','P','P','W/O','P','P','P','P','P','P','W/O','P','H','P','P','P','P','W/O','P','P','P','P','P','NH','W/O','P','L','L','L'] },
-      { sno: 6, empId: 34622, name: 'BHASKAR', fatherName: 'Guntaka Chengaiah', sex: 'M', designation: 'HK',
-        basic: 18632, gross: 14376.19, pf: 1620, esi: 101.25, pt: 0, net: 12654.94, actualDays: 27, bonus: 0, others: 0,
-        days: ['P','P','P','W/O','L','P','P','P','P','L','W/O','P','P','P','H','L','P','W/O','L','P','P','P','P','P','W/O','NH','P','P','P','P','P'] },
-      { sno: 7, empId: 34882, name: 'NAGARAJU', fatherName: 'Chinna adaiah', sex: 'M', designation: 'HK',
-        basic: 15500, gross: 15973.55, pf: 1800, esi: 112.50, pt: 0, net: 14061.05, actualDays: 30, bonus: 0, others: 0,
-        days: ['P','P','P','W/O','P','P','P','P','P','P','W/O','P','P','P','H','P','P','W/O','P','P','L','P','P','P','W/O','NH','P','P','P','P','P'] },
-      { sno: 8, empId: '', name: 'Nagaiah', fatherName: 'Kattuvapalle', sex: 'M', designation: 'HK',
-        basic: 15500, gross: 15441.10, pf: 1740, esi: 108.75, pt: 0, net: 13592.35, actualDays: 29, bonus: 0, others: 0,
-        days: ['P','P','P','W/O','P','P','P','P','P','P','W/O','P','L','P','H','P','P','W/O','P','P','L','P','P','P','W/O','NH','P','P','P','P','P'] },
-      { sno: 9, empId: '', name: 'Meena', fatherName: 'BHASKAR', sex: 'F', designation: 'HK',
-        basic: 15500, gross: 13843.74, pf: 1560, esi: 97.50, pt: 0, net: 12186.24, actualDays: 26, bonus: 0, others: 0,
-        days: ['P','P','P','W/O','L','P','P','P','P','L','W/O','P','P','L','H','L','P','W/O','L','P','P','P','P','P','W/O','NH','P','P','P','P','P'] }
-    ];
-
-    // Populate day1..day31 from the days array
-    apRowsRaw.forEach((row: any) => {
-      (row.days as string[]).forEach((v: string, i: number) => {
-        row[`day${i + 1}`] = v;
-      });
-      delete row.days;
-    });
-
-    const totals = {
-      totalBasic: 157347,
-      totalDA: 32000.52,
-      totalOthers: 38908.74,
-      totalBonus: 8732.97,
-      totalGross: 152485.19,
-      totalPF: 15720,
-      totalESI: 1078.14,
-      totalPTDeduction: 1886.4,
-      totalNet: 135687.05,
-      totalDays: 259
-    };
-
-    return { rows: apRowsRaw, totals };
-  }
-
-
   private renderReportHtml(reportType: string, template: string, apiData: any, meta: any): string {
     let filled = template;
 
@@ -826,16 +579,33 @@ export class ClientComplianceReportComponent implements OnInit {
       EmployeeName: row.EmployeeName || row.name || '',
       EmployeeCode: row.EmployeeCode || row.empId || '',
       Designation: row.Designation || row.designation || '',
+      // Commercial Breakdown earnings
       Basic: row.Basic || row.basic || 0,
       DA: row.DA || row.da || 0,
       HRA: row.HRA || row.hra || 0,
       Others: row.Others || row.others || 0,
       Bonus: row.Bonus || row.bonus || 0,
+      LeaveWages: row.LeaveWages || row.leaveWages || 0,
+      NH: row.NH || row.nh || 0,
+      Advance: row.Advance || row.advance || 0,
+      OT: row.OT || row.ot || 0,
+      OTAmount: row.OTAmount || row.otAmount || 0,
+      Gross: row.Gross || row.gross || 0,
+      // Commercial Breakdown percentages (for reporting)
+      cbHraPercentage: row.cbHraPercentage || 0,
+      cbLeavesPercentage: row.cbLeavesPercentage || 0,
+      cbNHPercentage: row.cbNHPercentage || 0,
+      cbAdvancePercentage: row.cbAdvancePercentage || 0,
+      cbBonusPercentage: row.cbBonusPercentage || 0,
+      cbPFPercentage: row.cbPFPercentage || 0,
+      cbESIPercentage: row.cbESIPercentage || 0,
+      cbOthersPercentage: row.cbOthersPercentage || 0,
+      // Deductions from Commercial Breakdown
       PF: row.PF || row.pf || 0,
       ESI: row.ESI || row.esi || 0,
       PT: row.PT || row.pt || 0,
-      OT: row.OT || row.ot || 0,
-      Gross: row.Gross || row.gross || 0,
+      AdvanceDed: row.AdvanceDed || row.advanceDed || 0,
+      OtherDed: row.OtherDed || row.otherDed || 0,
       TotalDed: row.TotalDed || row.totalDeductions || 0,
       Net: row.Net || row.net || 0,
       DaysWorked: row.DaysWorked || row.daysWorked || 0,
@@ -871,19 +641,33 @@ export class ClientComplianceReportComponent implements OnInit {
     // Replace all placeholders with actual data (handle both PascalCase and camelCase)
     const allData = { ...row, ...meta };
 
-    // Replace specific wage slip placeholders
+    // Replace specific wage slip placeholders with Commercial Breakdown data
     const replacements: { [key: string]: any } = {
       'Basic': row.Basic || row.basic || 0,
       'DA': row.DA || row.da || 0,
       'HRA': row.HRA || row.hra || 0,
       'Others': row.Others || row.others || 0,
       'Bonus': row.Bonus || row.bonus || 0,
+      'LeaveWages': row.LeaveWages || row.leaveWages || 0,
+      'NH': row.NH || row.nh || 0,
+      'Advance': row.Advance || row.advance || 0,
+      'OT': row.OT || row.ot || 0,
+      'OTAmount': row.OTAmount || row.otAmount || 0,
+      // Commercial Breakdown percentages (for reporting)
+      'cbHraPercentage': row.cbHraPercentage || 0,
+      'cbLeavesPercentage': row.cbLeavesPercentage || 0,
+      'cbNHPercentage': row.cbNHPercentage || 0,
+      'cbAdvancePercentage': row.cbAdvancePercentage || 0,
+      'cbBonusPercentage': row.cbBonusPercentage || 0,
+      'cbPFPercentage': row.cbPFPercentage || 0,
+      'cbESIPercentage': row.cbESIPercentage || 0,
+      'cbOthersPercentage': row.cbOthersPercentage || 0,
+      // Deductions from Commercial Breakdown
       'PF': row.PF || row.pf || 0,
       'ESI': row.ESI || row.esi || 0,
       'PT': row.PT || row.pt || 0,
       'AdvanceDed': row.AdvanceDed || row.advanceDed || 0,
       'OtherDed': row.OtherDed || row.otherDed || 0,
-      'OT': row.OT || row.ot || 0,
       'Gross': row.Gross || row.gross || 0,
       'TotalDed': row.TotalDed || row.totalDeductions || 0,
       'Net': row.Net || row.net || 0,
@@ -908,12 +692,13 @@ export class ClientComplianceReportComponent implements OnInit {
   private buildRowHtml(reportType: string, row: any, index: number, meta?: any): string {
     switch (reportType) {
       case 'form-xvii':
-        // Complete 28-column structure for Form XVII
+        // Complete 28-column structure for Form XVII with Commercial Breakdown data
         return `<tr>
           <td>${row.sno || index + 1}</td>
           <td>${row.empId || row.sno || index + 1}</td>
           <td class="left-text">${row.name || ''}</td>
           <td class="left-text">${row.designation || ''}</td>
+          <!-- Fixed salary -->
           <td>${row.basic || 0}</td>
           <td>${row.da || 0}</td>
           <td>${row.others || 0}</td>
@@ -925,6 +710,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.actualDays || row.attendance || 0}</td>
           <td>${row.fixedSalary || row.gross || 0}</td>
           <td>${row.workDays || row.attendance || 0}</td>
+          <!-- Earned salary -->
           <td>${row.basic || 0}</td>
           <td>${row.da || 0}</td>
           <td>${row.others || 0}</td>
@@ -936,6 +722,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.otHours || 0}</td>
           <td>${row.otAmount || 0}</td>
           <td>${row.gross || 0}</td>
+          <!-- Deductions -->
           <td>${row.pf || 0}</td>
           <td>${row.esi || 0}</td>
           <td>${row.pt || 0}</td>
@@ -956,7 +743,7 @@ export class ClientComplianceReportComponent implements OnInit {
         }).join('');
         return `<tr><td>${row.sno || index + 1}</td><td class="left-text">${row.name || ''} (${row.empId || ''})</td><td>${row.age || ''}/${row.sex || ''}</td><td class="left-text">${row.designation || ''}</td><td class="left-text">${row.fatherName || ''}</td>${dayCells}<td>${row.daysWorked || row.attendance || 0}</td><td>${row.workerSignature || ''}</td><td>${row.reportDate || ''}</td><td>${row.submissionDate || ''}</td><td>${row.terminationDate || ''}</td><td>${row.inchargeSignature || ''}</td></tr>`;
       case 'form-xxvii':
-        // Complete 23-column structure for Form XXVII Register of Wages
+        // Complete 23-column structure for Form XXVII Register of Wages with Commercial Breakdown data
         return `<tr>
           <td>${row.sno || index + 1}</td>
           <td class="left-text">${row.name || ''}</td>
@@ -968,6 +755,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.wagePeriod || ''}</td>
           <td>${row.totalDays || 0}</td>
           <td>${row.daysWorked || 0}</td>
+          <!-- Earnings from Commercial Breakdown -->
           <td>${row.basic || 0}</td>
           <td>${row.da || 0}</td>
           <td>${row.hra || 0}</td>
@@ -976,6 +764,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.leaveWages || 0}</td>
           <td>${row.basicDA || 0}</td>
           <td>${row.gross || 0}</td>
+          <!-- Deductions from Commercial Breakdown -->
           <td>${row.pf || 0}</td>
           <td>${row.esi || 0}</td>
           <td>${row.pt || 0}</td>
