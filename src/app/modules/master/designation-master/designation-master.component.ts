@@ -15,16 +15,16 @@ import Swal from 'sweetalert2';
 export class DesignationMasterComponent implements OnInit {
   designations: Designation[] = [];
   dataSource!: MatTableDataSource<Designation>;
-  displayedColumns: string[] = ['DesignationId', 'DesignationCode', 'DesignationName', 'DepartmentName', 'Description', 'IsActive', 'action'];
-  
+  displayedColumns: string[] = ['DesignationId', 'DepartmentName', 'DesignationCode', 'DesignationName', 'IsActive', 'action'];
+
   frm!: FormGroup;
   isEdit: boolean = false;
   currentDesignationId: number = 0;
   showForm: boolean = false;
-  
+
   departments: Department[] = [];
   selectedDepartmentId: number | null = null;
-  
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -46,10 +46,13 @@ export class DesignationMasterComponent implements OnInit {
       DesignationId: [0],
       DesignationCode: ['', [Validators.required, Validators.maxLength(100)]],
       DesignationName: ['', [Validators.required, Validators.maxLength(200)]],
-      Description: ['', Validators.maxLength(500)],
       DepartmentId: [null],
       IsActive: [true]
     });
+  }
+
+  compareDepartment(dept1: any, dept2: any): boolean {
+    return dept1 && dept2 ? dept1 === dept2 : dept1 === dept2;
   }
 
   loadDepartments(): void {
@@ -95,7 +98,6 @@ export class DesignationMasterComponent implements OnInit {
       DesignationId: 0,
       DesignationCode: '',
       DesignationName: '',
-      Description: '',
       DepartmentId: this.selectedDepartmentId,
       IsActive: true
     });
@@ -109,7 +111,6 @@ export class DesignationMasterComponent implements OnInit {
       DesignationId: designation.DesignationId,
       DesignationCode: designation.DesignationCode,
       DesignationName: designation.DesignationName,
-      Description: designation.Description || '',
       DepartmentId: designation.DepartmentId,
       IsActive: designation.IsActive
     });

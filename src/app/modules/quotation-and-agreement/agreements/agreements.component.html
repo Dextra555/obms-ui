@@ -16,25 +16,27 @@
 <mat-card>
   <mat-card-content>
     <div class="row" *ngIf="warningMessage ===''">
-      <div class="col-12 col-sm-12 col-md-4 col-lg-4 order-2 order-md-1">
-        <div class="text-right">
-          <mat-form-field appearance="outline" style="width: 130px; margin-right: 10px;">
-            <mat-label>Agreement Id</mat-label>
-            <input matInput [(ngModel)]="searchID" (keyup)="applyIDFilter($event)" placeholder="Agreement Id">
-          </mat-form-field>
-          <mat-form-field appearance="outline" style="margin-right: 10px;">
-            <mat-label>Search</mat-label>
-            <input matInput [(ngModel)]="searchString" (keyup)="applyFilter($event)" placeholder="Search">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Branch</mat-label>
-            <mat-select [(value)]="selectedBranch" (selectionChange)="changeBranch($event.value)">
-              <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Name}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
+      <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Agreement Id</mat-label>
+          <input matInput [(ngModel)]="searchID" (keyup)="applyIDFilter($event)" placeholder="Agreement Id">
+        </mat-form-field>
       </div>
-      <div class="col-12 col-sm-12 col-md-8 col-lg-8 order-1 order-md-2">
+      <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Branch</mat-label>
+          <mat-select [(value)]="selectedBranch" (selectionChange)="changeBranch($event.value)">
+            <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+        <mat-form-field appearance="outline" style="width: 100%;">
+          <mat-label>Search</mat-label>
+          <input matInput [(ngModel)]="searchString" (keyup)="applyFilter($event)" placeholder="Search">
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-sm-12 col-md-3 col-lg-3">
         <div class="text-right pt-2" style="display: flex; flex-direction: column; align-items: flex-end;">
           <button *ngIf="this.userAccessModel.createAccess == true || currentUser == 'superadmin'"
             class="btn wlt-c-furg-btn-primary mb-2" style="width: 120px;"
@@ -69,10 +71,6 @@
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Client Name</th>
           <td mat-cell *matCellDef="let element" class="text-left"> {{element.ClientName}} </td>
         </ng-container>
-        <ng-container matColumnDef="WorkPlace">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Work Place</th>
-          <td mat-cell *matCellDef="let element" class="text-left"> {{element.WorkPlace}} </td>
-        </ng-container>
         <ng-container matColumnDef="AgreementDate">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Start</th>
           <td mat-cell *matCellDef="let element" class="text-left"> {{returnDate(element.AgreementDate)}} </td>
@@ -82,10 +80,10 @@
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Added Date </th>
           <td mat-cell *matCellDef="let element"> {{element.AddedDate | date:'dd-MMM-yyyy'}} </td>
         </ng-container>
-        <!-- <ng-container matColumnDef="QuotationID">
+        <ng-container matColumnDef="QuotationID">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Quotation ID </th>
           <td mat-cell *matCellDef="let element"> {{element.QuotationID}} </td>
-        </ng-container> -->
+        </ng-container>
 
         <ng-container matColumnDef="Status">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Status </th>
@@ -98,15 +96,15 @@
           </th>
           <td mat-cell *matCellDef="let row" style="text-align:center;">
             <a style="cursor:pointer;" class="mr-2" matTooltip="View" (click)="viewDetails(row.ID)"
-               [style.opacity]="row.Status === 'Cancelled' ? '0.5' : '1'"
-               [style.pointer-events]="row.Status === 'Cancelled' ? 'none' : 'auto'">
-              <mat-icon aria-hidden="false" aria-label="view icon" [style.color]="row.Status === 'Cancelled' ? 'grey' : 'inherit'">visibility</mat-icon>
+               [style.opacity]="row.Status === 'Cancelled' || row.Status === 'Closed' ? '0.5' : '1'"
+               [style.pointer-events]="row.Status === 'Cancelled' || row.Status === 'Closed' ? 'none' : 'auto'">
+              <mat-icon aria-hidden="false" aria-label="view icon" [style.color]="row.Status === 'Cancelled' || row.Status === 'Closed' ? 'grey' : 'inherit'">visibility</mat-icon>
             </a>
             <a style="cursor:pointer;" class="wlt-c-furg-text-primary mr-2" matTooltip="Edit"
-              [routerLink]="row.Status === 'Cancelled' ? [] : ['/quotation-and-agreement/agreements/edit-agreement',row.ID]"
-               [style.opacity]="row.Status === 'Cancelled' ? '0.5' : '1'"
-               [style.pointer-events]="row.Status === 'Cancelled' ? 'none' : 'auto'">
-              <mat-icon aria-hidden="false" aria-label="edit icon" [style.color]="row.Status === 'Cancelled' ? 'grey' : 'inherit'">edit</mat-icon>
+              [routerLink]="row.Status === 'Cancelled' || row.Status === 'Closed' ? [] : ['/quotation-and-agreement/agreements/edit-agreement',row.ID]"
+               [style.opacity]="row.Status === 'Cancelled' || row.Status === 'Closed' ? '0.5' : '1'"
+               [style.pointer-events]="row.Status === 'Cancelled' || row.Status === 'Closed' ? 'none' : 'auto'">
+              <mat-icon aria-hidden="false" aria-label="edit icon" [style.color]="row.Status === 'Cancelled' || row.Status === 'Closed' ? 'grey' : 'inherit'">edit</mat-icon>
             </a>
             <a style="cursor:pointer; color: maroon;" class="mr-2" matTooltip="Export PDF"
               (click)="exportToPDF(row.ID)"
@@ -128,7 +126,7 @@
             </a> -->
             <a style="cursor:pointer; color: orange;" class="mr-2" matTooltip="Cancel Agreement"
               (click)="cancelAgreement(row.ID, row.ClientName)"
-              [style.display]="row.Status === 'Cancelled' ? 'none' : 'inline-block'">
+              [style.display]="row.Status === 'Cancelled' || row.Status === 'Closed' ? 'none' : 'inline-block'">
               <mat-icon aria-hidden="false" aria-label="cancel icon">block</mat-icon>
             </a>
           </td>

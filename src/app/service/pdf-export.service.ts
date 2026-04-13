@@ -100,10 +100,19 @@ export class PdfExportService {
       const serviceName = item.Description || '';
       const hsnCode = st?.HSNCode || st?.hsnCode || '998311';
       const description = st?.Description || st?.description || item.Description || '';
-      const monthAmt = parseFloat((item.MonthTotal || 0).toString().replace(/,/g, ''));
+      
+      const rate = item.Rate || 0;
+      const noOfHours = item.NoOfHours || 8;
+      const noOfGuards = item.NoOfGuards || 0;
+      const noOfDays = item.NoOfDays || 0;
+      const monthAmt = rate * noOfHours * noOfGuards * noOfDays;
+      
       const taxAmt = parseFloat((item.TaxAmount || 0).toString().replace(/,/g, ''));
       totalMonth += monthAmt;
       totalTax += taxAmt;
+
+      const perDayValue = 1 * rate * noOfHours;
+
       summaryTableRows += `
         <tr>
           <td style="text-align:center;">${index + 1}</td>
@@ -111,24 +120,27 @@ export class PdfExportService {
           <td style="width:200px; word-wrap:break-word;">${description}</td>
           <td style="text-align:center;">${hsnCode}</td>
           <td style="text-align:center;">${item.NoOfGuards ?? '-'}</td>
-          <td style="text-align:right;">${Math.round(item.Rate).toLocaleString('en-IN')}</td>
+          <td style="text-align:center;">${noOfDays}</td>
+          <td style="text-align:center;">${noOfHours}</td>
+          <td style="text-align:right;">${Math.round(perDayValue).toLocaleString('en-IN')}</td>
+          <td style="text-align:right;">${Math.round(rate).toLocaleString('en-IN')}</td>
           <td style="text-align:right;">${Math.round(monthAmt).toLocaleString('en-IN')}</td>
         </tr>
       `;
     });
 
     const grandTotal = Math.round(totalMonth + totalTax);
-    const taxRows = isSameState 
+    const taxRows = isSameState
       ? `<tr>
-           <td colspan="6" style="text-align:right; font-weight:bold;">CGST (9%)</td>
+           <td colspan="9" style="text-align:right; font-weight:bold;">CGST (9%)</td>
            <td style="text-align:right; font-weight:bold;">${Math.round(totalTax / 2).toLocaleString('en-IN')}</td>
          </tr>
          <tr>
-           <td colspan="6" style="text-align:right; font-weight:bold;">SGST (9%)</td>
+           <td colspan="9" style="text-align:right; font-weight:bold;">SGST (9%)</td>
            <td style="text-align:right; font-weight:bold;">${Math.round(totalTax / 2).toLocaleString('en-IN')}</td>
          </tr>`
       : `<tr>
-           <td colspan="6" style="text-align:right; font-weight:bold;">IGST (18%)</td>
+           <td colspan="9" style="text-align:right; font-weight:bold;">IGST (18%)</td>
            <td style="text-align:right; font-weight:bold;">${Math.round(totalTax).toLocaleString('en-IN')}</td>
          </tr>`;
 
@@ -298,6 +310,9 @@ export class PdfExportService {
                 <th style="width:30%;">Description</th>
                 <th style="width:12%;">HSN Code</th>
                 <th style="width:8%;">Qty</th>
+                <th style="width:8%;">NoOfDays</th>
+                <th style="width:8%;">Hours</th>
+                <th style="width:10%;">PerDay</th>
                 <th style="width:12%;">Rate</th>
                 <th style="width:10%;">Amount</th>
               </tr>
@@ -305,12 +320,12 @@ export class PdfExportService {
             <tbody>
               ${summaryTableRows}
               <tr class="total-row">
-                <td colspan="6" style="text-align:right;">Sub Total</td>
+                <td colspan="9" style="text-align:right;">Sub Total</td>
                 <td style="text-align:right;">${Math.round(totalMonth).toLocaleString('en-IN')}</td>
               </tr>
               ${taxRows}
               <tr class="total-row" style="background-color: #800000; color: white;">
-                <td colspan="6" style="text-align:right;">Grand Total (${monthYearStr})</td>
+                <td colspan="9" style="text-align:right;">Grand Total (${monthYearStr})</td>
                 <td style="text-align:right;">${grandTotal.toLocaleString('en-IN')}</td>
               </tr>
             </tbody>
@@ -609,31 +624,40 @@ export class PdfExportService {
       const serviceName = item.Description || '';
       const hsnCode = st?.HSNCode || st?.hsnCode || '998311';
       const description = st?.Description || st?.description || item.Description || '';
-      const monthAmt = parseFloat((item.MonthTotal || 0).toString().replace(/,/g, ''));
+      
+      const rate = item.Rate || 0;
+      const noOfHours = item.NoOfHours || 8;
+      const noOfGuards = item.NoOfGuards || 0;
+      const noOfDays = item.NoOfDays || 0;
+      const monthAmt = rate * noOfHours * noOfGuards * noOfDays;
+      
       const taxAmt = parseFloat((item.TaxAmount || 0).toString().replace(/,/g, ''));
       totalMonth += monthAmt;
       totalTax += taxAmt;
-      return [index + 1, serviceName, description, hsnCode, item.NoOfGuards ?? '-', Math.round(item.Rate).toLocaleString('en-IN') ?? '-', Math.round(monthAmt).toLocaleString('en-IN')];
+
+      const perDayValue = 1 * rate * noOfHours;
+
+      return [index + 1, serviceName, description, hsnCode, item.NoOfGuards ?? '-', noOfDays, noOfHours, Math.round(perDayValue).toLocaleString('en-IN'), Math.round(rate).toLocaleString('en-IN') ?? '-', Math.round(monthAmt).toLocaleString('en-IN')];
     });
 
     const summaryRows = [
-      ['', '', '', '', '', 'Sub Total', Math.round(totalMonth).toLocaleString('en-IN')],
-      ['', '', '', '', '', isSameState ? 'CGST (9%)' : 'IGST (18%)', isSameState ? Math.round(totalTax / 2).toLocaleString('en-IN') : Math.round(totalTax).toLocaleString('en-IN')]
+      ['', '', '', '', '', '', '', '', 'Sub Total', Math.round(totalMonth).toLocaleString('en-IN')],
+      ['', '', '', '', '', '', '', '', isSameState ? 'CGST (9%)' : 'IGST (18%)', isSameState ? Math.round(totalTax / 2).toLocaleString('en-IN') : Math.round(totalTax).toLocaleString('en-IN')]
     ];
     if (isSameState) {
-      summaryRows.push(['', '', '', '', '', 'SGST (9%)', Math.round(totalTax / 2).toLocaleString('en-IN')]);
+      summaryRows.push(['', '', '', '', '', '', '', '', 'SGST (9%)', Math.round(totalTax / 2).toLocaleString('en-IN')]);
     }
-    summaryRows.push(['', '', '', '', '', `Grand Total ( ${monthYearStr} )`, Math.round(totalMonth + totalTax).toLocaleString('en-IN')]);
+    summaryRows.push(['', '', '', '', '', '', '', '', `Grand Total ( ${monthYearStr} )`, Math.round(totalMonth + totalTax).toLocaleString('en-IN')]);
 
     autoTable(doc, {
       startY: y,
       margin: { left: 14, right: 14 },
-      head: [['S.No', 'Service Name', 'Description', 'HSN Code', 'Qty', 'Rate', 'Amount']],
+      head: [['S.No', 'Service Name', 'Description', 'HSN Code', 'Qty', 'NoOfDays', 'Hours', 'PerDay', 'Rate', 'Amount']],
       body: [...tableData, ...summaryRows],
       theme: 'grid',
       headStyles: { fillColor: maroon, textColor: [255, 255, 255], fontStyle: 'bold' },
       styles: { fontSize: 9, cellPadding: 2, lineWidth: 0.1, lineColor: maroon },
-      columnStyles: { 6: { halign: 'right' } },
+      columnStyles: { 7: { halign: 'right' }, 9: { halign: 'right' } },
       didParseCell: (data) => {
         if (data.section === 'body' && data.row.index >= tableData.length) {
           data.cell.styles.fontStyle = 'bold';
@@ -998,36 +1022,40 @@ export class PdfExportService {
       const serviceName = item.Description || '';
       const hsnCode = st?.HSNCode || st?.hsnCode || 'N/A';
       const description = st?.Description || st?.description || item.Description || '';
-      const monthAmt = parseFloat((item.MonthTotal || 0).toString().replace(/,/g, ''));
+      
+      const rate = item.Rate || 0;
+      const noOfHours = item.NoOfHours || 8;
+      const noOfGuards = item.NoOfGuards || 0;
+      const noOfDays = item.NoOfDays || 0;
+      const monthAmt = rate * noOfHours * noOfGuards * noOfDays;
+      
       const taxAmt = parseFloat((item.TaxAmount || 0).toString().replace(/,/g, ''));
       totalMonth += monthAmt;
       totalTax += taxAmt;
 
-      const noOfHours = item.NoOfHours || 8;
-      const rate = item.Rate || 0;
       const perDayValue = 1 * rate * noOfHours;
 
-      return [index + 1, serviceName, description, hsnCode, item.NoOfGuards ?? '-', noOfHours, Math.round(perDayValue).toLocaleString('en-IN'), Math.round(rate).toLocaleString('en-IN') ?? '-', Math.round(monthAmt).toLocaleString('en-IN')];
+      return [index + 1, serviceName, description, hsnCode, item.NoOfGuards ?? '-', noOfDays, noOfHours, Math.round(perDayValue).toLocaleString('en-IN'), Math.round(rate).toLocaleString('en-IN') ?? '-', Math.round(monthAmt).toLocaleString('en-IN')];
     });
 
     const summaryData = [
-      ['', '', '', '', '', '', '', 'Sub Total', Math.round(totalMonth).toLocaleString('en-IN')],
-      ['', '', '', '', '', '', '', isSameState ? 'CGST (9%)' : 'IGST (18%)', isSameState ? Math.round(totalTax / 2).toLocaleString('en-IN') : Math.round(totalTax).toLocaleString('en-IN')]
+      ['', '', '', '', '', '', '', '', 'Sub Total', Math.round(totalMonth).toLocaleString('en-IN')],
+      ['', '', '', '', '', '', '', '', isSameState ? 'CGST (9%)' : 'IGST (18%)', isSameState ? Math.round(totalTax / 2).toLocaleString('en-IN') : Math.round(totalTax).toLocaleString('en-IN')]
     ];
     if (isSameState) {
-      summaryData.push(['', '', '', '', '', '', '', 'SGST (9%)', Math.round(totalTax / 2).toLocaleString('en-IN')]);
+      summaryData.push(['', '', '', '', '', '', '', '', 'SGST (9%)', Math.round(totalTax / 2).toLocaleString('en-IN')]);
     }
-    summaryData.push(['', '', '', '', '', '', '', 'Grand Total', Math.round(totalMonth + totalTax).toLocaleString('en-IN')]);
+    summaryData.push(['', '', '', '', '', '', '', '', 'Grand Total', Math.round(totalMonth + totalTax).toLocaleString('en-IN')]);
 
     autoTable(doc, {
       startY: mainTableStartY,
       margin: { left: margin, right: margin },
-      head: [['S.No', 'Service Name', 'Description', 'HSN Code', 'Qty', 'Hours', 'PerDay', 'Rate', 'Amount']],
+      head: [['S.No', 'Service Name', 'Description', 'HSN Code', 'Qty', 'NoOfDays', 'Hours', 'PerDay', 'Rate', 'Amount']],
       body: [...tableData, ...summaryData],
       theme: 'grid',
       headStyles: { fillColor: maroon, textColor: [255, 255, 255], fontStyle: 'bold', lineWidth: 0.1 },
       styles: { fontSize: 8, cellPadding: 2, lineWidth: 0.1, lineColor: maroon },
-      columnStyles: { 6: { halign: 'right' }, 8: { halign: 'right' } },
+      columnStyles: { 7: { halign: 'right' }, 9: { halign: 'right' } },
       didParseCell: function (data) {
         // Make summary rows bold
         if (data.section === 'body' && data.row.index >= tableData.length) {

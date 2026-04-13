@@ -14,7 +14,6 @@ import Swal from 'sweetalert2';
 
 export interface IAgreement {
   ID: number,
-  WorkPlace: string;
   BranchName: string;
   ClientName: string;
   AgreementDate: string;
@@ -29,7 +28,7 @@ export interface IAgreement {
   styleUrls: ['./agreements.component.css']
 })
 export class AgreementsComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['SNo', 'AgreementID', 'BranchName', 'ClientName', 'WorkPlace', 'AgreementDate', 'AddedDate', 'Status', 'action'];
+  displayedColumns: string[] = ['SNo', 'AgreementID', 'BranchName', 'ClientName', 'AgreementDate', 'AddedDate', 'QuotationID', 'Status', 'action'];
 
   dataSource: MatTableDataSource<IAgreement> = new MatTableDataSource<IAgreement>([]);
   branchList: any;
@@ -180,7 +179,7 @@ export class AgreementsComponent implements OnInit, AfterViewInit {
 
         const matchesID = searchID ? data.ID.toString().toLowerCase().includes(searchID) : true;
         
-        const dataStr = `${data.BranchName} ${data.ClientName} ${data.WorkPlace} ${data.Status}`.toLowerCase();
+        const dataStr = `${data.BranchName} ${data.ClientName} ${data.Status}`.toLowerCase();
         const matchesText = searchString ? dataStr.includes(searchString) : true;
 
         return matchesID && matchesText;

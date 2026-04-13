@@ -44,10 +44,18 @@
 
     <div class="table-responsive">
       <table mat-table [dataSource]="dataSource" class="wlt-table table-striped" matSort>
-        
+
         <ng-container matColumnDef="DesignationId">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> ID</th>
           <td mat-cell *matCellDef="let element"> {{element.DesignationId}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="DepartmentName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header> Department</th>
+          <td mat-cell *matCellDef="let element">
+            <span *ngIf="element.DepartmentName">{{element.DepartmentName}}</span>
+            <span *ngIf="!element.DepartmentName" class="text-muted">-</span>
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="DesignationCode">
@@ -60,21 +68,13 @@
           <td mat-cell *matCellDef="let element"> {{element.DesignationName}} </td>
         </ng-container>
 
-        <ng-container matColumnDef="DepartmentName">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Department</th>
-          <td mat-cell *matCellDef="let element">
-            <span *ngIf="element.DepartmentName">{{element.DepartmentName}}</span>
-            <span *ngIf="!element.DepartmentName" class="text-muted">-</span>
-          </td>
-        </ng-container>
-
-        <ng-container matColumnDef="Description">
+        <!-- <ng-container matColumnDef="Description">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Description</th>
           <td mat-cell *matCellDef="let element">
             <span *ngIf="element.Description">{{element.Description}}</span>
             <span *ngIf="!element.Description" class="text-muted">-</span>
           </td>
-        </ng-container>
+        </ng-container> -->
 
         <ng-container matColumnDef="IsActive">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Status</th>
@@ -120,6 +120,18 @@
       <div class="row">
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
+            <mat-label>Department</mat-label>
+            <mat-select formControlName="DepartmentId" [compareWith]="compareDepartment">
+              <mat-option [value]="null">Select Department (Optional)</mat-option>
+              <mat-option *ngFor="let dept of departments" [value]="dept.DepartmentId">
+                {{dept.DepartmentName}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline">
             <mat-label>Designation Code</mat-label>
             <input matInput formControlName="DesignationCode" placeholder="Enter designation code" maxlength="100">
             <mat-error *ngIf="frm.get('DesignationCode')?.hasError('required')">
@@ -137,28 +149,8 @@
             </mat-error>
           </mat-form-field>
         </div>
-
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Department</mat-label>
-            <mat-select formControlName="DepartmentId">
-              <mat-option [value]="null">Select Department (Optional)</mat-option>
-              <mat-option *ngFor="let dept of departments" [value]="dept.DepartmentId">
-                {{dept.DepartmentName}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
       </div>
 
-      <div class="row">
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Description</mat-label>
-            <input matInput formControlName="Description" placeholder="Enter description (optional)" maxlength="500">
-          </mat-form-field>
-        </div>
-      </div>
 
       <div class="row">
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">

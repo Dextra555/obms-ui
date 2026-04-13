@@ -92,7 +92,7 @@
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
             <mat-label>Department</mat-label>
-            <mat-select formControlName="DepartmentId">
+            <mat-select formControlName="DepartmentId" (selectionChange)="onDepartmentChange($event.value)">
               <mat-option value="">-- Select Department --</mat-option>
               <mat-option *ngFor="let dept of departmentList" [value]="dept.DepartmentId">
                 {{dept.DepartmentName}}
