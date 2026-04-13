@@ -389,13 +389,6 @@ export class ClientComplianceReportComponent implements OnInit {
     this.showLoadingSpinner = true;
     const backendReportName = this.mapReportName(reportType);
 
-    // AP forms are not yet supported by the backend; show clear message early
-    if (isAPReport) {
-      this.showLoadingSpinner = false;
-      this.errorMessage = `AP Compliance Report data for '${this.formatReportType(reportType)}' is not yet available from the server. Backend support for AP forms is coming soon.`;
-      return;
-    }
-
     this._masterService.getComplianceReportData(backendReportName, payload).subscribe(
       (reportData: any) => {
         this.showLoadingSpinner = false;
@@ -705,7 +698,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.hra || 0}</td>
           <td>${row.leaveWages || 0}</td>
           <td>${row.nh || 0}</td>
-          <td>${(row.advance || 0) + (row.bonus || 0)}</td>
+          <td>${row.advance || 0}</td>
           <td>${row.actualDays || row.attendance || 0}</td>
           <td>${row.fixedSalary || row.gross || 0}</td>
           <td>${row.workDays || row.attendance || 0}</td>
@@ -716,7 +709,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.hra || 0}</td>
           <td>${row.leaveWages || 0}</td>
           <td>${row.nh || 0}</td>
-          <td>${(row.advance || 0) + (row.bonus || 0)}</td>
+          <td>${row.advance || 0}</td>
           <td>${row.otHours || 0}</td>
           <td>${row.otAmount || 0}</td>
           <td>${row.gross || 0}</td>
@@ -858,66 +851,110 @@ export class ClientComplianceReportComponent implements OnInit {
         </tr>`;
       }
       case 'ap-form-xx': {
-        // 13-column structure from NILL RIGISTER Form XX
+        // 13-column structure from NILL RIGISTER Form XX - Register of Deductions for Damage/Loss
+        // Map backend advances data to expected columns
         return `<tr>
           <td>${row.sno || index + 1}</td>
           <td class="left-text">${row.name || ''}</td>
           <td class="left-text">${row.fatherName || ''}</td>
           <td>${row.designation || ''}</td>
-          <td>Nil</td><td>Nil</td><td>Nil</td><td>Nil</td>
-          <td>0</td><td>0</td><td>Nil</td><td>Nil</td><td>Nil</td>
+          <td>${row.Particulars || ''}</td>
+          <td>${row.advance1Date || ''}</td>
+          <td>Yes</td>
+          <td>Manager</td>
+          <td>${row.advance1Amount || 0}</td>
+          <td>1</td>
+          <td>${row.advance1Date || ''}</td>
+          <td>${row.advance1Date || ''}</td>
+          <td>${row.remarks || ''}</td>
         </tr>`;
       }
       case 'ap-form-xxi': {
-        // 12-column structure from NILL RIGISTER Form XXI
+        // 12-column structure from NILL RIGISTER Form XXI - Register of Fines
+        // Map backend advances data to expected columns
         return `<tr>
           <td>${row.sno || index + 1}</td>
           <td class="left-text">${row.name || ''}</td>
           <td class="left-text">${row.fatherName || ''}</td>
           <td>${row.designation || ''}</td>
-          <td>Nil</td><td>Nil</td><td>Nil</td><td>Nil</td>
-          <td>Nil</td><td>0</td><td>Nil</td><td>Nil</td>
+          <td>${row.Particulars || ''}</td>
+          <td>${row.advance1Date || ''}</td>
+          <td>Yes</td>
+          <td>Manager</td>
+          <td>${row.advance1Date || ''}</td>
+          <td>${row.advance1Amount || 0}</td>
+          <td>${row.advance1Date || ''}</td>
+          <td>${row.remarks || ''}</td>
         </tr>`;
       }
       case 'ap-form-xxii': {
-        // 11-column structure from NILL RIGISTER Form XXII
+        // 11-column structure from NILL RIGISTER Form XXII - Register of Advances
+        // Map backend advances data to expected columns
         return `<tr>
           <td>${row.sno || index + 1}</td>
           <td class="left-text">${row.name || ''}</td>
           <td class="left-text">${row.fatherName || ''}</td>
           <td>${row.designation || ''}</td>
-          <td>Nil</td><td>Nil</td><td>Nil</td>
-          <td>0</td><td>Nil</td><td>Nil</td><td>Nil</td>
+          <td>${row.advance1Date || ''}</td>
+          <td>${row.advance1Amount || 0}</td>
+          <td>${row.Particulars || ''}</td>
+          <td>1</td>
+          <td>${row.advance1Date || ''} - ${row.advance1Amount || 0}</td>
+          <td>${row.advance1Date || ''}</td>
+          <td>${row.remarks || ''}</td>
         </tr>`;
       }
       case 'ap-form-xxiii': {
-        // 12-column structure from NILL RIGISTER Form XXIII
+        // 12-column structure from NILL RIGISTER Form XXIII - map backend property names
         return `<tr>
           <td>${row.sno || index + 1}</td>
-          <td class="left-text">${row.name || ''}</td>
-          <td class="left-text">${row.fatherName || ''}</td>
+          <td class="left-text">${row.employeeName || row.name || ''}</td>
+          <td class="left-text">${row.fathersName || row.fatherName || ''}</td>
           <td>${row.sex || ''}</td>
           <td>${row.designation || ''}</td>
-          <td>Nil</td><td>0</td><td>0</td><td>0</td><td>0</td><td>Nil</td><td>Nil</td>
+          <td>${row.overtimeWorkedDate || ''}</td>
+          <td>${row.totalOvertimeHours || 0}</td>
+          <td>${row.normalRateOfWages || 0}</td>
+          <td>${row.overtimeRate || 0}</td>
+          <td>${row.overtimeEarnings || 0}</td>
+          <td>${row.overtimeWagePaidDate || ''}</td>
+          <td class="left-text">${row.remarks || ''}</td>
         </tr>`;
       }
       case 'ap-form-xxix': {
         // Exact Form XXIX Excel layout - rendered as individual wage slip card per employee
+        // Map backend PascalCase properties to frontend camelCase expectations
+        const name = row.EmployeeName || row.name || '';
+        const empId = row.EmployeeCode || row.empId || '';
+        const designation = row.Designation || row.designation || '';
+        const basic = row.Basic || row.basic || 0;
+        const da = row.DA || row.da || 0;
+        const hra = row.HRA || row.hra || 0;
+        const others = row.Others || row.others || 0;
+        const bonus = row.Bonus || row.bonus || 0;
+        const ot = row.OT || row.ot || 0;
+        const gross = row.Gross || row.gross || 0;
+        const pf = row.PF || row.pf || 0;
+        const esi = row.ESI || row.esi || 0;
+        const pt = row.PT || row.pt || 0;
+        const net = row.Net || row.net || 0;
+        const daysWorked = row.DaysWorked || row.actualDays || 0;
+
         return `<div class="wage-slip-card">
           <div class="ws-title">FORM XXIX - WAGE SLIP</div>
           <div class="ws-rule">(Vide rule 78(2)(b) of the contract labour<br/>(Regulation and abolition central &amp; A.P Rules 1971))</div>
           <table class="ws-table">
             <tr><td class="label">Name &amp; Address of the Employer/Contractor:</td><td class="value" colspan="3">{{ContractorName}}</td></tr>
-            <tr><td class="label">Name of the Employee:</td><td class="value"><strong>${row.name || ''}</strong></td><td class="label">Designation of the Employee:</td><td class="value">${row.designation || ''}</td></tr>
-            <tr><td class="label">Name and Father's/Husband:</td><td class="value">${row.fatherName || ''}</td><td class="label">Nature and location of work:</td><td class="value">${row.designation || ''}</td></tr>
+            <tr><td class="label">Name of the Employee:</td><td class="value"><strong>${name}</strong></td><td class="label">Designation of the Employee:</td><td class="value">${designation}</td></tr>
+            <tr><td class="label">Name and Father's/Husband:</td><td class="value">${row.fatherName || ''}</td><td class="label">Nature and location of work:</td><td class="value">${designation}</td></tr>
             <tr><td class="label">For the week/Fortnight/Month ending:</td><td class="value" colspan="3">{{Period}}</td></tr>
-            <tr><td class="label">1. No of Days worked:</td><td class="value">${row.actualDays || 0}</td><td class="label">2. Rate of daily wages/piece rate:</td><td class="value">${row.basic || 0}</td></tr>
-            <tr><td class="label">3. Gross wages payable:</td><td class="value"><strong>${(+(row.gross || 0)).toFixed(2)}</strong></td><td></td><td></td></tr>
+            <tr><td class="label">1. No of Days worked:</td><td class="value">${daysWorked}</td><td class="label">2. Rate of daily wages/piece rate:</td><td class="value">${basic}</td></tr>
+            <tr><td class="label">3. Gross wages payable:</td><td class="value"><strong>${(+gross).toFixed(2)}</strong></td><td></td><td></td></tr>
             <tr><td class="label" colspan="4" style="background:#d9d9d9;font-weight:bold;">4. Deduction, If any:</td></tr>
-            <tr><td class="label">PF:</td><td class="value">${row.pf || 0}</td><td class="label">ESIC:</td><td class="value">${(+(row.esi || 0)).toFixed(4)}</td></tr>
-            <tr><td class="label">PT:</td><td class="value">${row.pt || 0}</td><td></td><td></td></tr>
-            <tr><td class="label">5. Net amount of wages paid:</td><td class="value"><strong>${(+(row.net || 0)).toFixed(4)}</strong></td><td class="label">6. Other allowance:</td><td class="value">0</td></tr>
-            <tr><td class="label">7. Holidays:</td><td class="value">1</td><td class="label">8. Net amount paid:</td><td class="value"><strong>${(+(row.net || 0)).toFixed(4)}</strong></td></tr>
+            <tr><td class="label">PF:</td><td class="value">${pf}</td><td class="label">ESIC:</td><td class="value">${(+esi).toFixed(4)}</td></tr>
+            <tr><td class="label">PT:</td><td class="value">${pt}</td><td></td><td></td></tr>
+            <tr><td class="label">5. Net amount of wages paid:</td><td class="value"><strong>${(+net).toFixed(4)}</strong></td><td class="label">6. Other allowance:</td><td class="value">0</td></tr>
+            <tr><td class="label">7. Holidays:</td><td class="value">1</td><td class="label">8. Net amount paid:</td><td class="value"><strong>${(+net).toFixed(4)}</strong></td></tr>
           </table>
           <div class="ws-sig">
             <span>Signature of the Employee</span>

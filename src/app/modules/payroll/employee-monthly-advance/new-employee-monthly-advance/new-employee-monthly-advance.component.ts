@@ -151,9 +151,12 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
     );
   }
   addFormFieldsdata(data: any) {
+    console.log('[NewEmployeeMonthlyAdvance] addFormFieldsdata called with data:', data);
+    console.log('[NewEmployeeMonthlyAdvance] Data length:', data?.length);
     const formArray = this.dynamicForm.get('formArray') as FormArray;
     formArray.clear();
     for (let i = 0; i < data.length; i++) {
+      console.log(`[NewEmployeeMonthlyAdvance] Adding employee ${i}:`, data[i]);
       formArray.push(this.fb.group({
         ID: [data[i].ID],
         EMP_ID: [data[i].EMP_ID],
@@ -168,6 +171,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
         Particulars: [data[i].Particulars],
       }));
     }
+    console.log('[NewEmployeeMonthlyAdvance] FormArray length after adding:', formArray.length);
   }
   getBranchMasterList() {
     this._masterService.getBranchMaster('null').subscribe((responseData) => {
@@ -304,11 +308,17 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
   }
 
   getEmployeeListByEmployeeType(dvanceDate: string, branchCode: string, employeeType: number, transType: number, advanceAmount: number, race: string): void {
+    console.log('[NewEmployeeMonthlyAdvance] getEmployeeListByEmployeeType called');
+    console.log('[NewEmployeeMonthlyAdvance] Parameters:', { dvanceDate, branchCode, employeeType, transType, advanceAmount, race });
     this._payrollService.getListByEmplyeeType(dvanceDate, branchCode, employeeType, transType, advanceAmount, race).subscribe(
       (data) => {
+        console.log('[NewEmployeeMonthlyAdvance] Employee list received:', data);
         this.addFormFieldsdata(data);
       },
-      (error) => this.handleErrors(error)
+      (error) => {
+        console.error('[NewEmployeeMonthlyAdvance] Error getting employee list:', error);
+        this.handleErrors(error);
+      }
     );
   }
   getAdvanceVoucherNo(branch: string, transType: string): void {
@@ -439,10 +449,14 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
 
 
   savebuttonClick(): void {
+    console.log('[NewEmployeeMonthlyAdvance] savebuttonClick called');
     this.showLoadingSpinner = true;
     this.salaryMonthlyAdvance = this.employeeAdvanceForm.value;
     this.salaryMonthlyAdvance.AdvanceDate = new Date(this.formatDate(this.employeeAdvanceForm.value.AdvanceDate));
     this.salaryMonthlyAdvance.AdvanceTakenDate = new Date(this.formatDate(this.employeeAdvanceForm.value.AdvanceDate));
+
+    console.log('[NewEmployeeMonthlyAdvance] Form data:', this.employeeAdvanceForm.value);
+    console.log('[NewEmployeeMonthlyAdvance] SalaryMonthlyAdvance object:', this.salaryMonthlyAdvance);
 
     const dateYear = new Date(this.salaryMonthlyAdvance.AdvanceDate);
     this.year = dateYear.getFullYear();
@@ -451,27 +465,18 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
 
     const formArray = this.dynamicForm.get('formArray') as FormArray;
     const requests = [];
-    if (formArray.length > 0) {
-      // for (let i = 0; i < formArray.length; i++) {
-      //   const formGroup = formArray.at(i) as FormGroup;
-      //   const salaryAdvance = {
-      //     ...this.salaryMonthlyAdvance,
-      //     ID: formGroup.get('ID')?.value,
-      //     EmployeeID: formGroup.get('EMP_ID')?.value,
-      //     Amount: formGroup.get('Amount')?.value,
-      //     Particulars: formGroup.get('Particulars')?.value,
-      //     PaymentType: formGroup.get('PAYMODE')?.value,
-      //     VoucherNo: (i + 1).toString().padStart(8, '0'),
-      //   };
-      //   requests.push(this._payrollService.saveAndUpdateSalaryMonthlyAdvance(salaryAdvance));
-      // }
+    console.log('[NewEmployeeMonthlyAdvance] FormArray length:', formArray.length);
 
+    if (formArray.length > 0) {
       for (let i = 0; i < formArray.length; i++) {
         const formGroup = formArray.at(i) as FormGroup;
         const amount = formGroup.get('Amount')?.value;
 
+        console.log(`[NewEmployeeMonthlyAdvance] Processing item ${i}, Amount: ${amount}`);
+
         // Skip if Amount is null, empty, or 0
         if (!amount || parseFloat(amount) === 0) {
+          console.log(`[NewEmployeeMonthlyAdvance] Skipping item ${i} due to zero/null amount`);
           continue;
         }
 
@@ -484,14 +489,20 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
           PaymentType: formGroup.get('PAYMODE')?.value,
           VoucherNo: (i + 1).toString().padStart(8, '0'),
         };
+
+        console.log(`[NewEmployeeMonthlyAdvance] Adding request for item ${i}:`, salaryAdvance);
         requests.push(this._payrollService.saveAndUpdateSalaryMonthlyAdvance(salaryAdvance));
       }
 
+      console.log(`[NewEmployeeMonthlyAdvance] Total requests to execute: ${requests.length}`);
+
       forkJoin(requests).subscribe(
         (responses) => {
+          console.log('[NewEmployeeMonthlyAdvance] Responses received:', responses);
           const failedResponses: any[] = [];
 
-          responses.forEach(response => {
+          responses.forEach((response, index) => {
+            console.log(`[NewEmployeeMonthlyAdvance] Processing response ${index}:`, response);
             if (response.True === 'True') {
               this.showMessage(response.Message, 'warning', 'Warning Message');
             } else if (response.ResignDate === 'ResignDate') {
@@ -500,11 +511,13 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
               this.showMessage(response.Message, 'success', 'Success Message');
               this._router.navigate(['/payroll/employee-monthly-advance']);
             } else {
+              console.error(`[NewEmployeeMonthlyAdvance] Unknown response type for item ${index}:`, response);
               failedResponses.push(response);  // Store failed responses
             }
           });
 
           if (failedResponses.length > 0) {
+            console.error('[NewEmployeeMonthlyAdvance] Failed responses:', failedResponses);
             this.handleErrors(`Failed Responses: ${failedResponses}`);
           }
 
@@ -512,6 +525,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
           this.hideSpinner();
         },
         (error) => {
+          console.error('[NewEmployeeMonthlyAdvance] Error in forkJoin:', error);
           this.handleErrors(error);
         }
       );
