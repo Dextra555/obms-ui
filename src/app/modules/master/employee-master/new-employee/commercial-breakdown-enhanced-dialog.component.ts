@@ -8,6 +8,8 @@ export interface CommercialBreakdownData {
   DA?: number;
   HRA?: number;
   HRAPercentage?: number;
+  Leaves?: number;
+  LeavesPercentage?: number;
   OtherAllowances?: number;
   CB_NH?: number;
   CB_NHPercentage?: number;
@@ -26,6 +28,7 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
     return (this.frm.get('Basic')?.value || 0) +
       (this.frm.get('DA')?.value || 0) +
       (this.frm.get('HRA')?.value || 0) +
+      (this.frm.get('Leaves')?.value || 0) +
       (this.frm.get('OtherAllowances')?.value || 0) +
       (this.frm.get('CB_NH')?.value || 0);
   }
@@ -56,6 +59,8 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
       DA: [0, [Validators.required, Validators.min(0)]],
       HRA: [0, [Validators.required, Validators.min(0)]],
       HRAPercentage: [10, [Validators.required, Validators.min(0), Validators.max(100)]],
+      Leaves: [0, [Validators.required, Validators.min(0)]],
+      LeavesPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
       OtherAllowances: [0, [Validators.required, Validators.min(0)]],
       CB_NH: [0, [Validators.required, Validators.min(0)]],
       CB_NHPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
@@ -69,6 +74,8 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
         DA: this.data.DA ?? 0,
         HRA: this.data.HRA ?? 0,
         HRAPercentage: this.data.HRAPercentage ?? 10,
+        Leaves: this.data.Leaves ?? 0,
+        LeavesPercentage: this.data.LeavesPercentage ?? 0,
         OtherAllowances: this.data.OtherAllowances ?? 0,
         CB_NH: this.data.CB_NH ?? 0,
         CB_NHPercentage: this.data.CB_NHPercentage ?? 0

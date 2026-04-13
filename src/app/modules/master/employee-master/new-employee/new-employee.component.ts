@@ -185,6 +185,8 @@ export class NewEmployeeComponent implements OnInit {
       CB_DA: [0],
       CB_HRA: [0],
       CB_HRAPercentage: [0],
+      CB_Leaves: [0],
+      CB_LeavesPercentage: [0],
       CB_OtherAllowances: [0],
       CB_NH: [0],
       CB_NHPercentage: [0],
@@ -229,6 +231,8 @@ export class NewEmployeeComponent implements OnInit {
         this.frm.get('CB_DA')?.setValue(salaryDetail?.CB_DA || 0);
         this.frm.get('CB_HRA')?.setValue(salaryDetail?.CB_HRA || 0);
         this.frm.get('CB_HRAPercentage')?.setValue(salaryDetail?.CB_HRAPercentage || 0);
+        this.frm.get('CB_Leaves')?.setValue(salaryDetail?.CB_Leaves || 0);
+        this.frm.get('CB_LeavesPercentage')?.setValue(salaryDetail?.CB_LeavesPercentage || 0);
         this.frm.get('CB_OtherAllowances')?.setValue(salaryDetail?.CB_OtherAllowances || 0);
         this.frm.get('CB_NH')?.setValue(salaryDetail?.CB_NH || 0);
         this.frm.get('CB_NHPercentage')?.setValue(salaryDetail?.CB_NHPercentage || 0);
@@ -518,10 +522,20 @@ export class NewEmployeeComponent implements OnInit {
     data['CB_DA'] = parseFloat(data['CB_DA']) || 0;
     data['CB_HRA'] = parseFloat(data['CB_HRA']) || 0;
     data['CB_HRAPercentage'] = parseFloat(data['CB_HRAPercentage']) || 0;
+    data['CB_Leaves'] = parseFloat(data['CB_Leaves']) || 0;
+    data['CB_LeavesPercentage'] = parseFloat(data['CB_LeavesPercentage']) || 0;
     data['CB_OtherAllowances'] = parseFloat(data['CB_OtherAllowances']) || 0;
     data['CB_NH'] = parseFloat(data['CB_NH']) || 0;
     data['CB_NHPercentage'] = parseFloat(data['CB_NHPercentage']) || 0;
     data['CB_SubTotal'] = parseFloat(data['CB_SubTotal']) || 0;
+
+    // DEBUG: Log CB_Leaves values
+    console.log('=== DEBUG: CB_Leaves Values ===');
+    console.log('Form CB_Leaves value:', this.frm.get('CB_Leaves')?.value);
+    console.log('Form CB_LeavesPercentage value:', this.frm.get('CB_LeavesPercentage')?.value);
+    console.log('Data CB_Leaves after conversion:', data['CB_Leaves']);
+    console.log('Data CB_LeavesPercentage after conversion:', data['CB_LeavesPercentage']);
+    console.log('============================');
 
     if (data['EMP_NO_CHILD'] !== undefined) {
       data['EMP_NO_CHILD'] = parseInt(data['EMP_NO_CHILD'], 10) || 0;
@@ -767,6 +781,8 @@ export class NewEmployeeComponent implements OnInit {
         DA: this.frm.get('CB_DA')?.value || 0,
         HRA: this.frm.get('CB_HRA')?.value || 0,
         HRAPercentage: this.frm.get('CB_HRAPercentage')?.value || 0,
+        Leaves: this.frm.get('CB_Leaves')?.value || 0,
+        LeavesPercentage: this.frm.get('CB_LeavesPercentage')?.value || 0,
         OtherAllowances: this.frm.get('CB_OtherAllowances')?.value || 0,
         CB_NH: this.frm.get('CB_NH')?.value || 0,
         CB_NHPercentage: this.frm.get('CB_NHPercentage')?.value || 0
@@ -781,6 +797,8 @@ export class NewEmployeeComponent implements OnInit {
           CB_DA: result.DA || 0,
           CB_HRA: result.HRA || 0,
           CB_HRAPercentage: result.HRAPercentage || 0,
+          CB_Leaves: result.Leaves || 0,
+          CB_LeavesPercentage: result.LeavesPercentage || 0,
           CB_OtherAllowances: result.OtherAllowances || 0,
           CB_NH: result.CB_NH || 0,
           CB_NHPercentage: result.CB_NHPercentage || 0,

@@ -87,6 +87,8 @@ export class PayrollModuleService {
   }
 
   saveAndUpdateSalaryMonthlyAdvance(salaryAdvanceDetails: SalaryMonthlyAdvance): Observable<any> {
+    console.log('[PayrollService] saveAndUpdateSalaryMonthlyAdvance called with:', salaryAdvanceDetails);
+    console.log('[PayrollService] API URL:', this.apiUrl + 'payroll/GetSalaryAdvanceByDateAndEmployee');
 
     return this.httpClient.post<any[]>(this.apiUrl + 'payroll/GetSalaryAdvanceByDateAndEmployee',
 
@@ -100,11 +102,17 @@ export class PayrollModuleService {
 
         })
 
-      }).pipe(catchError(this.errorHandle));
+      }).pipe(
+        catchError((error: HttpErrorResponse) => {
+          console.error('[PayrollService] Error in saveAndUpdateSalaryMonthlyAdvance:', error);
+          console.error('[PayrollService] Error status:', error.status);
+          console.error('[PayrollService] Error message:', error.message);
+          console.error('[PayrollService] Error body:', error.error);
+          return this.errorHandle(error);
+        })
+      );
 
   }
-
-
 
   saveAndUpdateSalaryDailyAdvances(salaryAdvanceDetails: SalaryMonthlyAdvance[]): Observable<any> {
 
