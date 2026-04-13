@@ -9,7 +9,7 @@ import Swal from 'sweetalert2';
 import { DialogConfirmationComponent } from 'src/app/components/dialog-confirmation/dialog-confirmation.component';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { DatasharingService } from 'src/app/service/datasharing.service';
-import { MastermoduleService } from 'src/app/service/mastermodule.service';
+import { IndianStatutoryService } from 'src/app/service/indian-statutory.service';
 import { PFConfiguration } from 'src/app/model/indian-compliance.model';
 
 @Component({
@@ -20,7 +20,7 @@ import { PFConfiguration } from 'src/app/model/indian-compliance.model';
 export class PfSlabComponent implements AfterViewInit {
   pfConfigurations: PFConfiguration[] = [];
   showLoadingSpinner: boolean = false;
-  displayedColumns: string[] = ['basicSalaryLimit', 'employeeContributionRate', 'employerContributionRate', 'effectiveDate', 'isActive', 'action'];
+  displayedColumns: string[] = ['basicSalaryLimit', 'employeeContributionRate', 'employerContributionRate', 'financialYear', 'effectiveDate', 'isActive', 'action'];
   dataSource: any;
   errorMessage: string = '';
   currentUser: string = '';
@@ -30,7 +30,7 @@ export class PfSlabComponent implements AfterViewInit {
   constructor(
     private _liveAnnouncer: LiveAnnouncer, 
     public dialog: MatDialog,
-    private _masterService: MastermoduleService, 
+    private _statutoryService: IndianStatutoryService, 
     private _router: Router,
     private _dataService: DatasharingService
   ) {
@@ -91,7 +91,7 @@ export class PfSlabComponent implements AfterViewInit {
 
   getPFConfigurationList(): void {
     this.showLoadingSpinner = true;
-    this._masterService.getPFConfigurationList().subscribe(
+    this._statutoryService.getPFConfiguration().subscribe(
       (data: PFConfiguration[]) => {
         console.log('PF Data received:', data);
         if (data && data.length > 0) {
@@ -129,20 +129,28 @@ export class PfSlabComponent implements AfterViewInit {
         data: `Are you sure want to delete this PF configuration?`
       })
       .afterClosed()
-      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {       
+      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {
         if (result.confirmDialog) {
-          // This would need to be implemented in the backend
-          Swal.fire({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            title: 'Info',
-            text: 'Delete functionality needs to be implemented in backend',
-            icon: 'info',
-            showCloseButton: false,
-            timer: 3000,
-          });
-          this.showLoadingSpinner = false;
+          this._statutoryService.deletePFConfiguration(id).subscribe(
+            (response) => {
+              this.showLoadingSpinner = false;
+              Swal.fire({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                title: 'Success',
+                text: 'PF configuration deleted successfully',
+                icon: 'success',
+                showCloseButton: false,
+                timer: 3000,
+              });
+              this.getPFConfigurationList();
+            },
+            (error) => {
+              this.showLoadingSpinner = false;
+              Swal.fire('Error', 'Failed to delete PF configuration', 'error');
+            }
+          );
         } else {
           this.showLoadingSpinner = false;
         }

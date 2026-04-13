@@ -15,25 +15,22 @@
       <!-- Core Salary Components -->
       <h6 class="text-primary mb-3"><i class="fas fa-coins mr-2"></i>Core Salary Components</h6>
       <div class="row mb-3">
-        <div class="col-md-4">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Minimum Wages (Govt)</mat-label>
-            <input type="number" formControlName="MinimumWages" matInput placeholder="0.00" readonly>
-            <mat-hint>Calculated as Basic + DA</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-4">
-          <mat-form-field appearance="outline" class="w-100">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100 input-field">
             <mat-label>Basic Salary</mat-label>
             <input type="number" formControlName="Basic" matInput placeholder="0.00" (input)="calculatePercentages()">
             <mat-hint>Core salary component</mat-hint>
+            <mat-error *ngIf="frm.get('Basic')?.hasError('required')">Basic Salary is required</mat-error>
+            <mat-error *ngIf="frm.get('Basic')?.hasError('min')">Basic Salary must be 0 or greater</mat-error>
           </mat-form-field>
         </div>
-        <div class="col-md-4">
-          <mat-form-field appearance="outline" class="w-100">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100 input-field">
             <mat-label>Dearness Allowance (DA)</mat-label>
             <input type="number" formControlName="DA" matInput placeholder="0.00" (input)="calculatePercentages()">
             <mat-hint>Cost of living adjustment</mat-hint>
+            <mat-error *ngIf="frm.get('DA')?.hasError('required')">Dearness Allowance is required</mat-error>
+            <mat-error *ngIf="frm.get('DA')?.hasError('min')">Dearness Allowance must be 0 or greater</mat-error>
           </mat-form-field>
         </div>
       </div>
@@ -42,10 +39,12 @@
       <h6 class="text-primary mb-3"><i class="fas fa-plus-circle mr-2"></i>Other Allowances</h6>
       <div class="row mb-3">
         <div class="col-md-12">
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline" class="w-100 input-field">
             <mat-label>Other Allowances</mat-label>
             <input type="number" formControlName="OtherAllowances" matInput placeholder="0.00" (input)="calculatePercentages()">
             <mat-hint>Other miscellaneous allowances (direct input)</mat-hint>
+            <mat-error *ngIf="frm.get('OtherAllowances')?.hasError('required')">Other Allowances is required</mat-error>
+            <mat-error *ngIf="frm.get('OtherAllowances')?.hasError('min')">Other Allowances must be 0 or greater</mat-error>
           </mat-form-field>
         </div>
       </div>
@@ -54,17 +53,22 @@
       <h6 class="text-primary mb-3"><i class="fas fa-home mr-2"></i>Housing Allowance</h6>
       <div class="row mb-3">
         <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline" class="w-100 input-field">
             <mat-label>House Rent Allowance (HRA)</mat-label>
-            <input type="number" formControlName="HRA" matInput placeholder="0.00" readonly>
-            <mat-hint>Calculated automatically</mat-hint>
+            <input type="number" formControlName="HRA" matInput placeholder="0.00">
+            <mat-hint>Direct input or use percentage below</mat-hint>
+            <mat-error *ngIf="frm.get('HRA')?.hasError('required')">HRA is required</mat-error>
+            <mat-error *ngIf="frm.get('HRA')?.hasError('min')">HRA must be 0 or greater</mat-error>
           </mat-form-field>
         </div>
         <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
+          <mat-form-field appearance="outline" class="w-100 input-field">
             <mat-label>HRA Percentage (%)</mat-label>
             <input type="number" formControlName="HRAPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
             <mat-hint>Usually 10-15% of Basic</mat-hint>
+            <mat-error *ngIf="frm.get('HRAPercentage')?.hasError('required')">HRA Percentage is required</mat-error>
+            <mat-error *ngIf="frm.get('HRAPercentage')?.hasError('min')">HRA Percentage must be 0 or greater</mat-error>
+            <mat-error *ngIf="frm.get('HRAPercentage')?.hasError('max')">HRA Percentage must not exceed 100</mat-error>
           </mat-form-field>
         </div>
       </div>
@@ -77,294 +81,47 @@
       <strong><i class="fas fa-umbrella-beach mr-2"></i>EMPLOYEE BENEFITS & LEAVE</strong>
     </div>
     <div class="card-body bg-light text-dark">
-      <!-- Leave Benefits -->
-      <h6 class="text-success mb-3"><i class="fas fa-umbrella-beach mr-2"></i>Leave Benefits</h6>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Leave Encashment</mat-label>
-            <input type="number" formControlName="Leaves" matInput placeholder="0.00" readonly>
-            <mat-hint>Annual leave benefit</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Leave Percentage (%)</mat-label>
-            <input type="number" formControlName="LeavesPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 8.33% of Basic</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-
-      <!-- National Festival Allowance (NFH) -->
+      <!-- National Festival Allowance -->
       <h6 class="text-success mb-3"><i class="fas fa-flag mr-2"></i>National Festival Allowance (NFH)</h6>
       <div class="row mb-3">
-        <div class="col-md-12">
-          <mat-form-field appearance="outline" class="w-100">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100 input-field">
             <mat-label>National Festival Allowance (NFH)</mat-label>
-            <input type="number" formControlName="NFH" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <input type="number" formControlName="CB_NH" matInput placeholder="0.00" (input)="calculatePercentages()">
             <mat-hint>Festival allowance (direct input)</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-
-      <!-- Tax & Bonus -->
-      <h6 class="text-success mb-3"><i class="fas fa-percentage mr-2"></i>Tax & Bonus</h6>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Professional Tax</mat-label>
-            <input type="number" formControlName="ProfessionalTax" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>State tax deduction</mat-hint>
+            <mat-error *ngIf="frm.get('CB_NH')?.hasError('required')">NFH is required</mat-error>
+            <mat-error *ngIf="frm.get('CB_NH')?.hasError('min')">NFH must be 0 or greater</mat-error>
           </mat-form-field>
         </div>
         <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Statutory Bonus</mat-label>
-            <input type="number" formControlName="Bonus" matInput placeholder="0.00" readonly>
-            <mat-hint>As per Payment of Bonus Act</mat-hint>
+          <mat-form-field appearance="outline" class="w-100 input-field">
+            <mat-label>NFH Percentage (%)</mat-label>
+            <input type="number" formControlName="CB_NHPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
+            <mat-hint>Percentage of Basic + DA</mat-hint>
+            <mat-error *ngIf="frm.get('CB_NHPercentage')?.hasError('required')">NFH Percentage is required</mat-error>
+            <mat-error *ngIf="frm.get('CB_NHPercentage')?.hasError('min')">NFH Percentage must be 0 or greater</mat-error>
+            <mat-error *ngIf="frm.get('CB_NHPercentage')?.hasError('max')">NFH Percentage must not exceed 100</mat-error>
           </mat-form-field>
-        </div>
-      </div>
-
-      <!-- Bonus & Reliever Costs -->
-      <h6 class="text-success mb-3"><i class="fas fa-user-clock mr-2"></i>Bonus & Reliever Costs</h6>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Bonus Percentage (%)</mat-label>
-            <input type="number" formControlName="BonusPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 8.33% of Basic</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Reliever/Replacement Cost</mat-label>
-            <input type="number" formControlName="RelieverCharges" matInput placeholder="0.00" readonly>
-            <mat-hint>For weekly off coverage</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-
-      <!-- Reliever Cost Configuration -->
-      <h6 class="text-success mb-3"><i class="fas fa-cogs mr-2"></i>Reliever Cost Configuration</h6>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Reliever Cost Percentage (%)</mat-label>
-            <input type="number" formControlName="RelieverChargesPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 25% of Basic</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <!-- Space for balance -->
-        </div>
-      </div>
-
-      <div class="row mt-3">
-        <div class="col-12">
-          <div class="d-flex justify-content-between align-items-center p-2 bg-white rounded border">
-            <strong class="text-primary">GROSS SALARY SUBTOTAL:</strong>
-            <span class="badge bg-primary fs-6">{{ subTotal | number:'1.2-2' }}</span>
-          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Statutory Deductions -->
-  <div class="card bg-warning text-dark mb-3">
-    <div class="card-header">
-      <strong><i class="fas fa-gavel mr-2"></i>STATUTORY DEDUCTIONS (Employer Contribution)</strong>
-    </div>
-    <div class="card-body bg-light text-dark">
-      <!-- Provident Fund Section -->
-      <h6 class="text-warning mb-3"><i class="fas fa-piggy-bank mr-2"></i>Provident Fund (PF)</h6>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Employer PF Contribution</mat-label>
-            <input type="number" formControlName="PF" matInput placeholder="0.00" readonly>
-            <mat-hint class="mt-2">Employer PF contribution (12% of Basic)</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>PF Percentage (%)</mat-label>
-            <input type="number" formControlName="PFPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 12% of Basic</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Employee PF Contribution</mat-label>
-            <input type="number" formControlName="EmployeePF" matInput placeholder="0.00" readonly>
-            <mat-hint class="mt-2">Employee PF contribution (12% of Basic)</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Employee PF Percentage (%)</mat-label>
-            <input type="number" formControlName="EmployeePFPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 12% of Basic</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-
-      <!-- Employee State Insurance Section -->
-      <h6 class="text-warning mb-3"><i class="fas fa-heartbeat mr-2"></i>Employee State Insurance (ESI)</h6>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Employer ESI Contribution</mat-label>
-            <input type="number" formControlName="ESI" matInput placeholder="0.00" readonly>
-            <mat-hint>Employer ESI contribution (3.25% of Gross)</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>ESI Percentage (%)</mat-label>
-            <input type="number" formControlName="ESIPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 3.25% of Gross</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Employee ESI Contribution</mat-label>
-            <input type="number" formControlName="EmployeeESI" matInput placeholder="0.00" readonly>
-            <mat-hint>Employee ESI contribution (0.75% of Gross)</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Employee ESI Percentage (%)</mat-label>
-            <input type="number" formControlName="EmployeeESIPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 0.75% of Gross</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-
-      <div class="row mt-3">
-        <div class="col-12">
-          <div class="d-flex justify-content-between align-items-center p-2 bg-white rounded border">
-            <strong class="text-warning">TOTAL COST TO COMPANY:</strong>
-            <span class="badge bg-warning text-dark fs-6">{{ totalPlusStatutory | number:'1.2-2' }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Operational Costs -->
+  <!-- Summary Section -->
   <div class="card bg-info text-white mb-3">
     <div class="card-header">
-      <strong><i class="fas fa-business-time mr-2"></i>OPERATIONAL COSTS</strong>
+      <strong><i class="fas fa-calculator mr-2"></i>SALARY SUMMARY</strong>
     </div>
     <div class="card-body bg-light text-dark">
-      <!-- Uniform & Equipment Costs -->
-      <h6 class="text-info mb-3"><i class="fas fa-tshirt mr-2"></i>Uniform & Equipment Costs</h6>
-      <div class="row mb-3">
-        <div class="col-md-4">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Uniform & Kit Cost</mat-label>
-            <input type="number" formControlName="UniformCost" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Monthly uniform cost</mat-hint>
-          </mat-form-field>
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h6 class="text-info mb-2">Total Monthly Salary (SubTotal)</h6>
+          <small class="text-muted">Sum of Basic + DA + HRA + Other Allowances + NFH</small>
         </div>
-        <div class="col-md-4">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Other Expenses</mat-label>
-            <input type="number" formControlName="Others" matInput placeholder="0.00" readonly>
-            <mat-hint>Miscellaneous costs</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-4">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Others Percentage (%)</mat-label>
-            <input type="number" formControlName="OthersPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 2-3% of Basic</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-
-      <!-- Administrative Costs -->
-      <h6 class="text-info mb-3"><i class="fas fa-building mr-2"></i>Administrative Costs</h6>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Administration Charges</mat-label>
-            <input type="number" formControlName="AdministrationCharges" matInput placeholder="0.00" readonly>
-            <mat-hint>Office & admin costs</mat-hint>
-          </mat-form-field>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Admin Charges Percentage (%)</mat-label>
-            <input type="number" formControlName="AdministrationChargesPercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 5-10% of Basic</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Final Summary -->
-  <div class="card bg-dark text-white mb-3">
-    <div class="card-header">
-      <strong><i class="fas fa-calculator mr-2"></i>SALARY SUMMARY & BILLING</strong>
-    </div>
-    <div class="card-body bg-light text-dark">
-      <!-- Cost Analysis -->
-      <h6 class="text-dark mb-3"><i class="fas fa-chart-line mr-2"></i>Cost Analysis</h6>
-      <div class="row mb-3">
-        <div class="col-md-6">
-          <div class="d-flex justify-content-between align-items-center mb-2 p-3 rounded border border-2" [ngClass]="totalDirectCostClass">
-            <strong class="fs-5" [ngClass]="totalDirectCost <= 0 ? 'text-warning' : 'text-success'">TOTAL DIRECT COST (A):</strong>
-            <span class="badge fs-5 p-2" [ngClass]="totalDirectCostBadgeClass">{{ totalDirectCost | number:'1.2-2' }}</span>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Management & Profit Margin (%)</mat-label>
-            <input type="number" formControlName="ManagementFeePercentage" matInput placeholder="0.00" (input)="calculatePercentages()">
-            <mat-hint>Usually 10-20% margin</mat-hint>
-          </mat-form-field>
-        </div>
-      </div>
-
-      <!-- Management Fee -->
-      <h6 class="text-dark mb-3"><i class="fas fa-hand-holding-usd mr-2"></i>Management Fee</h6>
-      <div class="row mb-3">
-        <div class="col-12">
-          <div class="d-flex justify-content-between align-items-center mb-2 p-3 bg-white rounded border">
-            <strong class="text-dark">Management Fee Amount:</strong>
-            <span class="badge bg-secondary fs-6">{{ managementFee | number:'1.2-2' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Final Billing -->
-      <h6 class="text-dark mb-3"><i class="fas fa-file-invoice-dollar mr-2"></i>Final Billing</h6>
-      <div class="row mb-3">
-        <div class="col-12">
-          <div class="d-flex justify-content-between align-items-center p-3 bg-success text-white rounded">
-            <strong class="fs-5">MONTHLY BILLABLE COST (B):</strong>
-            <span class="badge bg-light text-success fs-4">{{ monthlyChargedCost | number:'1.2-2' }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Multi-Guard Calculation -->
-      <div class="row mt-2" *ngIf="noOfGuards > 1">
-        <div class="col-12 border-top pt-3">
-          <h6 class="text-primary mb-3"><i class="fas fa-users mr-2"></i>Multi-Guard Calculation</h6>
-          <div class="d-flex justify-content-between align-items-center text-primary p-3 bg-light rounded border">
-            <strong>Estimated Monthly Total ({{noOfGuards}} Guards):</strong>
-            <span class="badge bg-primary fs-5">{{ grandTotal | number:'1.2-2' }}</span>
+        <div class="col-md-4 text-right">
+          <div class="summary-value">
+            <span class="currency-symbol">₹</span>
+            <span class="amount">{{ subTotal | number:'1.2-2' }}</span>
           </div>
         </div>
       </div>

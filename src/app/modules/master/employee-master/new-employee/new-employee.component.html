@@ -384,27 +384,7 @@
           <h2><span>Salary Details</span></h2>
         </div>
         <div class="col-6">
-          <div class="row">
-            <div class="col-6">
-              <mat-label class="mr-3"><strong>Salary Structure</strong></mat-label>
-              <br/>
-              <mat-radio-group aria-label="Select a Salary Structure " formControlName="salary_structure" (change)="salaryStructureChange($event)">
-                <mat-radio-button value="Y">Structured Salary</mat-radio-button>
-                <mat-radio-button value="N">Non Structured Salary</mat-radio-button>
-              </mat-radio-group>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-6">
-              <mat-form-field appearance="outline">
-                <mat-label>Salary Structure</mat-label>
-                <mat-select formControlName="SALARYLAB" (selectionChange)="salaryStructureChangeSlab($event)">
-                  <mat-option *ngFor="let d of salaryStructureList" value="{{d.SalaryId}}">{{d.Name}}</mat-option>
-
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </div>
+         
           <div class="row">
             <div class="col-6">
               <mat-form-field appearance="outline">

@@ -705,8 +705,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.hra || 0}</td>
           <td>${row.leaveWages || 0}</td>
           <td>${row.nh || 0}</td>
-          <td>${row.advance || 0}</td>
-          <td>${row.bonus || row.advBonus || 0}</td>
+          <td>${(row.advance || 0) + (row.bonus || 0)}</td>
           <td>${row.actualDays || row.attendance || 0}</td>
           <td>${row.fixedSalary || row.gross || 0}</td>
           <td>${row.workDays || row.attendance || 0}</td>
@@ -717,8 +716,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.hra || 0}</td>
           <td>${row.leaveWages || 0}</td>
           <td>${row.nh || 0}</td>
-          <td>${row.advance || 0}</td>
-          <td>${row.bonus || row.advBonus || 0}</td>
+          <td>${(row.advance || 0) + (row.bonus || 0)}</td>
           <td>${row.otHours || 0}</td>
           <td>${row.otAmount || 0}</td>
           <td>${row.gross || 0}</td>

@@ -153,6 +153,25 @@ export class IndianStatutoryService {
     return this.http.get<any[]>(`${this.apiUrl}statutory/pf-configuration`);
   }
 
+  // Save PF Configuration
+  savePFConfiguration(config: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}statutory/pf-configuration`, config, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    });
+  }
+
+  // Update PF Configuration
+  updatePFConfiguration(id: number, config: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}statutory/pf-configuration/${id}`, config, {
+      headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    });
+  }
+
+  // Delete PF Configuration
+  deletePFConfiguration(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}statutory/pf-configuration/${id}`);
+  }
+
   // Get ESI Configuration
   getESIConfiguration(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}statutory/esi-configuration`);

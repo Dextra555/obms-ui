@@ -62,10 +62,12 @@ export interface PFConfiguration {
   basicSalaryLimit: number;
   employeeContributionRate: number;
   employerContributionRate: number;
+  employerEPSRate: number;
   effectiveDate: string;
   isActive: boolean;
   createdDate: string;
   createdBy: string;
+  financialYear: string;
   lastUpdatedDate: string;
   lastUpdatedBy: string;
 }

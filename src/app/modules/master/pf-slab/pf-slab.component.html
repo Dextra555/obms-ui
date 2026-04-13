@@ -61,7 +61,15 @@
             <span class="badge badge-primary">{{ row.EmployerContributionRate }}%</span>
           </td>
         </ng-container>
-        
+
+        <!-- Financial Year Column -->
+        <ng-container matColumnDef="financialYear">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Financial Year</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge badge-secondary">{{ row.FinancialYear }}</span>
+          </td>
+        </ng-container>
+
         <!-- Effective Date Column -->
         <ng-container matColumnDef="effectiveDate">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Effective Date</th>
@@ -81,14 +89,14 @@
         <ng-container matColumnDef="action" stickyEnd>
           <th mat-header-cell *matHeaderCellDef style="text-align:center; width: 120px;">Actions</th>
           <td mat-cell *matCellDef="let row" style="text-align:center;">
-            <a *ngIf="(this.userAccessModel.readAccess == true || currentUser == 'superadmin')" 
+            <a *ngIf="(this.userAccessModel.readAccess == true || currentUser == 'superadmin')"
                style="cursor:pointer;" class="wlt-c-furg-text-primary mr-2" matTooltip="Edit"
-               [routerLink]="['/master/pf-slab/edit-pf-slab', row.Id]">
+               [routerLink]="['/master/pf-slab/new-pf-slab']" [queryParams]="{ id: row.id }">
               <mat-icon aria-hidden="false" aria-label="edit icon">edit</mat-icon>
             </a>
             <a *ngIf="(this.userAccessModel.deleteAccess == true || currentUser == 'superadmin')"
                style="cursor:pointer;" class="wlt-c-furg-text-danger" matTooltip="Delete"
-               (click)="onDeleteClick(row.Id)">
+               (click)="onDeleteClick(row.id)">
               <mat-icon aria-hidden="false" aria-label="trash icon">delete_outline</mat-icon>
             </a>
           </td>
