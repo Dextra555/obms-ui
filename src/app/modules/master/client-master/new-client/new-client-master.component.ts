@@ -105,7 +105,7 @@ export class NewClientMasterComponent implements OnInit {
       Branch: this.fb.control('', [Validators.required]),
       Status: this.fb.control('Active'),
       PersonIncharge: this.fb.control('', [Validators.required]),
-      ShortName: this.fb.control('', [Validators.required]),
+      ShortName: this.fb.control(''),
       Phone: this.fb.control('', [Validators.required]),
       Fax: this.fb.control(''),
       UserEmail: this.fb.control(''),

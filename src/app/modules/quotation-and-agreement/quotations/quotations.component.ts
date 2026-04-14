@@ -15,7 +15,6 @@ import Swal from "sweetalert2";
 
 export interface IQuotation {
   ID: number,
-  WorkPlace: string;
   BranchName: string;
   ClientName: string;
   QuotationDate: string;
@@ -30,7 +29,7 @@ export interface IQuotation {
   styleUrls: ['./quotations.component.css']
 })
 export class QuotationsComponent {
-  displayedColumns: string[] = ['SNo', 'QuotationID', 'BranchName', 'ClientName', 'WorkPlace', 'QuotationDate', 'AddedDate', 'Status', 'action'];
+  displayedColumns: string[] = ['SNo', 'QuotationID', 'BranchName', 'ClientName', 'QuotationDate', 'AddedDate', 'Status', 'action'];
   dataSource!: MatTableDataSource<IQuotation>;
   branchList: any;
   clientList: any;
@@ -171,7 +170,7 @@ export class QuotationsComponent {
 
         const matchesID = searchID ? data.ID.toString().toLowerCase().includes(searchID) : true;
 
-        const dataStr = `${data.BranchName} ${data.ClientName} ${data.WorkPlace} ${data.Status}`.toLowerCase();
+        const dataStr = `${data.BranchName} ${data.ClientName} ${data.Status}`.toLowerCase();
         const matchesText = searchString ? dataStr.includes(searchString) : true;
 
         return matchesID && matchesText;

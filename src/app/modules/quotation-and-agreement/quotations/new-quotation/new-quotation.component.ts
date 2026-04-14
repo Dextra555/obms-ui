@@ -22,7 +22,6 @@ import { IQuotationDetail } from "../../../../model/quotation-detail.model";
 
 export interface IQuotation {
   ID: number,
-  WorkPlace: string;
   BranchName: string;
   ClientName: string;
   QuotationDate: string;
@@ -37,7 +36,7 @@ export class NewQuotationComponent {
   displayedColumns: string[] = ['SNo', 'ServiceType', 'Description', 'NoOfGuards', 'PerDay', 'Rate', 'NoOfHours', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
   dataSource!: MatTableDataSource<IQuotationDetail>;
 
-  quotationDisplayedColumns: string[] = ['SNo', 'QuotationID', 'BranchName', 'ClientName', 'WorkPlace', 'QuotationDate', 'action'];
+  quotationDisplayedColumns: string[] = ['SNo', 'QuotationID', 'BranchName', 'ClientName', 'QuotationDate', 'action'];
   quotationDataSource!: MatTableDataSource<IQuotation>;
 
   frm!: FormGroup
@@ -95,7 +94,6 @@ export class NewQuotationComponent {
       QuotationDate: [new Date(), Validators.required],
       Branch: ['', Validators.required],
       Client: ['', Validators.required],
-      WorkPlace: ['', Validators.required],
       IsValid: [true],
       details: this.fb.group({
         ID: [0],

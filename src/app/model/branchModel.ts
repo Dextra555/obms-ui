@@ -18,7 +18,7 @@ GSTIN?:string;
 PersonIncharge!:string;
 Description?:string;
 Email?:string;
-ShortName!:string;
+ShortName?:string;
 IsHeadQuarters?:boolean;
 UbsCode!:string;
 LastUpdate?:Date;

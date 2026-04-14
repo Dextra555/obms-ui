@@ -56,7 +56,6 @@ export interface IItemDetails {
 
 export interface IAgreement {
   ID: number,
-  WorkPlace: string;
   BranchName: string;
   ClientName: string;
   AgreementDate: string;
@@ -71,7 +70,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['ServiceType', 'Description', 'NoOfGuards', 'PerDay', 'Rate', 'NoOfHours', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
   dataSource!: MatTableDataSource<IItemDetails>;
 
-  agreementDisplayedColumns: string[] = ['BranchName', 'ClientName', 'WorkPlace', 'AgreementDate', 'action'];
+  agreementDisplayedColumns: string[] = ['BranchName', 'ClientName', 'AgreementDate', 'action'];
   agreementDataSource!: MatTableDataSource<IAgreement>;
 
   frm!: FormGroup
@@ -125,7 +124,6 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
       AgreementEndDate: [new Date()],
       Branch: ['', Validators.required],
       Client: ['', Validators.required],
-      WorkPlace: ['', Validators.required],
       IsValid: [true],
       QuotationID: [0],
       details: this.fb.group({
@@ -515,7 +513,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
     let emptyData = {
       ID: 0,
       AgreementID: 0,
-      ServiceTypeID: null, // Added missing control
+      ServiceTypeID: null,
       Description: '',
       NoOfGuards: 0,
       PerDay: 0,
@@ -533,7 +531,37 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
       total: 0,
       Category: '',
       Reason: '',
-      index: -1
+      index: -1,
+      Basic: 0,
+      DA: 0,
+      Leaves: 0,
+      LeavesPercentage: 0,
+      Allowance: 0,
+      Bonus: 0,
+      BonusPercentage: 0,
+      NFH: 0,
+      PF: 0,
+      PFPercentage: 0,
+      ESI: 0,
+      ESIPercentage: 0,
+      Uniform: 0,
+      ServiceFee: 0,
+      HRA: 0,
+      HRAPercentage: 0,
+      ProfessionalTax: 0,
+      RelieverCharges: 0,
+      RelieverChargesPercentage: 0,
+      Others: 0,
+      OthersPercentage: 0,
+      AdministrationCharges: 0,
+      AdministrationChargesPercentage: 0,
+      ManagementFee: 0,
+      ManagementFeePercentage: 0,
+      SubTotal: 0,
+      TotalPlusStatutory: 0,
+      TotalDirectCost: 0,
+      MonthlyChargedCost: 0,
+      CommercialBreakdown: null
     }
 
     this.frm.get('details')?.setValue(emptyData);

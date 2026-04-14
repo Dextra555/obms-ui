@@ -427,8 +427,12 @@ export class NewEmployeeComponent implements OnInit {
     });
   }
 
-  loadDesignations(): void {
-    this.http.get('/api/Designation').subscribe({
+  loadDesignations(departmentId?: number): void {
+    let url = '/api/Designation';
+    if (departmentId && departmentId > 0) {
+      url += `?departmentId=${departmentId}`;
+    }
+    this.http.get(url).subscribe({
       next: (response: any) => {
         this.designationList = response;
       },
@@ -437,6 +441,13 @@ export class NewEmployeeComponent implements OnInit {
         this.showMessage('Error loading designations', 'error', 'Error Message');
       }
     });
+  }
+
+  onDepartmentChange(departmentId: any): void {
+    // Clear designation when department changes
+    this.frm.get('DesignationId')?.setValue(null);
+    // Load designations filtered by selected department
+    this.loadDesignations(departmentId);
   }
 
   formatDateInput(event: any, formControlName: string): void {

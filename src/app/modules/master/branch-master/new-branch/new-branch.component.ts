@@ -78,7 +78,7 @@ export class NewBranchComponent implements OnInit {
       BankBranch: this.fb.control(''),
       BankAccount: this.fb.control(''),
       PersonIncharge: this.fb.control('', [Validators.required]),
-      ShortName: this.fb.control('', [Validators.required, Validators.maxLength(10)]),
+      ShortName: this.fb.control('', [Validators.maxLength(10)]),
       UbsCode: this.fb.control(''),
       Phone: this.fb.control('', [Validators.required]),
       Fax: this.fb.control(''),
@@ -184,6 +184,19 @@ export class NewBranchComponent implements OnInit {
 
       (error) => this.handleErrors(error)
     );
+  }
+
+  onBranchNameChange(event: any): void {
+    // Only auto-generate ShortName in new mode, not in edit mode
+    if (this.branchCodeStatus === 'new') {
+      const branchName = event.target.value;
+      if (branchName && branchName.length >= 3) {
+        const shortName = branchName.substring(0, 3).toUpperCase();
+        this.branchForm.patchValue({
+          ShortName: shortName
+        });
+      }
+    }
   }
 
   loadAvailableBranches(): void {
