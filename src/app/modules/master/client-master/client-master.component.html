@@ -55,39 +55,13 @@
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Client Name </th>
           <td mat-cell *matCellDef="let element" class="text-left"> {{element.Name}} </td>
         </ng-container>
-        <ng-container matColumnDef="ubs_code">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Short Name </th>
-          <td mat-cell *matCellDef="let element" class="text-left"> {{element.Shortname}} </td>
-        </ng-container>
-        <ng-container matColumnDef="address">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Address </th>
-          <td mat-cell *matCellDef="let element" class="text-left"> {{element.Address1}} </td>
-        </ng-container>
         <ng-container matColumnDef="person_incharge">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Person Incharge </th>
           <td mat-cell *matCellDef="let element" class="text-left"> {{element.PersonIncharge}} </td>
         </ng-container>
-        <ng-container matColumnDef="gstin">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> GSTIN </th>
-          <td mat-cell *matCellDef="let element" class="text-left">
-            <span class="badge badge-info" *ngIf="element.GSTIN">{{element.GSTIN}}</span>
-            <span class="text-muted" *ngIf="!element.GSTIN">-</span>
-          </td>
-        </ng-container>
-        <ng-container matColumnDef="pan_number">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> PAN </th>
-          <td mat-cell *matCellDef="let element" class="text-left">
-            <span class="badge badge-warning" *ngIf="element.PANNumber">{{element.PANNumber}}</span>
-            <span class="text-muted" *ngIf="!element.PANNumber">-</span>
-          </td>
-        </ng-container>
         <ng-container matColumnDef="indian_state">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Indian State </th>
           <td mat-cell *matCellDef="let element" class="text-left">{{element.IndianState || element.State}}</td>
-        </ng-container>
-        <ng-container matColumnDef="pin_code">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> PIN Code </th>
-          <td mat-cell *matCellDef="let element" class="text-left">{{element.PINCode || element.PostCode}}</td>
         </ng-container>
         <ng-container matColumnDef="compliance_status">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Compliance Status </th>

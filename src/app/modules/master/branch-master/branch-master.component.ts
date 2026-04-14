@@ -28,7 +28,7 @@ export class BranchMasterComponent implements AfterViewInit {
   showLoadingSpinner: boolean = false;
   branchCode: string = 'null';
   errorMessage: string = '';
-  displayedColumns: string[] = ['code', 'ubsCode', 'name', 'address1', 'state', 'parentBranch', 'personIncharge', 'action'];
+  displayedColumns: string[] = ['code', 'name', 'address1', 'state', 'parentBranch', 'personIncharge', 'action'];
   dataSource: any;
   currentUser: string = '';
   warningMessage: string = '';

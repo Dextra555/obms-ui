@@ -31,7 +31,6 @@ export class NewEmployeeComponent implements OnInit {
   nationalityList: any;
   raceList: any;
   clientList: any;
-  salaryStructureList: any;
   employeeCheckInfoValidation: boolean = true;
   currentUser: string = '';
   empId: any;
@@ -152,10 +151,6 @@ export class NewEmployeeComponent implements OnInit {
       EMPPAY_CATEGORY: ['', [Validators.required]],
       EMPPAY_DATE_JOINED: [''],
       EMPPAY_DATE_RESIGNED: [''],
-      salary_structure: [''],
-      SALARYLAB: [0],
-      NewSalaryStructure: ['N'],
-      SalaryStructure1000_3h: ['0'],
       EMPPAY_BASIC_RATE: ['', [Validators.required]],
       ATTENDANCEALLOWANCE: [0],
       AttendanceAllowanceWorkingDays: [0],
@@ -244,7 +239,6 @@ export class NewEmployeeComponent implements OnInit {
         }
         
         this.frm.get('EMP_CITIZEN')?.setValue(employee['EMP_CITIZEN'].toString());
-        this.frm.get('SALARYLAB')?.setValue(employment['SALARYLAB'].toString() ?? 0);
         this.frm.get('EMP_SP_WORK')?.setValue(employee['EMP_SP_WORK'] == true ? "1" : "0");
         this.frm.get('TMPGUARD')?.setValue(salaryDetail?.TMPGUARD == true ? "0" : "1");
         this.frm.get('INCOMETAXDETECT')?.setValue(salaryDetail?.INCOMETAXDETECT == true ? "Yes" : "No");
@@ -321,7 +315,6 @@ export class NewEmployeeComponent implements OnInit {
       this.nationalityList = data['nationalityList'];
       this.raceList = data['raceList'];
       this.clientList = data['clientList'];
-      this.salaryStructureList = data['salaryStructureList'];
       
       // Handle edit scenario - load employee code data after initial data is loaded
       if (this.empId != 0 && this.empId != undefined) {
@@ -511,7 +504,6 @@ export class NewEmployeeComponent implements OnInit {
 
     // Convert numeric fields from string to number
     data['EMPPAY_BASIC_RATE'] = parseFloat(data['EMPPAY_BASIC_RATE']) || 0;
-    data['SALARYLAB'] = parseFloat(data['SALARYLAB']) || 0;
     data['ATTENDANCEALLOWANCE'] = parseFloat(data['ATTENDANCEALLOWANCE']) || 0;
     data['NewStructureATTENDANCEALLOWANCE'] = parseFloat(data['NewStructureATTENDANCEALLOWANCE']) || 0;
     data['SpecialAllowance'] = parseFloat(data['SpecialAllowance']) || 0;
@@ -639,17 +631,6 @@ export class NewEmployeeComponent implements OnInit {
     }
   }
 
-  salaryStructureChange(event: any) {
-    if (event.value == 'N') {
-      // Salary is set via Commercial Breakdown only - keep disabled
-      this.frm.get('EMPPAY_BASIC_RATE')?.setValue("");
-    } else {
-      this.frm.get('EMPPAY_BASIC_RATE')?.setValue("0");
-    }
-    // Salary field always remains disabled - only editable via Commercial Breakdown
-    this.frm.get('EMPPAY_BASIC_RATE')?.disable({ onlySelf: true });
-  }
-
   isTemporaryEmployeeChange(value: any) {
     if (value == '0') {
       this.frm.get("INCOMETAXDETECT")?.setValue("No");
@@ -712,19 +693,6 @@ export class NewEmployeeComponent implements OnInit {
     } else {
       this.frm.get("EMP_NO_CHILD")?.disable({ onlySelf: true });
     }
-  }
-
-  salaryStructureChangeSlab(data: any) {
-    console.log(data.value);
-
-    // SalaryBand
-    // WorkingDays
-
-    let da = this.salaryStructureList.filter((x: any) => x.SalaryId == data.value)
-    console.log(da);
-    // Set working days but salary is set via Commercial Breakdown only
-    this.frm.get("AttendanceAllowanceWorkingDays")?.setValue(da[0]['WorkingDays'])
-
   }
 
   // Bank selection handler
