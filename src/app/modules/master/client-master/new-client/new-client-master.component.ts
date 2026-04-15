@@ -328,7 +328,10 @@ export class NewClientMasterComponent implements OnInit {
           BillingAddress2: responseData[0].BillingAddress2 || '',
           BillingCity: responseData[0].BillingCity || '',
           BillingState: responseData[0].BillingState || '',
-          BillingPINCode: responseData[0].BillingPINCode || ''
+          BillingPINCode: responseData[0].BillingPINCode || '',
+
+          // Compliance Status
+          ClientComplianceStatus: responseData[0].ClientComplianceStatus || 'non_compliance_client'
         });
         
         // Call GST status change handler to enable/disable fields appropriately
