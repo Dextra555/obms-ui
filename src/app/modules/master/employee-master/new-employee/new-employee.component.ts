@@ -189,7 +189,10 @@ export class NewEmployeeComponent implements OnInit {
       
       // Department and Designation Fields
       DepartmentId: [null],
-      DesignationId: [null]
+      DesignationId: [null],
+      
+      // Salary Structure Flag (for migration from salary slab to commercial breakdown)
+      NewSalaryStructure: ['N']
     });
 
     this.checklistItems.forEach((item) => {
@@ -249,6 +252,22 @@ export class NewEmployeeComponent implements OnInit {
         this.frm.get('AttendanceAllowanceFollowCalendar')?.setValue(employment['AttendanceAllowanceFollowCalendar'] == "Y");
 
         this.calendarChangeEvent(employment['AttendanceAllowanceFollowCalendar'] == "Y");
+
+        // Reverse mapping: Set DepartmentId based on EMPPAY_JOB_TITLE
+        if (employment['EMPPAY_JOB_TITLE']) {
+          const department = this.departmentList.find(dept => dept.DepartmentName === employment['EMPPAY_JOB_TITLE']);
+          if (department) {
+            this.frm.get('DepartmentId')?.setValue(department.DepartmentId);
+          }
+        }
+
+        // Reverse mapping: Set DesignationId based on EMPPAY_CATEGORY
+        if (employment['EMPPAY_CATEGORY']) {
+          const designation = this.designationList.find(desig => desig.DesignationName === employment['EMPPAY_CATEGORY']);
+          if (designation) {
+            this.frm.get('DesignationId')?.setValue(designation.DesignationId);
+          }
+        }
 
         const oEmployeeCheckList = employee['EMP_CHECKLIST']; //256+128+64+32+16+8+4+2+1;
         this.checklistItems.forEach((item) => {
@@ -448,6 +467,32 @@ export class NewEmployeeComponent implements OnInit {
     this.frm.get('DesignationId')?.setValue(null);
     // Load designations filtered by selected department
     this.loadDesignations(departmentId);
+    
+    // Set EMPPAY_JOB_TITLE with department name
+    const selectedDepartment = this.departmentList.find(dept => dept.DepartmentId === departmentId);
+    if (selectedDepartment) {
+      this.frm.get('EMPPAY_JOB_TITLE')?.setValue(selectedDepartment.DepartmentName);
+    }
+  }
+
+  onDesignationChange(designationId: any): void {
+    // Set EMPPAY_CATEGORY with designation name
+    const selectedDesignation = this.designationList.find(desig => desig.DesignationId === designationId);
+    if (selectedDesignation) {
+      this.frm.get('EMPPAY_CATEGORY')?.setValue(selectedDesignation.DesignationName);
+    }
+  }
+
+  calculateCommercialBreakdownTotal(): void {
+    const basic = parseFloat(this.frm.get('CB_Basic')?.value) || 0;
+    const da = parseFloat(this.frm.get('CB_DA')?.value) || 0;
+    const hra = parseFloat(this.frm.get('CB_HRA')?.value) || 0;
+    const leaves = parseFloat(this.frm.get('CB_Leaves')?.value) || 0;
+    const nh = parseFloat(this.frm.get('CB_NH')?.value) || 0;
+    const otherAllowances = parseFloat(this.frm.get('CB_OtherAllowances')?.value) || 0;
+
+    const total = basic + da + hra + leaves + nh + otherAllowances;
+    this.frm.get('CB_SubTotal')?.setValue(total);
   }
 
   formatDateInput(event: any, formControlName: string): void {
@@ -531,6 +576,16 @@ export class NewEmployeeComponent implements OnInit {
     data['CB_NH'] = parseFloat(data['CB_NH']) || 0;
     data['CB_NHPercentage'] = parseFloat(data['CB_NHPercentage']) || 0;
     data['CB_SubTotal'] = parseFloat(data['CB_SubTotal']) || 0;
+
+    // MIGRATION: Automatically set NewSalaryStructure based on CB usage
+    // If CB_Basic > 0, use Commercial Breakdown (NewSalaryStructure = 'Y')
+    // If CB_Basic = 0, use Salary Slab (NewSalaryStructure = 'N') for backward compatibility
+    data['NewSalaryStructure'] = data['CB_Basic'] > 0 ? 'Y' : 'N';
+    
+    // When using Commercial Breakdown, set SALARYLAB to 0 to clear salary slab reference
+    if (data['NewSalaryStructure'] === 'Y') {
+      data['SALARYLAB'] = 0;
+    }
 
     // DEBUG: Log CB_Leaves values
     console.log('=== DEBUG: CB_Leaves Values ===');

@@ -87,35 +87,6 @@
         </div>
       </div>
 
-      <!-- Department and Designation Section -->
-      <div class="row mt-3">
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Department</mat-label>
-            <mat-select formControlName="DepartmentId" (selectionChange)="onDepartmentChange($event.value)">
-              <mat-option value="">-- Select Department --</mat-option>
-              <mat-option *ngFor="let dept of departmentList" [value]="dept.DepartmentId">
-                {{dept.DepartmentName}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Designation</mat-label>
-            <mat-select formControlName="DesignationId">
-              <mat-option value="">-- Select Designation --</mat-option>
-              <mat-option *ngFor="let desig of designationList" [value]="desig.DesignationId">
-                {{desig.DesignationName}}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-          <!-- Empty space for layout balance -->
-        </div>
-      </div>
-
       <div class="row" *ngIf="warningMessage ==''">
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
           <h2><span>Personal Details</span></h2>
@@ -126,7 +97,6 @@
           <mat-radio-group aria-label="Select a Nationality " formControlName="EMP_CITIZEN" (change)="nationalityChange($event.value)">
             <mat-radio-button value="0">Indian Citizen</mat-radio-button>
             <mat-radio-button value="1">Foreigner</mat-radio-button>
-            <mat-radio-button value="2">Permanent Resident</mat-radio-button>
             <mat-radio-button value="3">Migrate People</mat-radio-button>
           </mat-radio-group>
         </div>
@@ -231,13 +201,13 @@
             please select Marital Status
           </mat-error>
         </div>
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
           <mat-form-field appearance="outline">
             <mat-label>Work Experience</mat-label>
             <input type="text" formControlName="EM_WORK_EXP" matInput placeholder="" autocomplete="off">
           </mat-form-field>
         </div>
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
           <mat-form-field appearance="outline">
             <mat-label>Highest Education</mat-label>
             <input type="text" formControlName="EMP_HGH_EDU" matInput placeholder="" autocomplete="off">
@@ -293,19 +263,6 @@
           </mat-form-field>
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-        </div>
-        <!--      </div>-->
-        <!--      <div class="row">-->
-        <!--        <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">-->
-        <!--          <h2><span>Permanent / Contact Information</span></h2>-->
-        <!--        </div>-->
-        <!--        <div class="col-12 col-sm-12 col-md-4 col-lg-4">-->
-        <!--          <mat-form-field appearance="outline">-->
-        <!--            <mat-label>Name</mat-label>-->
-        <!--            <input type="text" formControlName="EMP_PER_NAME_CONTACT" matInput placeholder="" autocomplete="off">-->
-        <!--          </mat-form-field>-->
-        <!--        </div>-->
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4 ">
           <mat-form-field appearance="outline">
             <mat-label>Address Line1</mat-label>
             <input type="text" formControlName="EMP_CONTACT_ADDRESS1" matInput placeholder="" autocomplete="off">
@@ -350,14 +307,24 @@
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
-            <mat-label>Job Title</mat-label>
-            <input type="text" formControlName="EMPPAY_JOB_TITLE" matInput placeholder="" autocomplete="off">
+            <mat-label>Department</mat-label>
+            <mat-select formControlName="DepartmentId" (selectionChange)="onDepartmentChange($event.value)">
+              <mat-option value="">-- Select Department --</mat-option>
+              <mat-option *ngFor="let dept of departmentList" [value]="dept.DepartmentId">
+                {{dept.DepartmentName}}
+              </mat-option>
+            </mat-select>
           </mat-form-field>
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
-            <mat-label>Category</mat-label>
-            <input type="text" formControlName="EMPPAY_CATEGORY" matInput placeholder="" autocomplete="off">
+            <mat-label>Designation</mat-label>
+            <mat-select formControlName="DesignationId" (selectionChange)="onDesignationChange($event.value)">
+              <mat-option value="">-- Select Designation --</mat-option>
+              <mat-option *ngFor="let desig of designationList" [value]="desig.DesignationId">
+                {{desig.DesignationName}}
+              </mat-option>
+            </mat-select>
           </mat-form-field>
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
@@ -383,17 +350,68 @@
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
           <h2><span>Salary Details</span></h2>
         </div>
-        <div class="col-6">
-         
+        <div class="col-12">
+          <!-- Commercial Breakdown Inline Edit -->
           <div class="row">
-            <div class="col-6">
-              <mat-form-field appearance="outline">
-                <mat-label>Salary</mat-label>
-                <input type="text" formControlName="EMPPAY_BASIC_RATE" matInput placeholder="" autocomplete="off" readonly>
-                <button type="button" mat-icon-button matSuffix (click)="openCommercialDetails()" matTooltip="Commercial Breakdown">
-                  <mat-icon>payments</mat-icon>
-                </button>
-              </mat-form-field>
+            <div class="col-12">
+              <div class="commercial-breakdown-table">
+                <table class="table table-sm mb-0">
+                  <tbody>
+                    <tr>
+                      <td class="py-2">Basic Salary</td>
+                      <td class="py-2">
+                        <input type="number" formControlName="CB_Basic" class="form-control form-control-sm text-right" placeholder="0.00" (input)="calculateCommercialBreakdownTotal()">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">Dearness Allowance (DA)</td>
+                      <td class="py-2">
+                        <input type="number" formControlName="CB_DA" class="form-control form-control-sm text-right" placeholder="0.00" (input)="calculateCommercialBreakdownTotal()">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">House Rent Allowance (HRA)</td>
+                      <td class="py-2">
+                        <input type="number" formControlName="CB_HRA" class="form-control form-control-sm text-right" placeholder="0.00" (input)="calculateCommercialBreakdownTotal()">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">Leave Wages</td>
+                      <td class="py-2">
+                        <input type="number" formControlName="CB_Leaves" class="form-control form-control-sm text-right" placeholder="0.00" (input)="calculateCommercialBreakdownTotal()">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">National Festival Allowance (NFH)</td>
+                      <td class="py-2">
+                        <input type="number" formControlName="CB_NH" class="form-control form-control-sm text-right" placeholder="0.00" (input)="calculateCommercialBreakdownTotal()">
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="py-2">Other Allowances</td>
+                      <td class="py-2">
+                        <input type="number" formControlName="CB_OtherAllowances" class="form-control form-control-sm text-right" placeholder="0.00" (input)="calculateCommercialBreakdownTotal()">
+                      </td>
+                    </tr>
+                    <tr class="table-light font-weight-bold">
+                      <td class="py-3">Total</td>
+                      <td class="py-3 text-right">₹ {{ frm.get('CB_SubTotal')?.value | number:'1.2-2' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-6 ">
+              <mat-label class="mr-3"><strong>Salary Group</strong></mat-label>
+              <br/>
+              <div class="py-2">
+                <mat-radio-group aria-label="Select Salary Group" formControlName="SalaryGroup">
+                  <mat-radio-button *ngFor="let group of salaryGroups" [value]="group.value">{{group.label}}</mat-radio-button>
+                </mat-radio-group>
+              </div>
             </div>
           </div>
 
@@ -411,38 +429,15 @@
 
           <div class="row">
             <div class="col-6">
-              <mat-label class="mr-3"><strong>Salary Group</strong></mat-label>
-              <br/>
-              <mat-radio-group aria-label="Select Salary Group" formControlName="SalaryGroup">
-                <mat-radio-button *ngFor="let group of salaryGroups" [value]="group.value">{{group.label}}</mat-radio-button>
-              </mat-radio-group>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-6">
-              <mat-form-field appearance="outline">
-                <mat-label>Allowance</mat-label>
-                <input type="text" formControlName="ATTENDANCEALLOWANCE" matInput placeholder="" autocomplete="off">
-              </mat-form-field>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-6">
-              <mat-form-field appearance="outline">
-                <mat-label>Special Allowance</mat-label>
-                <input type="num" formControlName="SpecialAllowance" matInput placeholder="" autocomplete="off">
-              </mat-form-field>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-6">
               <mat-label class="mr-3"><strong>Salary Payment Mode</strong></mat-label>
               <br/>
-              <mat-radio-group aria-label="Select a Salary Payment Mode" formControlName="PAYMODE" (change)="changePaymentMode($event.value)">
-                <mat-radio-button value="Bank">Bank</mat-radio-button>
-                <mat-radio-button value="Cash">Cash</mat-radio-button>
-                <mat-radio-button value="Cheque">Cheque</mat-radio-button>
-              </mat-radio-group>
+              <div class="py-2">
+                <mat-radio-group aria-label="Select a Salary Payment Mode" formControlName="PAYMODE" (change)="changePaymentMode($event.value)">
+                  <mat-radio-button value="Bank">Bank</mat-radio-button>
+                  <mat-radio-button value="Cash">Cash</mat-radio-button>
+                  <mat-radio-button value="Cheque">Cheque</mat-radio-button>
+                </mat-radio-group>
+              </div>
             </div>
           </div>
           <div class="row" *ngIf="isBank">
@@ -559,33 +554,7 @@
               </mat-form-field>
             </div>
           </div>
-          <div class="row">
-            <div class="col-6">
-              <mat-label class="mr-3"><strong>PF Deduction Beyond Age 58</strong></mat-label>
-              <br/>
-              <mat-radio-group aria-label="Select a PF Deduction Beyond Age 58" formControlName="DETECTBYND55">
-                <mat-radio-button value="Yes">Yes</mat-radio-button>
-                <mat-radio-button value="No">No</mat-radio-button>
-                <mat-radio-button value="">None</mat-radio-button>
-              </mat-radio-group>
-              <mat-error *ngIf="frm.get('DETECTBYND55')?.hasError('required') && (frm.get('DETECTBYND55')?.touched || submitted) ">
-                please select PF Deduction Beyond Age 58
-              </mat-error>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-6">
-
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-6">
-
-            </div>
-          </div>
-
         </div>
-
       </div>
       <div class="row" *ngIf="warningMessage ==''">
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
@@ -596,33 +565,6 @@
             {{ item.label }}
           </mat-checkbox>
         </div>
-        <!--        <div class="col-12 col-sm-12 col-md-6 col-lg-4">-->
-        <!--          <mat-checkbox formControlName="EMP_CHECKLIST" value="0" (change)="checkListChange($event.source.value)">Application Form</mat-checkbox>-->
-        <!--        </div>-->
-        <!--        <div class="col-12 col-sm-12 col-md-6 col-lg-4">-->
-        <!--          <mat-checkbox formControlName="EMP_CHECKLIST" value="1" (change)="checkListChange($event.source.value)">Copy of IC</mat-checkbox>-->
-        <!--        </div>-->
-        <!--        <div class="col-12 col-sm-12 col-md-6 col-lg-4">-->
-        <!--          <mat-checkbox formControlName="EMP_CHECKLIST" value="2" (change)="checkListChange($event.source.value)">Bank Account Details</mat-checkbox>-->
-        <!--        </div>-->
-        <!--        <div class="col-12 col-sm-12 col-md-6 col-lg-4">-->
-        <!--          <mat-checkbox formControlName="EMP_CHECKLIST" value="3" (change)="checkListChange($event.source.value)">Passport Size Photos</mat-checkbox>-->
-        <!--        </div>-->
-        <!--        <div class="col-12 col-sm-12 col-md-6 col-lg-4" >-->
-        <!--          <mat-checkbox formControlName="EMP_CHECKLIST" value="4" (change)="checkListChange($event.source.value)">Copy of Passport</mat-checkbox>-->
-        <!--        </div>-->
-        <!--        <div class="col-12 col-sm-12 col-md-6 col-lg-4" >-->
-        <!--          <mat-checkbox formControlName="EMP_CHECKLIST">Copy of Visa</mat-checkbox>-->
-        <!--        </div>-->
-        <!--        <div class="col-12 col-sm-12 col-md-6 col-lg-4">-->
-        <!--          <mat-checkbox formControlName="EMP_CHECKLIST">Appointment Letter</mat-checkbox>-->
-        <!--        </div>-->
-        <!--        <div class="col-12 col-sm-12 col-md-6 col-lg-4">-->
-        <!--          <mat-checkbox formControlName="EMP_CHECKLIST">Confirmation Letter</mat-checkbox>-->
-        <!--        </div>-->
-        <!--        <div class="col-12 col-sm-12 col-md-6 col-lg-4">-->
-        <!--          <mat-checkbox formControlName="EMP_CHECKLIST">KDN Vetting</mat-checkbox>-->
-        <!--        </div>-->
       </div>
       <div class="row" *ngIf="warningMessage ==''">
         <div class="col-12">

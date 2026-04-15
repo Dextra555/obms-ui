@@ -63,8 +63,8 @@ export class EmployeeMasterComponent implements OnInit {
   branchList: any = [];
 
   displayedColumns: string[] = [
-    'EMP_CODE', 'EMP_ROLE', 'EMP_NAME', 'DepartmentName', 'DesignationName', 'EMP_SEX', 
-    'AadhaarNumber', 'PANNumber', 'EMP_PHONE', 'IndianState', 'action'
+    'EMP_CODE', 'EMP_ROLE', 'EMP_NAME', 'DepartmentName', 'DesignationName', 
+    'EMP_PHONE', 'action'
   ];
 
   // Indian compliance data
