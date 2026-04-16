@@ -142,14 +142,15 @@ export class NewAttendanceComponent implements OnInit {
       Shift2StartTime: [''],
       Shift2EndTime: [''],
       Shift2Hours: [''],
-      Passport: '',
+      AadhaarPAN: '',
       Age: '',
       JoinDate: '',
       ResignedDate: '',
       IncomeTax: '',
-      EPF: '',
-      EpfNo: '',
-      Socso: '',
+      PF: '',
+      PFAccountNo: '',
+      ESI: '',
+      UAN: '',
       PaymentMode: '',
       SalaryStructure: '',
       SalarySlab: '',
@@ -313,13 +314,14 @@ export class NewAttendanceComponent implements OnInit {
           // Patch employee details
           this.attendanceForm.patchValue({
             EmployeeID: employeeDetails.EMP_ID,
-            Passport: employeeDetails.EMP_IC_NEW + employeeDetails.EMP_PASSPORT_NO,
+            AadhaarPAN: (employeeDetails.AadhaarNumber || '') + (employeeDetails.PANNumber ? ' / ' + employeeDetails.PANNumber : ''),
             JoinDate: this.formatDisplayDate(employeeDetails.EMPPAY_DATE_JOINED) === '1970-01-01' ? '' : this.formatDisplayDate(employeeDetails.EMPPAY_DATE_JOINED),
             ResignedDate: this.formatDisplayDate(employeeDetails.EMPPAY_DATE_RESIGNED) === '1970-01-01' ? '' : this.formatDisplayDate(employeeDetails.EMPPAY_DATE_RESIGNED),
             IncomeTax: employeeDetails.INCOMETAXDETECT ? 'YES' : 'NO',
-            EPF: employeeDetails.EPFDETECT ? 'YES' : 'NO',
-            EpfNo: employeeDetails.EMPFL_EPFNO,
-            Socso: employeeDetails.SOCSODETECT ? 'YES' : 'NO',
+            PF: employeeDetails.PFDETECT ? 'YES' : 'NO',
+            PFAccountNo: employeeDetails.PFAccountNumber,
+            ESI: employeeDetails.ESIDETECT ? 'YES' : 'NO',
+            UAN: employeeDetails.UANNumber,
             PaymentMode: employeeDetails.PAYMODE,
             BasicPay: employeeDetails.EMPPAY_BASIC_RATE,
             Allowance: employeeDetails.ATTENDANCEALLOWANCE,
@@ -810,6 +812,21 @@ export class NewAttendanceComponent implements OnInit {
     this.dynamicForm = this.fb.group({
       formArray: this.fb.array([])
     });
+    this.attendanceForm.patchValue({
+      AadhaarPAN: '',
+      PF: '',
+      PFAccountNo: '',
+      ESI: '',
+      UAN: '',
+      BasicPay: '',
+      Allowance: '',
+      SpecialAllowance: '',
+      Annual: '',
+      Medical: '',
+      Maternity: '',
+      Paternity: '',
+      Hospitalization: '',
+    });
   }
   get formArray() {
     return (this.dynamicForm.get('formArray') as FormArray).controls;
@@ -827,14 +844,15 @@ export class NewAttendanceComponent implements OnInit {
       Shift2StartTime: '',
       Shift2EndTime: '',
       Shift2Hours: '',
-      Passport: '',
+      AadhaarPAN: '',
       Age: '',
       JoinDate: '',
       ResignedDate: '',
       IncomeTax: '',
-      EPF: '',
-      EpfNo: '',
-      Socso: '',
+      PF: '',
+      PFAccountNo: '',
+      ESI: '',
+      UAN: '',
       PaymentMode: '',
       SalaryStructure: '',
       SalarySlab: '',
@@ -1654,7 +1672,7 @@ export class NewAttendanceComponent implements OnInit {
     this.dtAdvanceDate = this.formatDate(
       new Date(dtAdvanceDate.getFullYear(), dtAdvanceDate.getMonth() + 1, 0)
     );
-   
+
     this.showLoadingSpinner = true;
     this.attendanceModel.ID = this.attendanceForm.value.ID;
     this.attendanceModel.EmployeeID = this.attendanceForm.value.EmployeeID;
@@ -1667,7 +1685,7 @@ export class NewAttendanceComponent implements OnInit {
     this.attendanceModel.SpecialAllowanceDeduction = this.employeeSelectedType == 'Guard' ? this.attendanceForm.value.SpecialAllowanceDeduction : this.attendanceForm.value.SpecialAllowanceDeductionStaff;
     this.attendanceModel.LastUpdatedBy = this.currentUser!;
     this.attendanceModel.LastUpdate = new Date;
-    
+
     const formArray = this.dynamicForm.get('formArray') as FormArray;
 
     // Iterate over the formArray and get the values

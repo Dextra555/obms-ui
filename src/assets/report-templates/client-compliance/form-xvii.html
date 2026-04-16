@@ -1,6 +1,7 @@
 <div class="form-header">
     <div style="text-align: center; margin-bottom: 15px;">
-        <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">FreightWatch G Security Services India Pvt. Ltd</div>
+        <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">FreightWatch G Security Services India Pvt.
+            Ltd</div>
         <div style="font-weight: bold; font-size: 14px;">{{ClientName}}</div>
         <div style="font-size: 12px; margin: 5px 0;">For the month of {{Period}}</div>
         <div style="font-weight: bold; font-size: 14px;">{{CompanyName}}</div>
@@ -21,7 +22,8 @@
         </div>
     </div>
 
-    <div style="display: flex; gap: 20px; font-size: 11px; border-top: 1px solid #000; padding-top: 10px; flex-wrap: wrap;">
+    <div
+        style="display: flex; gap: 20px; font-size: 11px; border-top: 1px solid #000; padding-top: 10px; flex-wrap: wrap;">
         <div><strong>Branch:</strong> {{BranchName}}</div>
         <div><strong>Client:</strong> {{ClientName}}</div>
         <div><strong>Period:</strong> {{Period}}</div>
@@ -125,16 +127,64 @@
 </table>
 
 <style>
-    body { font-family: 'Poppins', sans-serif; font-size: 11px; line-height: 1.2; margin: 10px; }
-    .form-header { border: 2px solid #000; padding: 15px; margin-bottom: 15px; }
-    .report-table.register-wages { border-collapse: collapse; width: 100%; font-size: 10px; margin-bottom: 15px; }
-    .report-table.register-wages th, .report-table.register-wages td { border: 1px solid #000; padding: 4px 6px; vertical-align: middle; text-align: center; }
-    .report-table.register-wages th { background: #f0f0f0; font-weight: bold; font-size: 9px; }
-    .report-table.register-wages td.left-text { text-align: left; }
-    .total-row td { background: #f0f0f0; font-weight: bold; }
+    body {
+        font-family: 'Poppins', sans-serif;
+        font-size: 11px;
+        line-height: 1.2;
+        margin: 10px;
+    }
+
+    .form-header {
+        border: 2px solid #000;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .report-table.register-wages {
+        border-collapse: collapse;
+        width: 100%;
+        font-size: 10px;
+        margin-bottom: 15px;
+    }
+
+    .report-table.register-wages th,
+    .report-table.register-wages td {
+        border: 1px solid #000;
+        padding: 4px 6px;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .report-table.register-wages th {
+        background: #f0f0f0;
+        font-weight: bold;
+        font-size: 9px;
+    }
+
+    .report-table.register-wages td.left-text {
+        text-align: left;
+    }
+
+    .total-row td {
+        background: #f0f0f0;
+        font-weight: bold;
+    }
+
     @media print {
-        body { margin: 0; font-size: 10px; }
-        .form-header { border: 2px solid #000; page-break-inside: avoid; }
-        .report-table.register-wages th, .report-table.register-wages td { font-size: 8px; padding: 3px 4px; }
+        body {
+            margin: 0;
+            font-size: 10px;
+        }
+
+        .form-header {
+            border: 2px solid #000;
+            page-break-inside: avoid;
+        }
+
+        .report-table.register-wages th,
+        .report-table.register-wages td {
+            font-size: 8px;
+            padding: 3px 4px;
+        }
     }
 </style>
