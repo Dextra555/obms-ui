@@ -13,6 +13,8 @@ export interface CommercialBreakdownData {
   OtherAllowances?: number;
   CB_NH?: number;
   CB_NHPercentage?: number;
+  CB_AdvanceStatutoryBonus?: number;
+  CB_AdvanceStatutoryBonusPercentage?: number;
 }
 
 @Component({
@@ -30,7 +32,8 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
       (this.frm.get('HRA')?.value || 0) +
       (this.frm.get('Leaves')?.value || 0) +
       (this.frm.get('OtherAllowances')?.value || 0) +
-      (this.frm.get('CB_NH')?.value || 0);
+      (this.frm.get('CB_NH')?.value || 0) +
+      (this.frm.get('CB_AdvanceStatutoryBonus')?.value || 0);
   }
 
   // Debounce subject for calculatePercentages
@@ -63,7 +66,9 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
       LeavesPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
       OtherAllowances: [0, [Validators.required, Validators.min(0)]],
       CB_NH: [0, [Validators.required, Validators.min(0)]],
-      CB_NHPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
+      CB_NHPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      CB_AdvanceStatutoryBonus: [0, [Validators.required, Validators.min(0)]],
+      CB_AdvanceStatutoryBonusPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
     });
   }
 
@@ -78,7 +83,9 @@ export class CommercialBreakdownEnhancedDialogComponent implements OnInit {
         LeavesPercentage: this.data.LeavesPercentage ?? 0,
         OtherAllowances: this.data.OtherAllowances ?? 0,
         CB_NH: this.data.CB_NH ?? 0,
-        CB_NHPercentage: this.data.CB_NHPercentage ?? 0
+        CB_NHPercentage: this.data.CB_NHPercentage ?? 0,
+        CB_AdvanceStatutoryBonus: this.data.CB_AdvanceStatutoryBonus ?? 0,
+        CB_AdvanceStatutoryBonusPercentage: this.data.CB_AdvanceStatutoryBonusPercentage ?? 0
       });
     }
   }
