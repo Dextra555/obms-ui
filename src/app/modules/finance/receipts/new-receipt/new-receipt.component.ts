@@ -361,7 +361,7 @@ export class NewReceiptComponent implements OnInit {
     } else if (value?.toString() === '5') { // IBG
       this.frm.patchValue({ ibgAmount: amount });
     }
-    
+
     this.calculation();
   }
 
@@ -487,6 +487,17 @@ export class NewReceiptComponent implements OnInit {
       data['BankID'] = 0;
       //this.frm.get("BankID")?.setValue(0);
     }
+
+    // Convert decimal fields to handle empty strings
+    data['HQPercentage'] = data['HQPercentage'] ? Number(data['HQPercentage']) : 0;
+    data['TaxPercentage'] = data['TaxPercentage'] ? Number(data['TaxPercentage']) : 0;
+    data['TaxAmount'] = data['TaxAmount'] ? Number(data['TaxAmount']) : 0;
+    data['HQAmount'] = data['HQAmount'] ? Number(data['HQAmount']) : 0;
+    data['BranchCollection'] = data['BranchCollection'] ? Number(data['BranchCollection']) : 0;
+    data['CreditNoteAmount'] = data['CreditNoteAmount'] ? Number(data['CreditNoteAmount']) : 0;
+    data['DebitNoteAmount'] = data['DebitNoteAmount'] ? Number(data['DebitNoteAmount']) : 0;
+    data['SuspendAmount'] = data['SuspendAmount'] ? Number(data['SuspendAmount']) : 0;
+    data['ReceiptAmount'] = data['ReceiptAmount'] ? Number(data['ReceiptAmount']) : 0;
     let details: any = [];
     var balance = this.frm.get("ReceiptAmount")?.value
     for (let i = 0; i < this.invoiceList.length; i++) {

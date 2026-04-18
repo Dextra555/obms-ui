@@ -27,7 +27,7 @@ export class ChequeStatusComponent implements OnInit {
   selectedIds: number[] = [];
 
   constructor(private _dataService: DatasharingService, private _masterService: MastermoduleService, private fb: FormBuilder,
-    private _liveAnnouncer: LiveAnnouncer, private _financeService: FinanceService,private route: Router
+    private _liveAnnouncer: LiveAnnouncer, private _financeService: FinanceService, private route: Router
   ) {
     this.userAccessModel = {
       readAccess: false,
@@ -127,7 +127,7 @@ export class ChequeStatusComponent implements OnInit {
   onSubmitClick() {
     const transType = this.frm.get('transType')?.value;
     const chequeStatus = this.frm.get('chequeStatus')?.value;
-    const text = chequeStatus === 'D' ? 'Return' : 'Deposite'; 
+    const text = chequeStatus === 'D' ? 'Return' : 'Deposite';
     const clearence_date = this.returnDate(this.frm.get('clearence_date')?.value);
 
     if (this.selectedIds.length === 0) {
@@ -139,7 +139,7 @@ export class ChequeStatusComponent implements OnInit {
         this.showMessage("Please select Clearence Date.", 'warning', 'Warning Message');
         return;
       }
-    }   
+    }
 
     this._financeService.restoreChequeStatus(this.selectedIds, this.currentUser, transType, text.charAt(0), clearence_date).subscribe({
       next: () => {
@@ -147,8 +147,8 @@ export class ChequeStatusComponent implements OnInit {
         this.selectedIds = [];
         this.frm.reset();
         this.route.navigateByUrl('/dummy', { skipLocationChange: true }).then(() => {
-        this.route.navigate(['/finance/cheque-status']);
-      });
+          this.route.navigate(['/finance/cheque-status']);
+        });
 
       },
       error: (err) => {

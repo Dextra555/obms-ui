@@ -78,7 +78,7 @@ export class PaymentsComponent implements AfterViewInit {
   lblNoOfCheques: any;
   selectedPaymentType: string = '1';
   existingPaymentType: string = '';
-  existingChequeNo:string = '';
+  existingChequeNo: string = '';
   showDataSourceTable: boolean = false;
 
 
@@ -349,6 +349,8 @@ export class PaymentsComponent implements AfterViewInit {
     }
 
     data['Amount'] = Number(totalAmount);
+    data['BankID'] = data['BankID'] ? Number(data['BankID']) : null;
+    data['Supplier'] = data['Supplier'] ? Number(data['Supplier']) : null;
     data['PaymentDate'] = this.returnDate(this.frm.get('PaymentDate')?.value);
     let total = 0;
     this.checklistItems.forEach((item) => {
@@ -360,7 +362,7 @@ export class PaymentsComponent implements AfterViewInit {
     });
     data['PaymentPurpose'] = total;
     data['userId'] = this.currentUser;
-   
+
     this._financeService.saveAndUpdatePayment(data).subscribe((d: any) => {
       this.showMessage("Payment Saved/Updated Successfully", 'success', 'Success Message');
       this.frm.reset();
@@ -380,7 +382,7 @@ export class PaymentsComponent implements AfterViewInit {
         data: `Are you sure you want to delete this payment?`
       })
       .afterClosed()
-      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {       
+      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {
         if (result.confirmDialog) {
 
           this._financeService.deletePayment(this.paymentID, this.currentUser).subscribe({
@@ -477,18 +479,18 @@ export class PaymentsComponent implements AfterViewInit {
 
 
   paymentTypeChange(value: any) {
-    this.selectedPaymentType = value;    
-    if(this.existingPaymentType == value){
+    this.selectedPaymentType = value;
+    if (this.existingPaymentType == value) {
       this.frm.patchValue({ ChequeNo: this.existingChequeNo || '' });
-    }else{
+    } else {
       this.frm.patchValue({ ChequeNo: '' });
     }
     if (value == 1) {
       this.paymentTypeDisplay = "Cheque No.";
-    } else if (value == 2) {      
+    } else if (value == 2) {
       this.lblNoOfCheques = '';
       this.paymentTypeDisplay = "Voucher No.";
-    } else if (value == 3) {      
+    } else if (value == 3) {
       this.lblNoOfCheques = '';
       this.paymentTypeDisplay = "Contra.";
     } else if (value == 4) {
@@ -499,10 +501,10 @@ export class PaymentsComponent implements AfterViewInit {
 
   supplierChange(value: any) {
     this.supplierRows.clear();
-    this._financeService.GetPaymentSupplierInvoices(value, this.currentUser).subscribe((d: any) => {     
-      if(d?.length > 0){
+    this._financeService.GetPaymentSupplierInvoices(value, this.currentUser).subscribe((d: any) => {
+      if (d?.length > 0) {
         this.showDataSourceTable = true;
-      }else{
+      } else {
         this.showDataSourceTable = false;
       }
       d.forEach((d: ISupplierInvoice) => {
