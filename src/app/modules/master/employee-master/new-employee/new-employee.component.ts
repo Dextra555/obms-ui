@@ -88,7 +88,7 @@ export class NewEmployeeComponent implements OnInit {
         this.currentUser = username;
       });
     }
-    
+
     // Remove data loading from constructor - will be called in ngOnInit after proper initialization
     this.frm = this.fb.group({
       EMP_ID: [0],
@@ -119,7 +119,7 @@ export class NewEmployeeComponent implements OnInit {
       EMP_CONTACT_ADDRESS1: ['', [Validators.required]],
       EMP_CONTACT_ADDRESS2: ['', [Validators.required]],
       EMP_CONTACT_TELEPHONE: ['', [Validators.required]],
-      
+
       // Malaysian fields (keeping for backward compatibility)
       EMP_POST_CODE: ['', [Validators.pattern('^[0-9]{6}$')]],
       EMP_TOWN: [''],
@@ -133,7 +133,7 @@ export class NewEmployeeComponent implements OnInit {
       SOCSODETECT: ['No'],
       EMPFL_SOSCO_NO: [''],
       DETECTBYND55: ['No'],
-      
+
       // Indian Compliance Fields
       AadhaarNumber: ['', [Validators.pattern('^[2-9]\\d{11}$')]],
       PANNumber: ['', [Validators.pattern('^[A-Z]{5}[0-9]{4}[A-Z]{1}$')]],
@@ -174,7 +174,7 @@ export class NewEmployeeComponent implements OnInit {
       EMP_CHECKLIST: [],
       EMPPAY_ID: [0],
       EMPFL_ID: [0],
-      
+
       // Commercial Breakdown Fields
       CB_Basic: [0],
       CB_DA: [0],
@@ -185,12 +185,14 @@ export class NewEmployeeComponent implements OnInit {
       CB_OtherAllowances: [0],
       CB_NH: [0],
       CB_NHPercentage: [0],
+      CB_AdvanceStatutoryBonus: [0],
+      CB_AdvanceStatutoryBonusPercentage: [0],
       CB_SubTotal: [0],
-      
+
       // Department and Designation Fields
       DepartmentId: [null],
       DesignationId: [null],
-      
+
       // Salary Structure Flag (for migration from salary slab to commercial breakdown)
       NewSalaryStructure: ['N']
     });
@@ -207,7 +209,7 @@ export class NewEmployeeComponent implements OnInit {
         let employee = result['employee'];
         let employment = result['employment'];
         let salaryDetail = result['salaryDetail'];
-        
+
         // Handle null salaryDetail case
         if (salaryDetail != null) {
           this.payMode = salaryDetail['PAYMODE'];
@@ -216,7 +218,7 @@ export class NewEmployeeComponent implements OnInit {
           this.payMode = 'Bank'; // Default payment mode
           this.changePaymentMode('Bank');
         }
-        
+
         this.nationalityChange(employee['EMP_CITIZEN']);
         this.frm.patchValue(employee);
         this.frm.patchValue(employment);
@@ -234,13 +236,15 @@ export class NewEmployeeComponent implements OnInit {
         this.frm.get('CB_OtherAllowances')?.setValue(salaryDetail?.CB_OtherAllowances || 0);
         this.frm.get('CB_NH')?.setValue(salaryDetail?.CB_NH || 0);
         this.frm.get('CB_NHPercentage')?.setValue(salaryDetail?.CB_NHPercentage || 0);
+        this.frm.get('CB_AdvanceStatutoryBonus')?.setValue(salaryDetail?.CB_AdvanceStatutoryBonus || 0);
+        this.frm.get('CB_AdvanceStatutoryBonusPercentage')?.setValue(salaryDetail?.CB_AdvanceStatutoryBonusPercentage || 0);
         this.frm.get('CB_SubTotal')?.setValue(salaryDetail?.CB_SubTotal || 0);
 
         // Update salary field to show CB_Basic value instead of slab data when using Commercial Breakdown
         if (employment?.NewSalaryStructure == 'N' || salaryDetail?.CB_Basic > 0) {
           this.frm.get('EMPPAY_BASIC_RATE')?.setValue(salaryDetail?.CB_Basic || 0);
         }
-        
+
         this.frm.get('EMP_CITIZEN')?.setValue(employee['EMP_CITIZEN'].toString());
         this.frm.get('EMP_SP_WORK')?.setValue(employee['EMP_SP_WORK'] == true ? "1" : "0");
         this.frm.get('TMPGUARD')?.setValue(salaryDetail?.TMPGUARD == true ? "0" : "1");
@@ -327,14 +331,14 @@ export class NewEmployeeComponent implements OnInit {
       this.bankList = data['bankList'];
       this.stateList = data['stateList'];
       this.icColorList = data['icColorList'];
-      
+
       // Load Department and Designation data
       this.loadDepartments();
       this.loadDesignations();
       this.nationalityList = data['nationalityList'];
       this.raceList = data['raceList'];
       this.clientList = data['clientList'];
-      
+
       // Handle edit scenario - load employee code data after initial data is loaded
       if (this.empId != 0 && this.empId != undefined) {
         // Edit mode - employee data will be loaded separately
@@ -388,7 +392,7 @@ export class NewEmployeeComponent implements OnInit {
       this.frm.get('EMP_PASSPORT_NO')?.clearValidators();
       this.frm.get('EMP_PASSPORT_NO')?.setValue('');
     }
-    
+
     this.frm.get('EMP_PASSPORT_NO')?.updateValueAndValidity();
   }
 
@@ -467,7 +471,7 @@ export class NewEmployeeComponent implements OnInit {
     this.frm.get('DesignationId')?.setValue(null);
     // Load designations filtered by selected department
     this.loadDesignations(departmentId);
-    
+
     // Set EMPPAY_JOB_TITLE with department name
     const selectedDepartment = this.departmentList.find(dept => dept.DepartmentId === departmentId);
     if (selectedDepartment) {
@@ -489,30 +493,31 @@ export class NewEmployeeComponent implements OnInit {
     const hra = parseFloat(this.frm.get('CB_HRA')?.value) || 0;
     const leaves = parseFloat(this.frm.get('CB_Leaves')?.value) || 0;
     const nh = parseFloat(this.frm.get('CB_NH')?.value) || 0;
+    const advanceStatutoryBonus = parseFloat(this.frm.get('CB_AdvanceStatutoryBonus')?.value) || 0;
     const otherAllowances = parseFloat(this.frm.get('CB_OtherAllowances')?.value) || 0;
 
-    const total = basic + da + hra + leaves + nh + otherAllowances;
+    const total = basic + da + hra + leaves + nh + advanceStatutoryBonus + otherAllowances;
     this.frm.get('CB_SubTotal')?.setValue(total);
   }
 
   formatDateInput(event: any, formControlName: string): void {
     let value = event.target.value.replace(/\D/g, ''); // Remove non-numeric characters
-    
+
     if (value.length >= 8) {
       // Format as DD-MM-YYYY
       const day = value.substring(0, 2);
       const month = value.substring(2, 4);
       const year = value.substring(4, 8);
-      
+
       // Create a valid date string for the datepicker
       const formattedDate = `${day}-${month}-${year}`;
       event.target.value = formattedDate;
-      
+
       // Parse and set the date value
       const dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
       if (!isNaN(dateObj.getTime())) {
         this.frm.get(formControlName)?.setValue(dateObj);
-        
+
         // Calculate age if it's the date of birth field
         if (formControlName === 'EMP_DATE_OF_BIRTH') {
           this.calculateAge();
@@ -529,17 +534,17 @@ export class NewEmployeeComponent implements OnInit {
 
   onSubmit() {
     this.submitted = true;
-    
+
     // Custom validation: Prevent submission if EMP_ROLE is 'None'
     if (this.frm.get('EMP_ROLE')?.value === 'None') {
       this.showMessage('Please select a valid employee type (Guard or Staff) before creating employee.', 'warning', 'Warning Message');
       return;
     }
-    
+
     if (this.frm.invalid) {
       this.showMessage('Please correct the validation errors in the form before submitting.', 'warning', 'Warning Message');
       console.log('Form invalid:', this.frm.errors);
-      
+
       // Log individual control errors for debugging
       Object.keys(this.frm.controls).forEach(key => {
         const controlErrors = this.frm.get(key)?.errors;
@@ -551,7 +556,7 @@ export class NewEmployeeComponent implements OnInit {
     }
 
     if (!this.employeeCheckInfoValidation && this.isForeigner) {
-      this.showMessage('Employee already has this IC number. Please choose a different IC number.', 'warning', 'Warning Message');      
+      this.showMessage('Employee already has this IC number. Please choose a different IC number.', 'warning', 'Warning Message');
       return;
     }
 
@@ -575,13 +580,15 @@ export class NewEmployeeComponent implements OnInit {
     data['CB_OtherAllowances'] = parseFloat(data['CB_OtherAllowances']) || 0;
     data['CB_NH'] = parseFloat(data['CB_NH']) || 0;
     data['CB_NHPercentage'] = parseFloat(data['CB_NHPercentage']) || 0;
+    data['CB_AdvanceStatutoryBonus'] = parseFloat(data['CB_AdvanceStatutoryBonus']) || 0;
+    data['CB_AdvanceStatutoryBonusPercentage'] = parseFloat(data['CB_AdvanceStatutoryBonusPercentage']) || 0;
     data['CB_SubTotal'] = parseFloat(data['CB_SubTotal']) || 0;
 
     // MIGRATION: Automatically set NewSalaryStructure based on CB usage
     // If CB_Basic > 0, use Commercial Breakdown (NewSalaryStructure = 'Y')
     // If CB_Basic = 0, use Salary Slab (NewSalaryStructure = 'N') for backward compatibility
     data['NewSalaryStructure'] = data['CB_Basic'] > 0 ? 'Y' : 'N';
-    
+
     // When using Commercial Breakdown, set SALARYLAB to 0 to clear salary slab reference
     if (data['NewSalaryStructure'] === 'Y') {
       data['SALARYLAB'] = 0;
@@ -618,11 +625,11 @@ export class NewEmployeeComponent implements OnInit {
     data['AttendanceAllowanceFollowCalendar'] = this.frm.get('AttendanceAllowanceFollowCalendar')?.value ? 'Y' : 'N';
 
     data['LASTUPDATE'] = new Date().toISOString();
-    
+
     // Process Employment details dates securely avoiding auto-filling today's date
     data['EMP_DATE_OF_BIRTH'] = this.frm.get('EMP_DATE_OF_BIRTH')?.value ? this.returnDate(this.frm.get('EMP_DATE_OF_BIRTH')?.value) : null;
     data['TransferDate'] = null;
-    
+
     data['EMPPAY_DATE_JOINED'] = this.frm.get('EMPPAY_DATE_JOINED')?.value ? this.returnDate(this.frm.get('EMPPAY_DATE_JOINED')?.value) : null;
     data['EMPPAY_DATE_RESIGNED'] = this.frm.get('EMPPAY_DATE_RESIGNED')?.value ? this.returnDate(this.frm.get('EMPPAY_DATE_RESIGNED')?.value) : null;
     let total = 0;
@@ -745,7 +752,7 @@ export class NewEmployeeComponent implements OnInit {
       this._employeeService.checkEmployeeInfo(from, data).subscribe((d: any) => {
         var result = d['Result'];
         result.EMP_ID = result?.EMP_ID == 0 ? -1 : result?.EMP_ID;
-        if (result?.EMP_ID != this.empId) {          
+        if (result?.EMP_ID != this.empId) {
           this.empChkError[from] = result?.MESSAGE;
           this.employeeCheckInfoValidation = result?.MESSAGE == "success";
         }
@@ -819,7 +826,9 @@ export class NewEmployeeComponent implements OnInit {
         LeavesPercentage: this.frm.get('CB_LeavesPercentage')?.value || 0,
         OtherAllowances: this.frm.get('CB_OtherAllowances')?.value || 0,
         CB_NH: this.frm.get('CB_NH')?.value || 0,
-        CB_NHPercentage: this.frm.get('CB_NHPercentage')?.value || 0
+        CB_NHPercentage: this.frm.get('CB_NHPercentage')?.value || 0,
+        CB_AdvanceStatutoryBonus: this.frm.get('CB_AdvanceStatutoryBonus')?.value || 0,
+        CB_AdvanceStatutoryBonusPercentage: this.frm.get('CB_AdvanceStatutoryBonusPercentage')?.value || 0
       }
     });
 
@@ -836,6 +845,8 @@ export class NewEmployeeComponent implements OnInit {
           CB_OtherAllowances: result.OtherAllowances || 0,
           CB_NH: result.CB_NH || 0,
           CB_NHPercentage: result.CB_NHPercentage || 0,
+          CB_AdvanceStatutoryBonus: result.CB_AdvanceStatutoryBonus || 0,
+          CB_AdvanceStatutoryBonusPercentage: result.CB_AdvanceStatutoryBonusPercentage || 0,
           CB_SubTotal: result.SubTotal || 0,
           // Update salary field to show CB_Basic value instead of slab data
           EMPPAY_BASIC_RATE: result.Basic || 0

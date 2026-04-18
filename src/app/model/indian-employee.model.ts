@@ -44,7 +44,7 @@ export class IndianEmployeeModel {
     NewSalaryStructure: string;
     SalaryStructure1000_3h: string;
     KDNVetting: boolean;
-    
+
     // Indian Compliance Fields
     AadhaarNumber: string | null = null;
     PANNumber: string | null = null;
@@ -57,7 +57,7 @@ export class IndianEmployeeModel {
     BankIFSC: string | null = null;
     BankName: string | null = null;
     UPIId: string | null = null;
-    
+
     constructor(data: Partial<IndianEmployeeModel> = {}) {
         this.EMP_ID = data.EMP_ID || 0;
         this.EMP_ROLE = data.EMP_ROLE || '';
@@ -104,7 +104,7 @@ export class IndianEmployeeModel {
         this.NewSalaryStructure = data.NewSalaryStructure || '';
         this.SalaryStructure1000_3h = data.SalaryStructure1000_3h || '';
         this.KDNVetting = data.KDNVetting || false;
-        
+
         // Indian Compliance Fields
         this.AadhaarNumber = data.AadhaarNumber || null;
         this.PANNumber = data.PANNumber || null;
@@ -162,11 +162,11 @@ export const IFSC_PATTERN = /^[A-Z]{4}0[A-Z0-9]{7}$/;
 
 // Indian States List
 export const INDIAN_STATES = [
-  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
-  'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
-  'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
-  'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
-  'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands',
-  'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir',
-  'Ladakh', 'Lakshadweep', 'Puducherry'
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
+    'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
+    'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
+    'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+    'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Andaman and Nicobar Islands',
+    'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu', 'Delhi', 'Jammu and Kashmir',
+    'Ladakh', 'Lakshadweep', 'Puducherry'
 ];

@@ -21,21 +21,9 @@
     </div>
 
     <div class="upload-section">
-      <div 
-        class="drop-zone"
-        [class.dragging]="isDragging"
-        (dragover)="onDragOver($event)"
-        (dragleave)="onDragLeave($event)"
-        (drop)="onDrop($event)"
-        (click)="fileInput.click()"
-      >
-        <input 
-          #fileInput
-          type="file" 
-          accept=".xlsx,.xls"
-          style="display: none"
-          (change)="onFileSelected($event)"
-        >
+      <div class="drop-zone" [class.dragging]="isDragging" (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
+        <input #fileInput type="file" accept=".xlsx,.xls" style="display: none" (change)="onFileSelected($event)">
         <mat-icon class="upload-icon">cloud_upload</mat-icon>
         <h3>Drag & Drop your Excel file here</h3>
         <p>or click to browse</p>
@@ -68,11 +56,7 @@
       <mat-spinner *ngIf="progressValue < 100" diameter="60"></mat-spinner>
       <mat-icon *ngIf="progressValue === 100" class="success-icon">check_circle</mat-icon>
       <h3>{{ progressMessage }}</h3>
-      <mat-progress-bar 
-        mode="determinate" 
-        [value]="progressValue"
-        class="progress-bar"
-      ></mat-progress-bar>
+      <mat-progress-bar mode="determinate" [value]="progressValue" class="progress-bar"></mat-progress-bar>
       <p *ngIf="selectedFile">{{ selectedFile.name }} ({{ formatFileSize(selectedFile.size) }})</p>
     </div>
   </div>
@@ -87,7 +71,7 @@
           <mat-icon>check_circle</mat-icon>
         </mat-card-content>
       </mat-card>
-      
+
       <mat-card class="summary-card invalid" *ngIf="previewData.InvalidCount > 0">
         <mat-card-content>
           <div class="summary-number">{{ previewData.InvalidCount }}</div>
@@ -113,11 +97,11 @@
       </h3>
       <div class="error-list">
         <div *ngFor="let error of previewData.ValidationErrors" class="error-item">
-          <mat-icon>{{ getErrorIcon(error.fieldName) }}</mat-icon>
+          <mat-icon>{{ getErrorIcon(error.FieldName) }}</mat-icon>
           <div class="error-details">
-            <span class="error-location">Row {{ error.rowNumber }}</span>
-            <span class="error-employee">{{ error.employeeCode }} - {{ error.employeeName }}</span>
-            <span class="error-message">{{ error.errorMessage }}</span>
+            <span class="error-location">Row {{ error.RowNumber }}</span>
+            <span class="error-employee">{{ error.EmployeeCode }} - {{ error.EmployeeName }}</span>
+            <span class="error-message">{{ error.ErrorMessage }}</span>
           </div>
         </div>
       </div>
@@ -133,9 +117,9 @@
         <table mat-table [dataSource]="previewData.ValidRecords.slice(0, 5)" class="mat-elevation-z2">
           <ng-container matColumnDef="rowNumber">
             <th mat-header-cell *matHeaderCellDef>Row</th>
-            <td mat-cell *matCellDef="let record">{{ record.rowNumber }}</td>
+            <td mat-cell *matCellDef="let record">{{ record.RowNumber }}</td>
           </ng-container>
-          
+
           <ng-container matColumnDef="empCode">
             <th mat-header-cell *matHeaderCellDef>Code</th>
             <td mat-cell *matCellDef="let record">{{ record.Employee?.EMP_CODE || '-' }}</td>
@@ -164,7 +148,8 @@
           <ng-container matColumnDef="department">
             <th mat-header-cell *matHeaderCellDef>Department</th>
             <td mat-cell *matCellDef="let record">
-              <span class="badge badge-primary" *ngIf="record.Employee?.DepartmentName">{{ record.Employee?.DepartmentName }}</span>
+              <span class="badge badge-primary" *ngIf="record.Employee?.DepartmentName">{{
+                record.Employee?.DepartmentName }}</span>
               <span *ngIf="!record.Employee?.DepartmentName">-</span>
             </td>
           </ng-container>
@@ -172,7 +157,8 @@
           <ng-container matColumnDef="designation">
             <th mat-header-cell *matHeaderCellDef>Designation</th>
             <td mat-cell *matCellDef="let record">
-              <span class="badge badge-success" *ngIf="record.Employee?.DesignationName">{{ record.Employee?.DesignationName }}</span>
+              <span class="badge badge-success" *ngIf="record.Employee?.DesignationName">{{
+                record.Employee?.DesignationName }}</span>
               <span *ngIf="!record.Employee?.DesignationName">-</span>
             </td>
           </ng-container>
@@ -185,7 +171,8 @@
           <ng-container matColumnDef="state">
             <th mat-header-cell *matHeaderCellDef>State</th>
             <td mat-cell *matCellDef="let record">
-              <span class="badge badge-secondary" *ngIf="record.Employee?.IndianState">{{ record.Employee?.IndianState }}</span>
+              <span class="badge badge-secondary" *ngIf="record.Employee?.IndianState">{{ record.Employee?.IndianState
+                }}</span>
               <span *ngIf="!record.Employee?.IndianState">-</span>
             </td>
           </ng-container>
@@ -200,8 +187,12 @@
             <td mat-cell *matCellDef="let record">{{ record.Employee?.EMP_DATE_OF_BIRTH || '-' }}</td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="['rowNumber', 'empCode', 'empRole', 'empName', 'branch', 'client', 'department', 'designation', 'phone', 'state', 'gender', 'dob']"></tr>
-          <tr mat-row *matRowDef="let row; columns: ['rowNumber', 'empCode', 'empRole', 'empName', 'branch', 'client', 'department', 'designation', 'phone', 'state', 'gender', 'dob'];"></tr>
+          <tr mat-header-row
+            *matHeaderRowDef="['rowNumber', 'empCode', 'empRole', 'empName', 'branch', 'client', 'department', 'designation', 'phone', 'state', 'gender', 'dob']">
+          </tr>
+          <tr mat-row
+            *matRowDef="let row; columns: ['rowNumber', 'empCode', 'empRole', 'empName', 'branch', 'client', 'department', 'designation', 'phone', 'state', 'gender', 'dob'];">
+          </tr>
         </table>
       </div>
     </div>
@@ -219,11 +210,7 @@
     <div class="progress-container">
       <mat-spinner diameter="80"></mat-spinner>
       <h3>{{ progressMessage }}</h3>
-      <mat-progress-bar 
-        mode="determinate" 
-        [value]="progressValue"
-        class="progress-bar"
-      ></mat-progress-bar>
+      <mat-progress-bar mode="determinate" [value]="progressValue" class="progress-bar"></mat-progress-bar>
       <p class="progress-details">
         Importing {{ previewData?.ValidCount }} employees...
       </p>
@@ -232,7 +219,8 @@
 
   <!-- Step 4: Result -->
   <div *ngIf="currentStep === 'result' && importResult" class="result-step">
-    <div class="result-header" [class.success]="importResult.SuccessfulImports > 0" [class.error]="importResult.FailedImports > 0 && importResult.SuccessfulImports === 0">
+    <div class="result-header" [class.success]="importResult.SuccessfulImports > 0"
+      [class.error]="importResult.FailedImports > 0 && importResult.SuccessfulImports === 0">
       <mat-icon *ngIf="importResult.SuccessfulImports > 0">check_circle</mat-icon>
       <mat-icon *ngIf="importResult.FailedImports > 0 && importResult.SuccessfulImports === 0">error</mat-icon>
       <h2>{{ importResult.Message }}</h2>
@@ -245,7 +233,7 @@
           <div class="result-label">Successful</div>
         </mat-card-content>
       </mat-card>
-      
+
       <mat-card class="result-card error" *ngIf="importResult.FailedImports > 0">
         <mat-card-content>
           <div class="result-number">{{ importResult.FailedImports }}</div>
@@ -280,7 +268,8 @@
     </div>
 
     <!-- Success List -->
-    <div *ngIf="importResult.SuccessfulEmployees && importResult.SuccessfulEmployees.length > 0" class="success-list-section">
+    <div *ngIf="importResult.SuccessfulEmployees && importResult.SuccessfulEmployees.length > 0"
+      class="success-list-section">
       <h3>
         <mat-icon color="primary">check_circle</mat-icon>
         Successfully Imported (First 10)
@@ -290,7 +279,8 @@
           <mat-icon class="action-icon">{{ emp.Action === 'Created' ? 'add_circle' : 'edit' }}</mat-icon>
           <span class="emp-code">{{ emp.EmployeeCode }}</span>
           <span class="emp-name">{{ emp.EmployeeName }}</span>
-          <span class="action-badge" [class.created]="emp.Action === 'Created'" [class.updated]="emp.Action === 'Updated'">
+          <span class="action-badge" [class.created]="emp.Action === 'Created'"
+            [class.updated]="emp.Action === 'Updated'">
             {{ emp.Action }}
           </span>
         </div>
@@ -311,12 +301,8 @@
       <mat-icon>refresh</mat-icon>
       Upload Another
     </button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="importEmployees()"
-      [disabled]="!previewData || previewData.ValidCount === 0"
-    >
+    <button mat-raised-button color="primary" (click)="importEmployees()"
+      [disabled]="!previewData || previewData.ValidCount === 0">
       <mat-icon>cloud_upload</mat-icon>
       Import {{ previewData?.ValidCount }} Employees
     </button>
@@ -328,12 +314,10 @@
       <mat-icon>refresh</mat-icon>
       Try Again
     </button>
-    <button
-      mat-raised-button
-      color="primary"
-      (click)="closeDialog(importResult?.SuccessfulImports ? importResult!.SuccessfulImports > 0 : false)"
-    >
-      <mat-icon>{{ importResult?.SuccessfulImports && importResult!.SuccessfulImports > 0 ? 'done' : 'close' }}</mat-icon>
+    <button mat-raised-button color="primary"
+      (click)="closeDialog(importResult?.SuccessfulImports ? importResult!.SuccessfulImports > 0 : false)">
+      <mat-icon>{{ importResult?.SuccessfulImports && importResult!.SuccessfulImports > 0 ? 'done' : 'close'
+        }}</mat-icon>
       {{ importResult?.SuccessfulImports && importResult!.SuccessfulImports > 0 ? 'Done' : 'Close' }}
     </button>
   </ng-container>

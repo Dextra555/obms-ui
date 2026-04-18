@@ -480,10 +480,10 @@ export class ClientComplianceReportComponent implements OnInit {
     // Auto-calculate missing wage totals for AP Form XVII
     if (reportType === 'ap-form-xvii') {
       if (globalData.totalPFWages === undefined) {
-         globalData.totalPFWages = (globalData.totalBasic || 0) + (globalData.totalDA || 0);
+        globalData.totalPFWages = (globalData.totalBasic || 0) + (globalData.totalDA || 0);
       }
       if (globalData.totalESIWages === undefined) {
-         globalData.totalESIWages = globalData.totalGross || 0;
+        globalData.totalESIWages = globalData.totalGross || 0;
       }
     }
 
@@ -577,10 +577,10 @@ export class ClientComplianceReportComponent implements OnInit {
       DA: row.DA || row.da || 0,
       HRA: row.HRA || row.hra || 0,
       Others: row.Others || row.others || 0,
-      Bonus: row.Bonus || row.bonus || 0,
+      Bonus: row.advanceBonus || row.Bonus || row.bonus || 0,
       LeaveWages: row.LeaveWages || row.leaveWages || 0,
       NH: row.NH || row.nh || 0,
-      Advance: row.Advance || row.advance || 0,
+      // Advance is removed from earnings - it's a deduction, not an earning
       OT: row.OT || row.ot || 0,
       OTAmount: row.OTAmount || row.otAmount || 0,
       Gross: row.Gross || row.gross || 0,
@@ -597,7 +597,7 @@ export class ClientComplianceReportComponent implements OnInit {
       PF: row.PF || row.pf || 0,
       ESI: row.ESI || row.esi || 0,
       PT: row.PT || row.pt || 0,
-      AdvanceDed: row.AdvanceDed || row.advanceDed || 0,
+      AdvanceDed: row.advance || row.AdvanceDed || row.advanceDed || 0,
       OtherDed: row.OtherDed || row.otherDed || 0,
       TotalDed: row.TotalDed || row.totalDeductions || 0,
       Net: row.Net || row.net || 0,
@@ -698,7 +698,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.hra || 0}</td>
           <td>${row.leaveWages || 0}</td>
           <td>${row.nh || 0}</td>
-          <td>${row.advance || 0}</td>
+          <td>${row.advanceBonus || row.bonus || 0}</td>
           <td>${row.actualDays || row.attendance || 0}</td>
           <td>${row.fixedSalary || row.gross || 0}</td>
           <td>${row.workDays || row.attendance || 0}</td>
@@ -709,7 +709,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.hra || 0}</td>
           <td>${row.leaveWages || 0}</td>
           <td>${row.nh || 0}</td>
-          <td>${row.advance || 0}</td>
+          <td>${row.advanceBonus || row.bonus || 0}</td>
           <td>${row.otHours || 0}</td>
           <td>${row.otAmount || 0}</td>
           <td>${row.gross || 0}</td>
@@ -717,9 +717,9 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.pf || 0}</td>
           <td>${row.esi || 0}</td>
           <td>${row.pt || 0}</td>
-          <td>${row.advanceDed || 0}</td>
+          <td>${row.advance || 0}</td>
           <td>${row.lwf || 0}</td>
-          <td>${(row.pf || 0) + (row.esi || 0) + (row.pt || 0) + (row.advanceDed || 0) + (row.lwf || 0)}</td>
+          <td>${(row.pf || 0) + (row.esi || 0) + (row.pt || 0) + (row.advance || 0) + (row.lwf || 0)}</td>
           <td>${row.mobile || 0}</td>
           <td>${row.arrear || 0}</td>
           <td>${row.net || 0}</td>
@@ -751,7 +751,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.da || 0}</td>
           <td>${row.hra || 0}</td>
           <td>${row.others || 0}</td>
-          <td>${row.bonus || 0}</td>
+          <td>${row.advanceBonus || row.bonus || 0}</td>
           <td>${row.leaveWages || 0}</td>
           <td>${row.basicDA || 0}</td>
           <td>${row.gross || 0}</td>
@@ -827,7 +827,7 @@ export class ClientComplianceReportComponent implements OnInit {
         const daVal = Math.max(0, grossVal - basicVal - othersVal - bonusVal);
         const pfWagesVal = row.pfWages || (basicVal + daVal);
         const esiWagesVal = row.esiWages || grossVal;
-        
+
         return `<tr>
           <td>${row.sno || index + 1}</td>
           <td>${row.empId || ''}</td>

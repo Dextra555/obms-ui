@@ -25,16 +25,16 @@ export class NonComplianceReportComponent implements OnInit {
   warningMessage: string = '';
   userAccessModel!: UserAccessModel;
   selectedReportType: string = 'form-xxvi';
-  
+
   currentReportHtml: SafeHtml | null = null;
   currentReportHtmlRaw: string = '';
   reportTemplates: { [key: string]: string } = {};
 
   constructor(
-    public sanitizer: DomSanitizer, 
-    private fb: FormBuilder, 
+    public sanitizer: DomSanitizer,
+    private fb: FormBuilder,
     private http: HttpClient,
-    private _dataService: DatasharingService, 
+    private _dataService: DatasharingService,
     private _masterService: MastermoduleService,
     private router: Router
   ) {
@@ -100,7 +100,7 @@ export class NonComplianceReportComponent implements OnInit {
           this.userAccessModel.deleteAccess = data.Delete;
           this.userAccessModel.updateAccess = data.Update;
           this.userAccessModel.createAccess = data.Create;
-          
+
           if (this.userAccessModel.readAccess === true || this.currentUser == 'superadmin' || this.currentUser == 'admin') {
             this.warningMessage = '';
             this.getBranchMasterListByUser(this.currentUser);
@@ -152,7 +152,7 @@ export class NonComplianceReportComponent implements OnInit {
 
   getMonthName(month: number): string {
     const months = ['January', 'February', 'March', 'April', 'May', 'June',
-                   'July', 'August', 'September', 'October', 'November', 'December'];
+      'July', 'August', 'September', 'October', 'November', 'December'];
     return months[month - 1] || '';
   }
 
@@ -170,7 +170,7 @@ export class NonComplianceReportComponent implements OnInit {
       this.errorMessage = 'Please select Branch, Month and Year first.';
       return;
     }
-    
+
     this.selectedReportType = formType;
     this.errorMessage = '';
     const formValues = this.nonComplianceForm.value;
@@ -200,7 +200,7 @@ export class NonComplianceReportComponent implements OnInit {
     this._masterService.getComplianceReportData(backendReportName, payload).subscribe(
       (reportData: any) => {
         this.showLoadingSpinner = false;
-        
+
         const apiMeta = reportData?.metadata || {};
         const metaData = {
           Establishment: this.getBranchName(),
@@ -377,14 +377,14 @@ export class NonComplianceReportComponent implements OnInit {
   private buildRowHtml(reportType: string, row: any, index: number): string {
     // Safe accessors to prevent runtime errors when API returns incomplete rows
     const severity = (row.severity || 'Low') as string;
-    const status   = (row.status   || 'Pending') as string;
+    const status = (row.status || 'Pending') as string;
     switch (reportType) {
       case 'form-xxvi': {
         const totalDays = row.totalDays || 1;
         const daysWorked = row.daysWorked || 0;
         const attendancePercentage = parseFloat(((daysWorked / totalDays) * 100).toFixed(1));
-        const severityClass  = `severity-${severity.toLowerCase()}`;
-        const statusClass    = `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
+        const severityClass = `severity-${severity.toLowerCase()}`;
+        const statusClass = `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
         const attendanceClass = attendancePercentage < 75 ? 'attendance-low' : 'attendance-good';
         return `
           <tr>
@@ -409,7 +409,7 @@ export class NonComplianceReportComponent implements OnInit {
       case 'form-xxvii':
       case 'form-xxviii': {
         const severityClass2 = `severity-${severity.toLowerCase()}`;
-        const statusClass2   = `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
+        const statusClass2 = `status-${status.toLowerCase().replace(/\s+/g, '-')}`;
         // Salary breakdown fields
         const basic = row.basic ?? 0;
         const da = row.da ?? 0;
