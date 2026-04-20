@@ -8,6 +8,8 @@ export interface IQuotationDetail {
   Branch?: string;
   Description?: string;
   NoOfGuards?: number;
+  PerDay?: number;
+  PerMonth?: number;
   Rate?: number;
   NoOfHours?: number;
   NoOfDays?: number;
