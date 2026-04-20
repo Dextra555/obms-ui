@@ -35,7 +35,7 @@ export class NewSupplierComponent implements OnInit {
       deleteAccess: false,
       createAccess: false,
     }
-    
+
     this.frm = this.fb.group({
       Id: [0],
       Code: [''],
@@ -52,7 +52,7 @@ export class NewSupplierComponent implements OnInit {
       Category: [''],
       Status: ['A'],
     });
-    
+
   }
 
   ngOnInit(): void {
@@ -107,6 +107,7 @@ export class NewSupplierComponent implements OnInit {
 
     }
     let data = this.frm.getRawValue();
+    data['CreditLimit'] = data['CreditLimit'] ? Number(data['CreditLimit']) : 0;
     this.service.saveSupplier(data).subscribe((d: any) => {
       this.showMessage("Supplier Saved/Updated Successfully", 'success', 'Success Message');
       this.frm.reset();

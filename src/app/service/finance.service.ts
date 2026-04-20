@@ -274,11 +274,11 @@ export class FinanceService {
     return this.httpClient.post(`${this.apiUrl}Finance/saveOrUpdateLegalDemand`, action);
   }
 
-  deleteLegalDemand(id: number, currentUser: string,deleteRemarks: string): Observable<any> {
+  deleteLegalDemand(id: number, currentUser: string, deleteRemarks: string): Observable<any> {
     return this.httpClient.delete<any>(`${this.apiUrl}Finance/DeleteLegalDemand/${id}?currentUser=${encodeURIComponent(currentUser)}&deleteRemarks=${encodeURIComponent(deleteRemarks)}`);
   }
 
-   getLegalDemandByID(id: number): Observable<any> {
+  getLegalDemandByID(id: number): Observable<any> {
     return this.httpClient.get<any>(`${this.apiUrl}Finance/GetLegalDemandByID/${id}`);
   }
 
