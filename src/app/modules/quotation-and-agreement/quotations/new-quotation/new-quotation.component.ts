@@ -801,11 +801,12 @@ export class NewQuotationComponent {
     }
 
     if (parseInt("0" + tNoOfGuards, 10) === 0) {
-      vMonthTotal = parseFloat(tRate) * parseFloat(tNoOfDays);
+      vMonthTotal = parseFloat(tRate) * parseFloat(tNoOfHours) * parseFloat(tNoOfDays);
     } else {
       vMonthTotal = (
         parseFloat(tNoOfGuards) *
         parseFloat(tRate) *
+        parseFloat(tNoOfHours) *
         parseFloat(tNoOfDays)
       );
     }
