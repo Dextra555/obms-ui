@@ -716,6 +716,12 @@ export class NewQuotationComponent {
 
     let data = this.frm.getRawValue();
 
+    // Sync PerDay and PerMonth values from form to details array
+    this.details.forEach((detail: any) => {
+      detail.PerDay = parseFloat(detail.PerDay) || 0;
+      detail.PerMonth = parseFloat(detail.PerMonth) || 0;
+    });
+
     data['details'] = this.details;
 
 
@@ -1077,11 +1083,15 @@ export class NewQuotationComponent {
     if (action == 'add') {
 
       details['ID'] = 0;
+      details['PerDay'] = parseFloat(details['PerDay']) || 0;
+      details['PerMonth'] = parseFloat(details['PerMonth']) || 0;
 
       this.details.push(details);
 
     } else if (details['index'] >= 0 && action == 'update') {
 
+      details['PerDay'] = parseFloat(details['PerDay']) || 0;
+      details['PerMonth'] = parseFloat(details['PerMonth']) || 0;
       this.details[details['index']] = details;
 
     }
@@ -1556,7 +1566,7 @@ export class NewQuotationComponent {
 
     const noOfHours = parseFloat(this.frm.get('details.NoOfHours')?.value || 8);
 
-    
+
 
     if (perMonth > 0 && noOfDays > 0) {
 
@@ -1564,9 +1574,39 @@ export class NewQuotationComponent {
 
       this.frm.get('details.PerDay')?.setValue(this.formatCurrency(perDay));
 
-      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perDay));
 
-      
+
+      // Calculate per hour rate
+      const perHour = perDay / noOfHours;
+
+      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHour));
+
+
+
+      this.DetailRowChange();
+
+    }
+
+  }
+
+
+
+  onNoOfHoursChange(): void {
+
+    const perDay = parseFloat(this.frm.get('details.PerDay')?.value || 0);
+
+    const noOfHours = parseFloat(this.frm.get('details.NoOfHours')?.value || 8);
+
+
+
+    if (perDay > 0 && noOfHours > 0) {
+
+      // Recalculate per hour rate when working hours change
+      const perHour = perDay / noOfHours;
+
+      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHour));
+
+
 
       this.DetailRowChange();
 
@@ -1606,7 +1646,7 @@ export class NewQuotationComponent {
 
     const tNoOfGuards = this.frm.get('details.NoOfGuards')?.value;
 
-    const tRate = this.frm.get('details.Rate')?.value;
+    const tPerDay = this.frm.get('details.PerDay')?.value;
 
     const tNoOfHours = this.frm.get('details.NoOfHours')?.value;
 
@@ -1632,7 +1672,7 @@ export class NewQuotationComponent {
 
     if (parseInt("0" + tNoOfGuards, 10) === 0) {
 
-      vMonthTotal = parseFloat(tRate) * parseFloat(tNoOfDays);
+      vMonthTotal = parseFloat(tPerDay) * parseFloat(tNoOfDays);
 
     } else {
 
@@ -1640,7 +1680,7 @@ export class NewQuotationComponent {
 
         parseFloat(tNoOfGuards) *
 
-        parseFloat(tRate) *
+        parseFloat(tPerDay) *
 
         parseFloat(tNoOfDays)
 
@@ -1652,23 +1692,23 @@ export class NewQuotationComponent {
 
     if (!(parseInt("0" + tNoOfGuards, 10) === 0 ||
 
-      parseInt("0" + tRate, 10) === 0 ||
+      parseInt("0" + tPerDay, 10) === 0 ||
 
       parseInt("0" + tNoOfDays, 10) === 0)) {
 
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(vMonthTotal));
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
 
     } else if (this.type == 'S') {
 
-      vMonthTotal = tNoOfGuards * tRate;
+      vMonthTotal = tNoOfGuards * tPerDay;
 
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(vMonthTotal));
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
 
     } else if (this.type == 'H') {
 
-      vMonthTotal = tNoOfHours * tRate;
+      vMonthTotal = tNoOfHours * tPerDay;
 
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(vMonthTotal));
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
 
     } else {
 
@@ -1678,7 +1718,7 @@ export class NewQuotationComponent {
 
 
 
-    this.frm.get('details.YearTotal')?.setValue(this.formatCurrency(vMonthTotal * 12));
+    this.frm.get('details.YearTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal * 12)));
 
 
 
