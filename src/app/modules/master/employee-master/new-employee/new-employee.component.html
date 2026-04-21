@@ -58,6 +58,7 @@
           <mat-form-field appearance="outline">
             <mat-label>Name</mat-label>
             <input type="text" formControlName="EMP_NAME" matInput placeholder="" autocomplete="off">
+            <mat-hint>Full name as per Aadhaar</mat-hint>
             <mat-error *ngIf="frm.get('EMP_NAME')?.hasError('required') && (frm.get('EMP_NAME')?.touched || submitted)">
               Please enter employee name
             </mat-error>
@@ -137,6 +138,7 @@
             <mat-label>Aadhaar Number</mat-label>
             <input type="text" formControlName="AadhaarNumber" matInput placeholder="12-digit Aadhaar"
               autocomplete="off">
+            <mat-hint>Example: 234123412341</mat-hint>
             <mat-error *ngIf="frm.get('AadhaarNumber')?.invalid && frm.get('AadhaarNumber')?.touched">
               Please enter a valid 12-digit Aadhaar number
             </mat-error>
@@ -164,6 +166,7 @@
             <mat-label>PIN Code</mat-label>
             <input type="text" formControlName="EMP_POST_CODE" matInput placeholder="6-digit PIN code"
               autocomplete="off" maxlength="6">
+            <mat-hint>Example: 600001</mat-hint>
             <mat-error *ngIf="frm.get('EMP_POST_CODE')?.invalid && frm.get('EMP_POST_CODE')?.touched">
               Please enter a valid 6-digit PIN code
             </mat-error>
@@ -187,13 +190,13 @@
           <mat-form-field appearance="outline">
             <mat-label>Phone</mat-label>
             <input type="text" formControlName="EMP_PHONE" matInput placeholder="+91-XXXXXXXXXX" autocomplete="off">
+            <mat-hint>Example: +91-9876543210</mat-hint>
           </mat-form-field>
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
-            <mat-label>Mobile Phone</mat-label>
-            <input type="text" formControlName="EMP_MOBILEPHONE" matInput placeholder="+91-XXXXXXXXXX"
-              autocomplete="off">
+            <mat-label>Contact Person Phone</mat-label>
+            <input type="text" formControlName="EMP_CONTACT_TELEPHONE" matInput placeholder="" autocomplete="off">
           </mat-form-field>
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
@@ -223,7 +226,7 @@
           </mat-form-field>
         </div>
       </div>
-      <div class="row" *ngIf="warningMessage ==''">
+      <!-- <div class="row" *ngIf="warningMessage ==''">
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
           <h2><span>Spouse/Next Kin/Emergency</span></h2>
         </div>
@@ -238,6 +241,7 @@
             <mat-label>Spouse Aadhaar No</mat-label>
             <input type="text" formControlName="SpouseAadhaar" matInput placeholder="Spouse Aadhaar (Optional)"
               autocomplete="off">
+            <mat-hint>Example: 234123412341 (Optional)</mat-hint>
             <mat-error *ngIf="frm.get('SpouseAadhaar')?.invalid && frm.get('SpouseAadhaar')?.touched">
               Please enter a valid 12-digit Aadhaar number
             </mat-error>
@@ -248,6 +252,7 @@
             <mat-label>Spouse PAN No</mat-label>
             <input type="text" formControlName="SpousePAN" matInput placeholder="Spouse PAN (Optional)"
               autocomplete="off">
+            <mat-hint>Example: ABCDE1234F (Optional)</mat-hint>
             <mat-error *ngIf="frm.get('SpousePAN')?.invalid && frm.get('SpousePAN')?.touched">
               Please enter a valid PAN format
             </mat-error>
@@ -290,6 +295,7 @@
             <mat-label>Postal Code</mat-label>
             <input type="text" formControlName="EMP_CONTACT_POST_CODE" matInput placeholder="6-digit PIN code"
               autocomplete="off" maxlength="6">
+            <mat-hint>Example: 600001</mat-hint>
           </mat-form-field>
         </div>
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
@@ -312,7 +318,7 @@
             <input type="text" formControlName="EMP_CONTACT_TELEPHONE" matInput placeholder="" autocomplete="off">
           </mat-form-field>
         </div>
-      </div>
+      </div> -->
       <div class="row" *ngIf="warningMessage ==''">
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
           <h2><span>Employment Details</span></h2>
@@ -344,6 +350,7 @@
             <mat-label>Join Date (DDMMYYYY)</mat-label>
             <input type="text" formControlName="EMPPAY_DATE_JOINED" matInput [matDatepicker]="picker2"
               placeholder="DDMMYYYY" autocomplete="off" (input)="formatDateInput($event, 'EMPPAY_DATE_JOINED')">
+            <mat-hint>Example: 15012026 (15-Jan-2026)</mat-hint>
             <mat-datepicker-toggle matSuffix [for]="picker2">
             </mat-datepicker-toggle>
             <mat-datepicker #picker2></mat-datepicker>
@@ -354,6 +361,7 @@
             <mat-label>Resigned Date (DDMMYYYY)</mat-label>
             <input type="text" formControlName="EMPPAY_DATE_RESIGNED" [matDatepicker]="picker3" matInput
               placeholder="DDMMYYYY" autocomplete="off" (input)="formatDateInput($event, 'EMPPAY_DATE_RESIGNED')">
+            <mat-hint>Example: 31122026 (31-Dec-2026)</mat-hint>
             <mat-datepicker-toggle matSuffix [for]="picker3">
             </mat-datepicker-toggle>
             <mat-datepicker #picker3></mat-datepicker>
@@ -473,123 +481,136 @@
               </div>
             </div>
           </div>
-          <div class="row" *ngIf="isBank">
-            <div class="col-6">
-              <mat-form-field appearance="outline">
+          <div class="row mb-3" *ngIf="isBank">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+              <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Bank Name</mat-label>
                 <mat-select formControlName="BankName" (selectionChange)="onBankChange($event.value)">
                   <mat-option *ngFor="let bank of indianBanks" [value]="bank.code">{{bank.name}}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
-            <div class="col-6">
-              <mat-form-field appearance="outline">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+              <mat-form-field appearance="outline" class="w-100">
                 <mat-label>Bank A/C No</mat-label>
                 <input type="text" formControlName="BankAccountNumber" matInput placeholder="" autocomplete="off"
                   (change)="checkEmployeeInfo('BankAccount')">
+                <mat-hint>Example: 1234567890123 or ABC12345678 (9-18 alphanumeric characters)</mat-hint>
                 <mat-error *ngIf="frm.get('BankAccountNumber')?.invalid && frm.get('BankAccountNumber')?.touched">
-                  Missing or Invalid bank account number (9-18 digits)
+                  Missing or Invalid bank account number (9-18 alphanumeric characters)
                 </mat-error>
               </mat-form-field>
               <mat-error *ngIf="empChkError['BankAccount'] != 'success'">
                 {{empChkError['BankAccount']}}
               </mat-error>
             </div>
-            <div class="col-6">
-              <mat-form-field appearance="outline">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6 mt-2">
+              <mat-form-field appearance="outline" class="w-100">
                 <mat-label>IFSC Code</mat-label>
                 <input type="text" formControlName="BankIFSC" matInput placeholder="11-digit IFSC Code"
                   autocomplete="off" maxlength="11">
+                <mat-hint>Example: SBIN0001234</mat-hint>
                 <mat-error *ngIf="frm.get('BankIFSC')?.invalid && frm.get('BankIFSC')?.touched">
                   Please enter a valid 11-digit IFSC code
                 </mat-error>
               </mat-form-field>
             </div>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <div class="col-6">
               <mat-label class="mr-3"><strong>Is Temporary Employee</strong></mat-label>
               <br />
-              <mat-radio-group aria-label="Select a Is Temporary Employee" formControlName="TMPGUARD"
-                (change)="isTemporaryEmployeeChange($event.value)">
-                <mat-radio-button value="0">Yes</mat-radio-button>
-                <mat-radio-button value="1">No</mat-radio-button>
-                <mat-radio-button value="">None</mat-radio-button>
-              </mat-radio-group>
+              <div class="py-2">
+                <mat-radio-group aria-label="Select a Is Temporary Employee" formControlName="TMPGUARD"
+                  (change)="isTemporaryEmployeeChange($event.value)">
+                  <mat-radio-button value="0">Yes</mat-radio-button>
+                  <mat-radio-button value="1">No</mat-radio-button>
+                  <mat-radio-button value="">None</mat-radio-button>
+                </mat-radio-group>
+              </div>
               <mat-error
                 *ngIf="frm.get('TMPGUARD')?.hasError('required') && (frm.get('TMPGUARD')?.touched || submitted) ">
                 please select Temporary Employee
               </mat-error>
             </div>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <div class="col-6">
               <mat-label class="mr-3"><strong>Income Tax Deduction</strong></mat-label>
               <br />
-              <mat-radio-group aria-label="Select a Income Tax Deduction" formControlName="INCOMETAXDETECT">
-                <mat-radio-button value="Yes">Yes</mat-radio-button>
-                <mat-radio-button value="No">No</mat-radio-button>
-                <mat-radio-button value="">None</mat-radio-button>
-              </mat-radio-group>
+              <div class="py-2">
+                <mat-radio-group aria-label="Select a Income Tax Deduction" formControlName="INCOMETAXDETECT">
+                  <mat-radio-button value="Yes">Yes</mat-radio-button>
+                  <mat-radio-button value="No">No</mat-radio-button>
+                  <mat-radio-button value="">None</mat-radio-button>
+                </mat-radio-group>
+              </div>
               <mat-error
                 *ngIf="frm.get('INCOMETAXDETECT')?.hasError('required') && (frm.get('INCOMETAXDETECT')?.touched || submitted) ">
                 please select Income Tax Deduction
               </mat-error>
             </div>
             <div class="col-6">
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="outline" class="w-100">
                 <mat-label>PAN Number</mat-label>
                 <input type="text" formControlName="PANNumber" matInput placeholder="ABCDE1234F" autocomplete="off">
+                <mat-hint>Example: ABCDE1234F</mat-hint>
                 <mat-error *ngIf="frm.get('PANNumber')?.invalid && frm.get('PANNumber')?.touched">
                   Please enter a valid PAN format
                 </mat-error>
               </mat-form-field>
             </div>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <div class="col-6">
               <mat-label class="mr-3"><strong>PF Deduction</strong></mat-label>
               <br />
-              <mat-radio-group aria-label="Select a PF Deduction" formControlName="EPFDETECT">
-                <mat-radio-button value="Yes">Yes</mat-radio-button>
-                <mat-radio-button value="No">No</mat-radio-button>
-                <mat-radio-button value="">None</mat-radio-button>
-              </mat-radio-group>
+              <div class="py-2">
+                <mat-radio-group aria-label="Select a PF Deduction" formControlName="EPFDETECT">
+                  <mat-radio-button value="Yes">Yes</mat-radio-button>
+                  <mat-radio-button value="No">No</mat-radio-button>
+                  <mat-radio-button value="">None</mat-radio-button>
+                </mat-radio-group>
+              </div>
               <mat-error
                 *ngIf="frm.get('EPFDETECT')?.hasError('required') && (frm.get('EPFDETECT')?.touched || submitted) ">
                 please select PF Deduction
               </mat-error>
             </div>
             <div class="col-6">
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="outline" class="w-100">
                 <mat-label>PF Account Number</mat-label>
                 <input type="text" formControlName="PFAccountNumber" matInput placeholder="PF Account Number"
                   autocomplete="off" (change)="checkEmployeeInfo('EPFNo')">
+                <mat-hint>Example: MH/PUN/12345/123/1234567</mat-hint>
               </mat-form-field>
               <mat-error *ngIf="empChkError['EPFNo'] != 'success'">
                 {{empChkError['EPFNo']}}
               </mat-error>
             </div>
           </div>
-          <div class="row">
+          <div class="row mb-3">
             <div class="col-6">
               <mat-label class="mr-3"><strong>ESI Deduction</strong></mat-label>
               <br />
-              <mat-radio-group aria-label="Select a ESI Deduction" formControlName="SOCSODETECT">
-                <mat-radio-button value="Yes">Yes</mat-radio-button>
-                <mat-radio-button value="No">No</mat-radio-button>
-                <mat-radio-button value="">None</mat-radio-button>
-              </mat-radio-group>
+              <div class="py-2">
+                <mat-radio-group aria-label="Select a ESI Deduction" formControlName="SOCSODETECT">
+                  <mat-radio-button value="Yes">Yes</mat-radio-button>
+                  <mat-radio-button value="No">No</mat-radio-button>
+                  <mat-radio-button value="">None</mat-radio-button>
+                </mat-radio-group>
+              </div>
               <mat-error
                 *ngIf="frm.get('SOCSODETECT')?.hasError('required') && (frm.get('SOCSODETECT')?.touched || submitted) ">
                 please select ESI Deduction
               </mat-error>
             </div>
             <div class="col-6">
-              <mat-form-field appearance="outline">
+              <mat-form-field appearance="outline" class="w-100">
                 <mat-label>ESI IP Number</mat-label>
                 <input type="text" formControlName="ESINumber" matInput placeholder="ESI Insurance Number"
                   autocomplete="off" (change)="checkEmployeeInfo('SOCSONo')">
+                <mat-hint>Example: 1234567890</mat-hint>
                 <mat-error *ngIf="empChkError['SOCSONo'] != 'success'">
                   {{empChkError['SOCSONo']}}
                 </mat-error>
@@ -598,7 +619,7 @@
           </div>
         </div>
       </div>
-      <div class="row" *ngIf="warningMessage ==''">
+      <div class="row mb-3" *ngIf="warningMessage ==''">
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
           <h2><span>Check List</span></h2>
         </div>

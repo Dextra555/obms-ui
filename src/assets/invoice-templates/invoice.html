@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tax Invoice - FreightWatch G Security Services</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-black: #000;
             --gray-700: #333;
             --gray-500: #666;
-            --bg-light: #f4f4f4;
-            --border-thick: 1.5px solid #000;
+            --bg-light: #f5f5f5;
+            --border-thick: 1px solid #000;
             --border-thin: 0.5px solid #000;
-            --font-main: 'Poppins', -apple-system, sans-serif;
+            --font-main: 'Roboto', -apple-system, sans-serif;
         }
 
         * {
@@ -23,168 +23,253 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            padding: 0;
+            background: #e0e0e0;
+        }
+
         body {
             font-family: var(--font-main);
             color: var(--primary-black);
-            background: #fff;
-            padding: 30px;
-            font-size: 10px;
-            line-height: 1.3;
+            background: #e0e0e0;
+            font-size: 8.5px;
+            line-height: 1.2;
         }
 
         @media print {
-            body { padding: 0; margin: 0; }
-            .invoice-container { border: var(--border-thick) !important; width: 100% !important; margin: 0 !important; }
-            @page { size: A4; margin: 1cm; }
+            html, body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                padding: 0;
+                background: #fff;
+            }
+
+            .invoice-wrapper {
+                height: 100% !important;
+                padding: 0 !important;
+                background: #fff !important;
+            }
+
+            .invoice-container {
+                border: var(--border-thick) !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+            }
+
+            .table-flex-section {
+                flex: 1 1 auto !important;
+            }
+
+            @page {
+                size: A4 portrait;
+                margin: 8mm 8mm 8mm 8mm;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Wrapper to simulate A4 on screen */
+        .invoice-wrapper {
+            width: 210mm;
+            height: calc(297mm - 16mm); /* 297mm minus 2x 8mm padding */
+            margin: 0 auto;
+            padding: 8mm;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
         }
 
         .invoice-container {
             width: 100%;
-            max-width: 850px;
-            margin: 0 auto;
+            flex: 1 1 auto;
             border: var(--border-thick);
             background: #fff;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        /* Header Section */
+        /* Table section grows to fill remaining space */
+        .table-flex-section {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .table-flex-section .invoice-table {
+            flex: 1;
+        }
+
+        /* ── HEADER ── */
         .header-top {
             display: flex;
-            padding: 15px;
-            border-bottom: var(--border-thin);
+            padding: 3mm 3mm;
+            border-bottom: var(--border-thick);
             align-items: flex-start;
+            gap: 3mm;
         }
 
         .logo-section {
-            width: 25%;
+            width: 18%;
             display: flex;
             flex-direction: column;
+            align-items: center;
+            gap: 1.5mm;
+            flex-shrink: 0;
         }
 
         .company-logo {
-            max-width: 140px;
+            max-width: 44px;
+            max-height: 44px;
+            width: auto;
             height: auto;
-            margin-bottom: 5px;
+            object-fit: contain;
         }
 
         .tagline {
-            font-size: 11px;
-            font-weight: 500;
+            font-size: 5.5px;
+            font-weight: 700;
             color: var(--gray-500);
-            font-style: italic;
+            text-align: center;
+            letter-spacing: 0.2px;
         }
 
         .address-section {
             flex: 1;
-            padding: 0 15px;
+            padding: 0 3mm;
             border-left: var(--border-thin);
             border-right: var(--border-thin);
-            line-height: 1.4;
         }
 
         .company-name {
-            font-size: 18px;
+            font-size: 11px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 1mm;
             color: #000;
+            line-height: 1.1;
         }
 
         .contact-info {
-            font-size: 9px;
+            font-size: 6px;
             color: var(--gray-700);
+            line-height: 1.2;
+        }
+
+        .contact-info p {
+            margin-bottom: 0.4mm;
         }
 
         .cert-section {
-            width: 25%;
+            width: 20%;
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
-            gap: 12px;
+            align-items: center;
+            gap: 2mm;
+            flex-shrink: 0;
         }
 
         .cert-icons-row {
             display: flex;
-            gap: 8px;
+            gap: 2mm;
+            align-items: center;
         }
 
         .cert-thumb {
-            width: 35px;
-            height: 35px;
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
             border: 0.5px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 7px;
             border-radius: 50%;
-            background: #f9f9f9;
+            background: #fff;
+            padding: 2px;
         }
 
         .iso-box {
-            border: 1.5px solid #000;
-            padding: 4px 10px;
+            border: 1px solid #000;
+            padding: 1.5mm 3mm;
             font-weight: 700;
-            font-size: 10px;
+            font-size: 6px;
             text-align: center;
+            line-height: 1.2;
         }
 
-        /* Title Area */
+        /* ── TITLE ── */
         .main-title-bar {
             text-align: center;
-            padding: 5px;
-            border-bottom: var(--border-thin);
+            padding: 1.8mm 3mm;
+            border-bottom: var(--border-thick);
             background: var(--bg-light);
         }
 
         .main-title-bar h1 {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            margin-bottom: 0.4mm;
         }
 
         .sub-title {
-            font-size: 9px;
-            font-weight: 600;
+            font-size: 6px;
+            font-weight: 700;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        /* Invoice Meta Bar */
+        /* ── INVOICE META BAR ── */
         .invoice-meta-bar {
             display: flex;
-            border-bottom: var(--border-thin);
-        }
-
-        .meta-to {
-            width: 60px;
-            padding: 6px 10px;
-            font-weight: 700;
-            border-right: var(--border-thin);
-            display: flex;
+            justify-content: flex-end;
+            border-bottom: var(--border-thick);
+            padding: 1.5mm 3mm;
+            background: #fff;
             align-items: center;
         }
 
-        .meta-inv-details {
-            flex: 1;
-            display: flex;
-            justify-content: flex-end;
-        }
-
         .inv-cell-box {
-            width: 200px;
-            border-left: var(--border-thin);
+            display: flex;
+            flex-direction: column;
+            gap: 0.8mm;
         }
 
         .inv-cell-row {
-            padding: 6px 10px;
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
+            font-size: 7.5px;
+            white-space: nowrap;
+            gap: 8mm;
         }
 
-        .inv-cell-row:first-child { border-bottom: var(--border-thin); }
-        .inv-cell-row span:first-child { font-weight: 700; }
+        .inv-cell-row span:first-child {
+            font-weight: 700;
+            color: var(--gray-700);
+            min-width: 55px;
+            text-align: right;
+        }
 
-        /* Party Details Section */
+        .inv-cell-row span:last-child {
+            font-weight: 600;
+            min-width: 75px;
+            text-align: left;
+        }
+
+        /* ── PARTY DETAILS ── */
         .parties-grid {
             display: flex;
-            border-bottom: var(--border-thin);
+            border-bottom: var(--border-thick);
+        }
+
+        p {
+            margin-bottom: 0.4mm;
+            line-height: 1.15;
         }
 
         .party-col {
@@ -193,215 +278,369 @@
             flex-direction: column;
         }
 
-        .party-col:first-child { border-right: var(--border-thin); }
+        .party-col:first-child {
+            border-right: var(--border-thick);
+        }
 
         .party-head {
             background: var(--bg-light);
-            padding: 6px 10px;
-            border-bottom: var(--border-thin);
+            padding: 1mm 3mm;
+            border-bottom: var(--border-thick);
             font-weight: 700;
-            font-size: 9px;
+            font-size: 6.5px;
             text-transform: uppercase;
+            letter-spacing: 0.2px;
         }
 
         .party-body {
-            padding: 10px;
-            min-height: 80px;
+            padding: 1.5mm 3mm;
+            line-height: 1.15;
+            font-size: 7px;
         }
 
         .party-body strong {
             display: block;
-            font-size: 11px;
-            margin-bottom: 5px;
-            text-decoration: underline;
+            font-size: 7.5px;
+            margin-bottom: 0.6mm;
+            font-weight: 700;
         }
 
-        /* Work Order Bar */
+        .party-body p {
+            margin-bottom: 0.4mm;
+            font-size: 7px;
+            color: var(--gray-700);
+        }
+
+        /* ── WORK ORDER BAR ── */
         .work-order-full-bar {
-            border-bottom: var(--border-thin);
-            padding: 6px;
+            border-bottom: var(--border-thick);
+            padding: 1.2mm 3mm;
             text-align: center;
             font-weight: 700;
             background: var(--bg-light);
-            font-size: 11px;
+            font-size: 7px;
+            letter-spacing: 0.2px;
+            white-space: normal;
+            word-wrap: break-word;
         }
 
-        /* Main Table Styles */
+        /* ── INVOICE TABLE ── */
         .invoice-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 7.5px;
+            table-layout: fixed;
         }
 
         .invoice-table th {
-            border-bottom: var(--border-thin);
+            border-bottom: var(--border-thick);
             border-right: var(--border-thin);
-            padding: 8px 5px;
+            padding: 1.2mm 2mm;
             background: var(--bg-light);
             font-weight: 700;
-            font-size: 9px;
+            font-size: 6px;
             text-transform: uppercase;
             text-align: center;
+            line-height: 1.15;
+            word-break: break-word;
         }
 
-        .invoice-table th:last-child { border-right: none; }
+        .invoice-table th:last-child {
+            border-right: none;
+        }
 
         .invoice-table td {
             border-right: var(--border-thin);
-            border-bottom: 0.2px solid #ddd;
-            padding: 8px;
+            border-bottom: 0.5px solid #ddd;
+            padding: 1.2mm 2mm;
             vertical-align: top;
+            font-size: 7px;
+            word-break: break-word;
         }
 
-        .invoice-table td:last-child { border-right: none; }
+        .invoice-table td:last-child {
+            border-right: none;
+        }
 
-        /* GST Meta row above table body */
+        /* Force DataRows and summary rows to be tight, let filler-row take extra space */
+        .invoice-table tr:not(.filler-row) {
+            height: 1px;
+        }
+
+        .filler-row {
+            height: auto;
+        }
+
+        .filler-row td {
+            border-bottom: none !important;
+        }
+
+        /* GST meta row above table */
         .gst-meta-row td {
             background: #fff;
             font-weight: 600;
-            padding: 5px 10px;
-            border-bottom: var(--border-thin);
+            padding: 1.2mm 2mm;
+            border-bottom: var(--border-thick);
+            font-size: 6.5px;
+            text-align: center;
         }
 
-        /* Summary Sections */
+        /* ── TABLE SUMMARY ROWS ── */
         .summary-total-label {
             background: var(--bg-light);
             font-weight: 700;
             text-align: right;
-            padding-right: 15px;
+            padding-right: 2.5mm;
             border-top: var(--border-thin);
+            font-size: 7px;
         }
 
         .summary-total-value {
             font-weight: 700;
             text-align: right;
+            padding-right: 2.5mm;
             border-top: var(--border-thin);
+            font-size: 7px;
         }
 
-        /* Footer Info Styles */
+        .cgst-row .summary-total-label,
+        .sgst-row .summary-total-label,
+        .igst-row .summary-total-label {
+            background: transparent;
+            border-top: none;
+        }
+
+        .cgst-row .summary-total-value,
+        .sgst-row .summary-total-value,
+        .igst-row .summary-total-value {
+            border-top: none;
+        }
+
+        .grand-total-row {
+            font-weight: 700;
+            border-top: var(--border-thick) !important;
+            background: #fafafa;
+        }
+
+        .grand-total-row td {
+            padding: 1.5mm 2mm;
+        }
+
+        .grand-total-row .summary-total-label {
+            background: #fafafa;
+            border-top: none;
+            font-size: 7.5px;
+            font-weight: 700;
+        }
+
+        .grand-total-row .summary-total-value {
+            background: #fafafa;
+            border-top: none;
+            font-size: 7.5px;
+            font-weight: 700;
+        }
+
+        .amount-words-row {
+            background: #fff;
+            font-size: 7px;
+        }
+
+        .amount-words-row td {
+            padding: 1mm 2mm;
+            vertical-align: middle;
+        }
+
+        /* ── FOOTER CONTENT ── */
         .footer-content {
-            padding: 12px;
-            border-bottom: var(--border-thin);
+            padding: 2mm 3mm 1.5mm 3mm;
+            border-bottom: var(--border-thick);
+            font-size: 6.5px;
+            line-height: 1.2;
         }
 
+        /* Two-column layout for footer info */
+        .footer-two-col {
+            display: flex;
+            gap: 4mm;
+            margin-bottom: 1.2mm;
+        }
+
+        .footer-two-col > div {
+            flex: 1;
+        }
+
+        .footer-section {
+            margin-bottom: 1mm;
+            padding-bottom: 0.8mm;
+        }
+
+        .footer-section:not(:last-child) {
+            border-bottom: 0.5px solid #e0e0e0;
+        }
+
+        .footer-section-title {
+            font-weight: 700;
+            font-size: 6.5px;
+            margin-bottom: 0.5mm;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Compact 2-col info grid */
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 0.5mm 4mm;
+            font-size: 6.5px;
         }
 
         .info-item {
-            margin-bottom: 4px;
+            margin-bottom: 0.3mm;
+            font-size: 6.5px;
+            line-height: 1.15;
         }
 
-        .info-label { font-weight: 700; }
+        .info-label {
+            font-weight: 700;
+        }
 
         .declaration-ol {
-            margin: 10px 0 15px 20px;
-            font-size: 9px;
+            margin: 0.5mm 0 0.5mm 4mm;
+            font-size: 6px;
+            padding-left: 2mm;
         }
 
-        .declaration-ol li { margin-bottom: 2px; }
+        .declaration-ol li {
+            margin-bottom: 0.3mm;
+            line-height: 1.1;
+        }
 
         .terms-box {
-            margin-top: 15px;
-            padding-top: 10px;
-            border-top: var(--border-thin);
+            margin-top: 0.6mm;
+            padding-top: 0.6mm;
+            border-top: 0.5px solid #ddd;
+            font-size: 6px;
+            line-height: 1.1;
         }
 
-        .terms-head { font-weight: 700; text-decoration: underline; margin-bottom: 5px; }
+        .terms-head {
+            font-weight: 700;
+            margin-bottom: 0.3mm;
+            font-size: 6.5px;
+        }
 
-        /* Signature & Stamp */
+        .terms-box p {
+            margin-bottom: 0.3mm;
+            font-size: 6px;
+            line-height: 1.1;
+        }
+
+        .service-notes-section {
+            margin-bottom: 1mm;
+            padding-bottom: 0.8mm;
+            border-bottom: 0.5px solid #e0e0e0;
+            font-size: 6.5px;
+        }
+
+        /* ── SIGNATURE & STAMP ── */
         .submission-seal {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            padding: 15px 15px 30px 15px;
+            padding: 1.8mm 3mm 1.5mm 3mm;
+            background: #fff;
+            border-top: var(--border-thick);
+            margin-top: auto;
         }
 
         .stamp-placeholder {
-            width: 130px;
-            height: 130px;
-            border: 1px dashed #bbb;
+            width: 44px;
+            height: 44px;
+            border: 1px dashed #999;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ddd;
+            color: #bbb;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 5.5px;
             text-align: center;
             transform: rotate(-15deg);
         }
 
         .authorized-sign-box {
             text-align: center;
-            width: 200px;
+            width: 65px;
         }
 
         .authorized-line {
-            border-top: 1.5px solid #000;
-            margin-top: 60px;
-            padding-top: 5px;
+            border-top: 1px solid #000;
+            margin-top: 7mm;
+            padding-top: 1mm;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 6.5px;
         }
 
-        /* Global Branding */
+        /* ── GLOBAL BRANDING FOOTER ── */
         .global-branding-footer {
             text-align: center;
-            padding: 12px;
+            padding: 1.5mm 2mm;
             background: var(--bg-light);
-            font-size: 8px;
-            border-top: var(--border-thin);
+            font-size: 5.5px;
+            border-top: var(--border-thick);
             color: var(--gray-500);
+            line-height: 1.2;
         }
 
-        /* Helpers */
-        .text-right { text-align: right; }
+        .global-branding-footer p {
+            margin-bottom: 0.2mm;
+        }
+
+        /* ── HELPERS ── */
+        .text-right  { text-align: right; }
         .text-center { text-align: center; }
-        .bold { font-weight: 700; }
+        .bold        { font-weight: 700; }
     </style>
 </head>
 
 <body>
-    <div class="invoice-container">
-        <div style="text-align: center; font-size: 18px; font-weight: bold; padding: 10px; border-bottom: 1.5px solid #000;">FreightWatch G Security Services India Pvt. Ltd</div>
-        <!-- HEADER -->
-        <div class="header-top">
-            <div class="logo-section">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="Logo" class="company-logo" id="company-logo">
-                <div class="tagline">Securing Global Trade</div>
-            </div>
-            <div class="address-section">
-                <h2 class="company-name">{{CompanyName}}</h2>
-                <div class="contact-info">
-                    <p><strong>India Head Office :</strong></p>
-                    <p>{{CompanyAddress}}</p>
-                    <p>Tel : {{CompanyPhone}} | E-mail : {{CompanyEmail}}</p>
-                    <p>Co.Reg. /CIN No. : {{CINNo}} | Website: {{CompanyWebsite}}</p>
+    <div class="invoice-wrapper">
+        <div class="invoice-container">
+
+            <!-- ══ HEADER ══ -->
+            <div class="header-top">
+                <div class="logo-section">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+                        alt="Logo" class="company-logo" id="company-logo">
+                    <div class="tagline">Securing Global Trade</div>
+                </div>
+                <div class="address-section">
+                    <h2 class="company-name">FreightWatch G Security Services India Pvt. Ltd.</h2>
+                    <div class="contact-info">
+                        <p><strong>India Head Office :</strong> No.397 (old no.281)</p>
+                        <p>Anna Salai, Precision Plaza, 1st Floor, Teynampet, Tamilnadu, Chennai, India - 600018</p>
+                        <p>Tel : +91 4440050684 &nbsp;|&nbsp; E-mail : info@fwgindia.com</p>
+                        <p>Co.Reg. /CIN No. : U74920TN2005PTC057775 &nbsp;|&nbsp; Website: www.fwgindia.com</p>
+                    </div>
+                </div>
+                <div class="cert-section">
+                    <div class="cert-icons-row">
+                        <img src="assets/img/iaf.jfif" alt="IAF" class="cert-thumb">
+                        <img src="assets/img/uaf.jfif" alt="UAF" class="cert-thumb">
+                        <img src="assets/img/bmg.jfif" alt="BMG" class="cert-thumb">
+                    </div>
+                    <div class="iso-box">CERTIFIED ISO 9001 : 2015</div>
                 </div>
             </div>
-            <div class="cert-section">
-                <div class="cert-icons-row">
-                    <div class="cert-thumb">IAF</div>
-                    <div class="cert-thumb">UAF</div>
-                    <div class="cert-thumb">BMG</div>
-                </div>
-                <div class="iso-box">CERTIFIED ISO 9001 : 2015</div>
+
+            <!-- ══ TITLE BAR ══ -->
+            <div class="main-title-bar">
+                <h1>TAX INVOICE</h1>
+                <div class="sub-title">ORIGINAL FOR RECIPIENT</div>
             </div>
-        </div>
 
-        <!-- TITLE BAR -->
-        <div class="main-title-bar">
-            <h1>TAX INVOICE</h1>
-            <div class="sub-title">ORIGINAL FOR RECIPIENT</div>
-        </div>
-
-        <!-- META BAR -->
-        <div class="invoice-meta-bar">
-            <div class="meta-to">TO</div>
-            <div class="meta-inv-details">
+            <!-- ══ INVOICE META BAR ══ -->
+            <div class="invoice-meta-bar">
                 <div class="inv-cell-box">
                     <div class="inv-cell-row">
                         <span>INV No:</span>
@@ -413,122 +652,171 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- ADDRESSES -->
-        <div class="parties-grid">
-            <div class="party-col">
-                <div class="party-head">DETAILS OF RECEIVER (Billed to)</div>
-                <div class="party-body">
-                    <strong>{{BillingName}}</strong>
-                    <p>Address :</p>
-                    <p>{{BillingAddress}}</p>
+            <!-- ══ PARTY ADDRESSES ══ -->
+            <div class="parties-grid">
+                <div class="party-col">
+                    <div class="party-head">DETAILS OF RECEIVER (Billed to)</div>
+                    <div class="party-body">
+                        <strong>{{BillingName}}</strong>
+                        <p>Address : {{BillingAddress}}</p>
+                        <p>GSTIN : {{BillingGSTIN}}</p>
+                        <p>State : {{BillingState}}</p>
+                    </div>
+                </div>
+                <div class="party-col">
+                    <div class="party-head">DETAILS OF CONSIGNEE (Shipped to)</div>
+                    <div class="party-body">
+                        <strong>{{ShippingName}}</strong>
+                        <p>Address : {{ShippingAddress}}</p>
+                        <p>GSTIN : {{ShippingGSTIN}}</p>
+                        <p>State : {{ShippingState}}</p>
+                    </div>
                 </div>
             </div>
-            <div class="party-col">
-                <div class="party-head">DETAILS OF CONSIGNEE (Shipped to)</div>
-                <div class="party-body">
-                    <strong>{{ShippingName}}</strong>
-                    <p>Address :</p>
-                    <p>{{ShippingAddress}}</p>
+
+            <!-- ══ WORK ORDER BAR ══ -->
+            <div class="work-order-full-bar">
+                WORK ORDER NO: {{WorkOrderNo}} &nbsp;|&nbsp; WORK ORDER DATE: {{WorkOrderDate}}
+            </div>
+
+            <!-- ══ INVOICE TABLE ══ -->
+            <div class="table-flex-section">
+            <table class="invoice-table" style="height: 100%;">
+                <thead>
+                    <tr class="gst-meta-row">
+                        <td colspan="7">
+                            <span>GST No.: {{BillingGSTIN}}</span>
+                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                            <span>State : {{BillingState}}</span>
+                            &nbsp;&nbsp;|&nbsp;&nbsp;
+                            <span>SAC Code : {{SACCode}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="width: 28px;">S.No</th>
+                        <th>Particulars</th>
+                        <th style="width: 60px;">HSN Code</th>
+                        <th style="width: 45px;">Duties</th>
+                        <th style="width: 30px;">Qty</th>
+                        <th style="width: 80px;">Rate (₹)</th>
+                        <th style="width: 80px;">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{DataRows}}
+
+                    <!-- Filler Row to stretch vertical borders down -->
+                    <tr class="filler-row">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <!-- SUMMARY -->
+                    <tr>
+                        <td colspan="5"></td>
+                        <td class="summary-total-label">TOTAL</td>
+                        <td class="summary-total-value">{{Subtotal}}</td>
+                    </tr>
+                    <tr class="cgst-row">
+                        <td colspan="5"></td>
+                        <td class="summary-total-label">CGST - {{CGSTPct}}%</td>
+                        <td class="summary-total-value">{{CGSTAmount}}</td>
+                    </tr>
+                    <tr class="sgst-row">
+                        <td colspan="5"></td>
+                        <td class="summary-total-label">SGST - {{SGSTPct}}%</td>
+                        <td class="summary-total-value">{{SGSTAmount}}</td>
+                    </tr>
+                    <tr class="igst-row">
+                        <td colspan="5"></td>
+                        <td class="summary-total-label">IGST - {{IGSTPct}}%</td>
+                        <td class="summary-total-value">{{IGSTAmount}}</td>
+                    </tr>
+                    <tr class="grand-total-row">
+                        <td colspan="5"></td>
+                        <td class="summary-total-label">Grand Total</td>
+                        <td class="summary-total-value">{{GrandTotal}}</td>
+                    </tr>
+                    <tr class="amount-words-row">
+                        <td colspan="7">
+                            <span class="bold">Rupees:</span> {{AmountInWords}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            </div><!-- /.table-flex-section -->
+
+            <!-- ══ FOOTER CONTENT ══ -->
+            <div class="footer-content">
+
+                <!-- Service Period & Notes -->
+                <div class="service-notes-section">
+                    <span class="info-label">Service Period:</span> {{ServicePeriod}}
+                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                    <span class="info-label">Notes:</span> {{ThankYouMessage}}
+                </div>
+
+                <!-- Bank Details + Compliance Details side by side -->
+                <div class="footer-two-col">
+                    <div class="footer-section">
+                        <div class="footer-section-title">Bank Details</div>
+                        <div class="info-grid">
+                            <div><span class="info-label">Bank Name:</span> {{BankName}}</div>
+                            <div><span class="info-label">Branch:</span> {{BankBranch}}</div>
+                            <div><span class="info-label">A/C No:</span> {{AccountNo}}</div>
+                            <div><span class="info-label">IFSC Code:</span> {{IFSCCode}}</div>
+                        </div>
+                    </div>
+                    <div class="footer-section">
+                        <div class="footer-section-title">Compliance Details</div>
+                        <div class="info-grid">
+                            <div><span class="info-label">PAN:</span> {{PAN}}</div>
+                            <div><span class="info-label">GSTIN:</span> {{CompanyGSTIN}}</div>
+                            <div><span class="info-label">EPF No:</span> {{EPFNo}}</div>
+                            <div><span class="info-label">ESIC:</span> {{ESIC}}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Declaration -->
+                <div class="footer-section">
+                    <div class="footer-section-title">Declaration</div>
+                    <ol class="declaration-ol">
+                        <li>We declare that this invoice shows the Actual value of the services described and that all particulars are true and correct.</li>
+                        <li>If any discrepancy in this invoice, please contact us immediately. This invoice is subject to provisions of MSMED Act, 2006.</li>
+                    </ol>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="terms-box">
+                    <div class="terms-head">Terms &amp; Conditions</div>
+                    <p>Please remit the payment in our current account through NEFT / Account Payee Cheque in favour of "<span class="info-label">{{CompanyName}}</span>"</p>
+                    <p>Arrears in payments are subject to interest @12% p.a. Any discrepancy in this invoice must be notified to us in writing within five days of receipt, otherwise it will be treated as accepted. For any queries please contact: {{CompanyPhone}}</p>
                 </div>
             </div>
-        </div>
 
-        <!-- WORK ORDER -->
-        <div class="work-order-full-bar">
-            WORK ORDER NO: {{WorkOrderNo}} | WORK ORDER DATE: {{WorkOrderDate}}
-        </div>
-
-        <!-- TABLE -->
-        <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th style="width: 40px;">S.No</th>
-                    <th>Particulars</th>
-                    <th style="width: 80px;">HSN CODE</th>
-                    <th style="width: 60px;">Duties</th>
-                    <th style="width: 50px;">Qty</th>
-                    <th style="width: 100px;">Rate</th>
-                    <th style="width: 100px;">Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="gst-meta-row">
-                    <td colspan="7">
-                        <span>GST No.: {{BillingGSTIN}}</span> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 
-                        <span>State : {{BillingState}}</span> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 
-                        <span>Code : {{SACCode}}</span>
-                    </td>
-                </tr>
-                {{DataRows}}
-                
-                <!-- SUMMARY -->
-                <tr>
-                    <td colspan="5" rowspan="4" style="vertical-align: bottom; border-top: var(--border-thin);">
-                        <p style="padding: 10px;"><span class="bold">Rupees :</span> {{AmountInWords}}</p>
-                    </td>
-                    <td class="summary-total-label">TOTAL</td>
-                    <td class="summary-total-value">{{Subtotal}}</td>
-                </tr>
-                <tr>
-                    <td class="summary-total-label">CGST - {{CGSTPct}}%</td>
-                    <td class="summary-total-value">{{CGSTAmount}}</td>
-                </tr>
-                <tr>
-                    <td class="summary-total-label">SGST - {{SGSTPct}}%</td>
-                    <td class="summary-total-value">{{SGSTAmount}}</td>
-                </tr>
-                <tr>
-                    <td class="summary-total-label" style="font-size: 11px;">Grand Total</td>
-                    <td class="summary-total-value" style="font-size: 11px;">{{GrandTotal}}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <!-- FOOTER CONTENT -->
-        <div class="footer-content">
-            <div class="info-item"><span class="bold">Service Period:</span> {{ServicePeriod}}</div>
-            <div class="info-item"><span class="bold">Notes :</span> {{ThankYouMessage}}</div>
-            <br>
-            <div class="info-item"><span class="bold">Bank Name :</span> {{BankName}}, {{BankBranch}}</div>
-            
-            <div class="info-grid" style="margin-top: 5px;">
-                <div><span class="bold">A/C No :</span> {{AccountNo}}</div>
-                <div><span class="bold">IFSC Code :</span> {{IFSCCode}}</div>
-                <div><span class="bold">PAN :</span> {{PAN}}</div>
-                <div><span class="bold">GSTIN :</span> {{CompanyGSTIN}}</div>
-                <div><span class="bold">EPF NO :</span> {{EPFNo}}</div>
-                <div><span class="bold">ESIC :</span> {{ESIC}}</div>
+            <!-- ══ SIGNATURE & STAMP ══ -->
+            <div class="submission-seal">
+                <div class="stamp-placeholder">OFFICIAL<br>STAMP</div>
+                <div class="authorized-sign-box">
+                    <div class="authorized-line">Authorized Signature</div>
+                </div>
             </div>
 
-            <ol class="declaration-ol">
-                <li>Declaration: We declare that this invoice shows the Actual value of the services described and that all particulars are true and correct.</li>
-                <li>Queries: If any, regarding the invoice, please contact us immediately.</li>
-                <li>"This invoice is subject to provisions of MSMED Act, 2006".</li>
-            </ol>
-
-            <div class="terms-box">
-                <div class="terms-head">Terms & Conditions</div>
-                <p>Please remit the payment in our current account through NEFT/ Account Payee Cheque in favour of "<span class="bold">{{CompanyName}}</span>"</p>
-                <p style="font-style: italic; margin-top: 8px; color: var(--gray-700);">Arrears in payments are subject to interest @12% p.a. Any discrepancy in this invoice must be notified to us in writing within five days of receipt, otherwise it will be treated as accepted. For any queries please contact : {{CompanyPhone}}</p>
+            <!-- ══ GLOBAL BRANDING FOOTER ══ -->
+            <div class="global-branding-footer">
+                <p>Global Office : {{GlobalOfficeAddress}}</p>
+                <p>Tel : {{GlobalOfficePhone}} &nbsp;|&nbsp; Fax : {{GlobalOfficeFax}}</p>
             </div>
-        </div>
 
-        <!-- SIG & STAMP -->
-        <div class="submission-seal">
-            <div class="stamp-placeholder">OFFICIAL STAMP</div>
-            <div class="authorized-sign-box">
-                <div class="authorized-line">Authorized Signature</div>
-            </div>
-        </div>
-
-        <!-- BRANDING FOOTER -->
-        <div class="global-branding-footer">
-            <p>Global Office : {{GlobalOfficeAddress}}</p>
-            <p>Tel : {{GlobalOfficePhone}} | Fax : {{GlobalOfficeFax}}</p>
-        </div>
-    </div>
+        </div><!-- /.invoice-container -->
+    </div><!-- /.invoice-wrapper -->
 </body>
 
 </html>

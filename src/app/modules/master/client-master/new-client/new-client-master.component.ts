@@ -98,7 +98,7 @@ export class NewClientMasterComponent implements OnInit {
       Code: this.fb.control('', [Validators.required]),
       Name: this.fb.control('', [Validators.required]),
       Address1: this.fb.control('', [Validators.required]),
-      Address2: this.fb.control('', [Validators.required]),
+      Address2: this.fb.control(''),
       PostCode: this.fb.control('', [Validators.required, Validators.pattern(PIN_CODE_PATTERN)]),
       City: this.fb.control('', [Validators.required]),
       IndianState: this.fb.control('', [Validators.required]),
@@ -108,7 +108,7 @@ export class NewClientMasterComponent implements OnInit {
       ShortName: this.fb.control(''),
       Phone: this.fb.control('', [Validators.required]),
       Fax: this.fb.control(''),
-      UserEmail: this.fb.control(''),
+      UserEmail: this.fb.control('', [Validators.email]),
       IsClientHeadQuarters: this.fb.control(false),
       AgreementStart: this.fb.control(''),
       AgreementEnd: this.fb.control(''),
@@ -122,35 +122,35 @@ export class NewClientMasterComponent implements OnInit {
       TANNumber: this.fb.control('', [Validators.pattern('^[A-Z]{4}[0-9]{5}[A-Z]{1}$')]),
       CINNumber: this.fb.control('', [Validators.pattern('^[A-Z]{3}[0-9]{4}[A-Z]{2}[0-9]{6}$')]),
       GSTRegistrationStatus: this.fb.control('unregistered'),
-      
+
       // Remove duplicate PINCode - using PostCode for Indian PIN
-      
+
       // Shipping Address Fields
       ShippingAddress1: this.fb.control(''),
       ShippingAddress2: this.fb.control(''),
       ShippingCity: this.fb.control(''),
       ShippingState: this.fb.control(''),
       ShippingPINCode: this.fb.control('', [Validators.pattern(PIN_CODE_PATTERN)]),
-      
+
       // Billing Address Fields
       BillingAddress1: this.fb.control(''),
       BillingAddress2: this.fb.control(''),
       BillingCity: this.fb.control(''),
       BillingState: this.fb.control(''),
       BillingPINCode: this.fb.control('', [Validators.pattern(PIN_CODE_PATTERN)]),
-      
+
       // Simplified Compliance Field
       ClientComplianceStatus: this.fb.control('non_compliance_client')
-    });   
+    });
     this.userAccessModel = {
       readAccess: false,
-      updateAccess:false,
-      deleteAccess:false,
-      createAccess:false,
-    } 
+      updateAccess: false,
+      deleteAccess: false,
+      createAccess: false,
+    }
   }
 
-  ngOnInit(): void {    
+  ngOnInit(): void {
     this.currentUser = sessionStorage.getItem('username')!;
     if (this.currentUser == 'null' || this.currentUser == undefined) {
       this._dataService.getUsername().subscribe((username) => {
@@ -158,13 +158,13 @@ export class NewClientMasterComponent implements OnInit {
       });
     }
     this.getUserAccessRights(this.currentUser, 'Client Master');
-    
+
     // Load all dynamic configurations
     this.loadAllConfigurations();
-    
+
     // Load Indian states for GST calculations
     this.loadIndianStates();
-    
+
     this._activatedRoute.queryParams.subscribe((params) => {
       if (params['code'] != undefined) {
         this.getClientMasterList(params['code'], params['status']);
@@ -199,7 +199,7 @@ export class NewClientMasterComponent implements OnInit {
     );
   }
 
-  getUserAccessRights(userName: string, screenName: string) {   
+  getUserAccessRights(userName: string, screenName: string) {
     this._masterService.getUserAccessRights(userName, screenName).subscribe(
       (data) => {
         console.log(data);
@@ -207,7 +207,7 @@ export class NewClientMasterComponent implements OnInit {
           this.userAccessModel.readAccess = data.Read
           this.userAccessModel.deleteAccess = data.Delete;
           this.userAccessModel.updateAccess = data.Update;
-          this.userAccessModel.createAccess = data.Create; 
+          this.userAccessModel.createAccess = data.Create;
         }
       },
       (error) => {
@@ -252,7 +252,7 @@ export class NewClientMasterComponent implements OnInit {
   }
   getAllClientMasterList(clientCode: string, status: string): void {
     console.log('Loading client dropdown data for:', clientCode, status);
-    
+
     if (clientCode === 'all') {
       // For new client creation, get all active clients
       this._masterService.getClientMsterListByStatus(status).subscribe(
@@ -284,7 +284,7 @@ export class NewClientMasterComponent implements OnInit {
     this.showLoadingSpinner = true;
     this._masterService.getClienthMaster(clientCode, status).subscribe((responseData) => {
       if (responseData != null) {
-        console.log('responseData',responseData)
+        console.log('responseData', responseData)
         this.clientCodeStatus = 'edit';
         this.clientForm.patchValue({
           Id: responseData[0].ID,
@@ -315,14 +315,14 @@ export class NewClientMasterComponent implements OnInit {
           TANNumber: responseData[0].TANNumber || '',
           CINNumber: responseData[0].CINNumber || '',
           GSTRegistrationStatus: responseData[0].GSTRegistrationStatus || 'unregistered',
-          
+
           // Shipping Address Fields
           ShippingAddress1: responseData[0].ShippingAddress1 || '',
           ShippingAddress2: responseData[0].ShippingAddress2 || '',
           ShippingCity: responseData[0].ShippingCity || '',
           ShippingState: responseData[0].ShippingState || '',
           ShippingPINCode: responseData[0].ShippingPINCode || '',
-          
+
           // Billing Address Fields
           BillingAddress1: responseData[0].BillingAddress1 || '',
           BillingAddress2: responseData[0].BillingAddress2 || '',
@@ -333,10 +333,10 @@ export class NewClientMasterComponent implements OnInit {
           // Compliance Status
           ClientComplianceStatus: responseData[0].ClientComplianceStatus || 'non_compliance_client'
         });
-        
+
         // Call GST status change handler to enable/disable fields appropriately
         this.onGSTRegistrationStatusChange({ value: responseData[0].GSTRegistrationStatus || 'unregistered' });
-        
+
       }
       if (responseData[0].isClientHeadQuarters == false) {
         this.clientForm.get('IsClientHeadQuarters')?.setValue(responseData[0].IsClientHeadQuarters);
@@ -347,14 +347,14 @@ export class NewClientMasterComponent implements OnInit {
       }
       if (responseData[0].AgreementStart == null) {
         this.clientForm.get('AgreementStart')?.setValue('');
-      }else{
+      } else {
         this.clientForm.get('AgreementStart')?.setValue(responseData[0].AgreementStart);
       }
       if (responseData[0].AgreementEnd == null) {
         this.clientForm.get('AgreementEnd')?.setValue('');
-      }else{
+      } else {
         this.clientForm.get('AgreementEnd')?.setValue(responseData[0].AgreementEnd);
-      }      
+      }
       this.showLoadingSpinner = false;
     },
 
@@ -376,7 +376,7 @@ export class NewClientMasterComponent implements OnInit {
 
   onGSTRegistrationStatusChange(event: any) {
     const gstStatus = event.value;
-    
+
     if (gstStatus === 'no_gst') {
       // Clear GST-related fields when "No GST" is selected
       this.clientForm.get('GSTIN')?.setValue('');
@@ -394,26 +394,26 @@ export class NewClientMasterComponent implements OnInit {
       const stateCode = gstin.substring(0, 2);
       console.log('GST State Code detected:', stateCode);
     }
-    
+
     // GSTIN validation logic removed - using simplified compliance
   }
-  
-  
+
+
   onPANChange(event: any) {
     // PAN validation logic removed - using simplified compliance
   }
-  
+
   onTANChange(event: any) {
     // TAN validation logic removed - using simplified compliance
   }
-  
+
   onCINChange(event: any) {
     // CIN validation logic removed - using simplified compliance
   }
-  
 
-  
-  
+
+
+
   loadIndianStates() {
     this._indianComplianceService.getIndianStatesFromAPI().subscribe(
       (states: any[]) => {
@@ -520,7 +520,7 @@ export class NewClientMasterComponent implements OnInit {
       });
       return;
     }
-    
+
     this.showLoadingSpinner = true;
     this.clientModel = this.clientForm.value;
 
@@ -533,36 +533,36 @@ export class NewClientMasterComponent implements OnInit {
     this.clientModel.LastUpdatedDate = this.clientForm.get('LastUpdatedDate')?.value ? this.clientForm.get('LastUpdatedDate')?.value : null;
     this.clientModel.Email = (this.clientForm.value.UserEmail == '' || this.clientForm.value.UserEmail == 'null') ? '' : this.clientForm.value.UserEmail;
 
-      // Update simplified compliance field
-      this.clientModel.ClientComplianceStatus = this.clientForm.get('ClientComplianceStatus')?.value || 'non_compliance_client';
+    // Update simplified compliance field
+    this.clientModel.ClientComplianceStatus = this.clientForm.get('ClientComplianceStatus')?.value || 'non_compliance_client';
 
-      this._masterService.saveAndUpdateClientMaster(this.clientModel).subscribe((response: any) => {
-        if (response.Success == 'Success') {
-          this.clientModel = response.Client;
-          this._dataService.setUsername(this.currentUser);
-          this._router.navigate(['/master/client-master']);
-          Swal.fire({
-            toast: true,
-            position: 'top',
-            showConfirmButton: false,
-            title: 'Success',
-            text: response.Message || `Successfully saved client details.`,
-            icon: 'success',
-            showCloseButton: false,
-            timer: 3000,
-          });
-        } else if (response.Success == 'Error') {
-          this.showLoadingSpinner = false;
-          Swal.fire({
-            title: 'Error',
-            text: response.Message || 'Failed to save client details',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          });
-        }
-      },
-        (error) => this.handleErrors(error)
-      );
+    this._masterService.saveAndUpdateClientMaster(this.clientModel).subscribe((response: any) => {
+      if (response.Success == 'Success') {
+        this.clientModel = response.Client;
+        this._dataService.setUsername(this.currentUser);
+        this._router.navigate(['/master/client-master']);
+        Swal.fire({
+          toast: true,
+          position: 'top',
+          showConfirmButton: false,
+          title: 'Success',
+          text: response.Message || `Successfully saved client details.`,
+          icon: 'success',
+          showCloseButton: false,
+          timer: 3000,
+        });
+      } else if (response.Success == 'Error') {
+        this.showLoadingSpinner = false;
+        Swal.fire({
+          title: 'Error',
+          text: response.Message || 'Failed to save client details',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      }
+    },
+      (error) => this.handleErrors(error)
+    );
   }
   clearClientDetails(): void {
     this.clientForm.reset();

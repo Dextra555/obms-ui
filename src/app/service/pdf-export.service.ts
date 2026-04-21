@@ -98,15 +98,15 @@ export class PdfExportService {
     details.forEach((item: any, index: number) => {
       const st = serviceTypes.find((x: any) => x.ServiceName === item.Description || x.serviceName === item.Description);
       const serviceName = item.Description || '';
-      const hsnCode = st?.HSNCode || st?.hsnCode || '998311';
+      const hsnCode = st?.HSNCode || st?.hsnCode || '';
       const description = st?.Description || st?.description || item.Description || '';
-      
+
       const rate = item.Rate || 0;
       const noOfHours = item.NoOfHours || 8;
       const noOfGuards = item.NoOfGuards || 0;
       const noOfDays = item.NoOfDays || 0;
       const monthAmt = rate * noOfHours * noOfGuards * noOfDays;
-      
+
       const taxAmt = parseFloat((item.TaxAmount || 0).toString().replace(/,/g, ''));
       totalMonth += monthAmt;
       totalTax += taxAmt;
@@ -583,7 +583,7 @@ export class PdfExportService {
     const columnStyles: any = {
       0: { halign: 'left' }
     };
-    
+
     // Add right alignment for all detail columns
     details.forEach((_, index) => {
       columnStyles[index + 1] = { halign: 'right' };
@@ -622,15 +622,15 @@ export class PdfExportService {
     const tableData = details.map((item: any, index: number) => {
       const st = serviceTypes.find((x: any) => x.ServiceName === item.Description || x.serviceName === item.Description);
       const serviceName = item.Description || '';
-      const hsnCode = st?.HSNCode || st?.hsnCode || '998311';
+      const hsnCode = st?.HSNCode || st?.hsnCode || '';
       const description = st?.Description || st?.description || item.Description || '';
-      
+
       const rate = item.Rate || 0;
       const noOfHours = item.NoOfHours || 8;
       const noOfGuards = item.NoOfGuards || 0;
       const noOfDays = item.NoOfDays || 0;
       const monthAmt = rate * noOfHours * noOfGuards * noOfDays;
-      
+
       const taxAmt = parseFloat((item.TaxAmount || 0).toString().replace(/,/g, ''));
       totalMonth += monthAmt;
       totalTax += taxAmt;
@@ -726,17 +726,17 @@ export class PdfExportService {
     // Check if there's a percentage field and calculate based on service amount
     const percentageField = fieldName + 'Percentage';
     let percentage = 0;
-    
+
     // Try to get percentage from detail object
     if (detail[percentageField] !== undefined && detail[percentageField] !== null) {
       percentage = parseFloat(detail[percentageField]) || 0;
     }
-    
+
     // Try to get percentage from CommercialBreakdown
     if (percentage === 0 && detail.CommercialBreakdown && detail.CommercialBreakdown[percentageField] !== undefined) {
       percentage = parseFloat(detail.CommercialBreakdown[percentageField]) || 0;
     }
-    
+
     // If percentage is found, calculate the value based on service amount (MonthTotal)
     if (percentage > 0) {
       const serviceAmount = parseFloat((detail.MonthTotal || 0).toString().replace(/,/g, ''));
@@ -786,17 +786,17 @@ export class PdfExportService {
   }
 
   private calculateStatutoryTotal(detail: any): number {
-    return this.getCommercialValue(detail, 'PF') + 
-           this.getCommercialValue(detail, 'ESI') + 
-           this.getCommercialValue(detail, 'ProfessionalTax');
+    return this.getCommercialValue(detail, 'PF') +
+      this.getCommercialValue(detail, 'ESI') +
+      this.getCommercialValue(detail, 'ProfessionalTax');
   }
 
   private calculateDirectCost(detail: any): number {
-    return this.calculateWagesTotal(detail) + 
-           this.calculateStatutoryTotal(detail) + 
-           this.getCommercialValue(detail, 'UniformCost') + 
-           this.getCommercialValue(detail, 'Others') + 
-           this.getCommercialValue(detail, 'AdministrationCharges');
+    return this.calculateWagesTotal(detail) +
+      this.calculateStatutoryTotal(detail) +
+      this.getCommercialValue(detail, 'UniformCost') +
+      this.getCommercialValue(detail, 'Others') +
+      this.getCommercialValue(detail, 'AdministrationCharges');
   }
 
   private calculateCommercials(row: any) {
@@ -866,11 +866,11 @@ export class PdfExportService {
     const uniform = 300;
     const statutoryTotal = directCost - uniform;
     const wagesTotal = Math.round(statutoryTotal / 1.1625);
-    
+
     // Use actual PF and ESI values from the data if available, otherwise use calculated values
-    const pf = this.getCommercialValue(row, 'PF') ;
-    const esi = this.getCommercialValue(row, 'ESI') ;
-    
+    const pf = this.getCommercialValue(row, 'PF');
+    const esi = this.getCommercialValue(row, 'ESI');
+
     const minWage = 11192;
     const bonus = 932;
     const allowance = wagesTotal - minWage - bonus;
@@ -1022,13 +1022,13 @@ export class PdfExportService {
       const serviceName = item.Description || '';
       const hsnCode = st?.HSNCode || st?.hsnCode || 'N/A';
       const description = st?.Description || st?.description || item.Description || '';
-      
+
       const rate = item.Rate || 0;
       const noOfHours = item.NoOfHours || 8;
       const noOfGuards = item.NoOfGuards || 0;
       const noOfDays = item.NoOfDays || 0;
       const monthAmt = rate * noOfHours * noOfGuards * noOfDays;
-      
+
       const taxAmt = parseFloat((item.TaxAmount || 0).toString().replace(/,/g, ''));
       totalMonth += monthAmt;
       totalTax += taxAmt;
@@ -1060,7 +1060,7 @@ export class PdfExportService {
         // Make summary rows bold
         if (data.section === 'body' && data.row.index >= tableData.length) {
           data.cell.styles.fontStyle = 'bold';
-          
+
           // Highlight the TOTAL ALL VALUES row with a different background
           if (data.row.index === tableData.length + summaryData.length - 1) {
             data.cell.styles.fillColor = [200, 200, 200]; // Darker gray for TOTAL ALL VALUES
@@ -1132,7 +1132,7 @@ export class PdfExportService {
     const columnStyles: any = {
       0: { halign: 'left' }
     };
-    
+
     details.forEach((_, index) => {
       columnStyles[index + 1] = { halign: 'right' };
     });
