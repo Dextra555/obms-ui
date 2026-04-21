@@ -39,6 +39,7 @@
                     <mat-form-field appearance="outline">
                         <mat-label>Client Name</mat-label>
                         <input type="text" formControlName="Name" matInput placeholder="" autocomplete="off">
+                        <mat-hint>Official company name as per GST/PAN</mat-hint>
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4" hidden>
@@ -61,7 +62,8 @@
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>GST Registration Status</mat-label>
-                        <mat-select formControlName="GSTRegistrationStatus" (selectionChange)="onGSTRegistrationStatusChange($event)">
+                        <mat-select formControlName="GSTRegistrationStatus"
+                            (selectionChange)="onGSTRegistrationStatusChange($event)">
                             <mat-option value="registered">Registered</mat-option>
                             <mat-option value="unregistered">Unregistered</mat-option>
                             <mat-option value="composition">Composition</mat-option>
@@ -72,13 +74,17 @@
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>GSTIN</mat-label>
-                        <input type="text" formControlName="GSTIN" matInput placeholder="29ABCDE1234F1ZV" autocomplete="off" (input)="onGSTINChange($event)">
+                        <input type="text" formControlName="GSTIN" matInput placeholder="29ABCDE1234F1ZV"
+                            autocomplete="off" (input)="onGSTINChange($event)">
+                        <mat-hint>Example: 29ABCDE1234F1Z5 (15 characters)</mat-hint>
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>PAN Number</mat-label>
-                        <input type="text" formControlName="PANNumber" matInput placeholder="ABCDE1234F" autocomplete="off" (input)="onPANChange($event)">
+                        <input type="text" formControlName="PANNumber" matInput placeholder="ABCDE1234F"
+                            autocomplete="off" (input)="onPANChange($event)">
+                        <mat-hint>Example: ABCDE1234F (10 characters)</mat-hint>
                         <mat-error *ngIf="clientForm.get('PANNumber')?.invalid && clientForm.get('PANNumber')?.touched">
                             Invalid PAN format (5 letters + 4 digits + 1 letter)
                         </mat-error>
@@ -87,7 +93,9 @@
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>TAN Number</mat-label>
-                        <input type="text" formControlName="TANNumber" matInput placeholder="ABCD12345B" autocomplete="off" (input)="onTANChange($event)">
+                        <input type="text" formControlName="TANNumber" matInput placeholder="ABCD12345B"
+                            autocomplete="off" (input)="onTANChange($event)">
+                        <mat-hint>Example: ABCD12345B (10 characters)</mat-hint>
                         <mat-error *ngIf="clientForm.get('TANNumber')?.invalid && clientForm.get('TANNumber')?.touched">
                             Invalid TAN format (4 letters + 5 digits + 1 letter)
                         </mat-error>
@@ -96,13 +104,15 @@
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>CIN Number</mat-label>
-                        <input type="text" formControlName="CINNumber" matInput placeholder="L12345MH2016PLC123456" autocomplete="off" (input)="onCINChange($event)">
+                        <input type="text" formControlName="CINNumber" matInput placeholder="L12345MH2016PLC123456"
+                            autocomplete="off" (input)="onCINChange($event)">
+                        <mat-hint>Example: L12345MH2016PLC123456 (21 characters)</mat-hint>
                         <mat-error *ngIf="clientForm.get('CINNumber')?.invalid && clientForm.get('CINNumber')?.touched">
                             Invalid CIN format
                         </mat-error>
                     </mat-form-field>
                 </div>
-                                            </div>
+            </div>
             <div class="row">
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
                     <h2><span>Address</span></h2>
@@ -122,7 +132,9 @@
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>PIN Code</mat-label>
-                        <input type="text" formControlName="PostCode" matInput placeholder="6-digit PIN code" autocomplete="off" maxlength="6">
+                        <input type="text" formControlName="PostCode" matInput placeholder="6-digit PIN code"
+                            autocomplete="off" maxlength="6">
+                        <mat-hint>Example: 600001</mat-hint>
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
@@ -152,19 +164,23 @@
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>Shipping Address Line1</mat-label>
-                        <input type="text" formControlName="ShippingAddress1" matInput placeholder="" autocomplete="off">
+                        <input type="text" formControlName="ShippingAddress1" matInput placeholder=""
+                            autocomplete="off">
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>Shipping Address Line2</mat-label>
-                        <input type="text" formControlName="ShippingAddress2" matInput placeholder="" autocomplete="off">
+                        <input type="text" formControlName="ShippingAddress2" matInput placeholder=""
+                            autocomplete="off">
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>Shipping PIN Code</mat-label>
-                        <input type="text" formControlName="ShippingPINCode" matInput placeholder="6-digit PIN code" autocomplete="off" maxlength="6">
+                        <input type="text" formControlName="ShippingPINCode" matInput placeholder="6-digit PIN code"
+                            autocomplete="off" maxlength="6">
+                        <mat-hint>Example: 600001</mat-hint>
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
@@ -206,7 +222,9 @@
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>Billing PIN Code</mat-label>
-                        <input type="text" formControlName="BillingPINCode" matInput placeholder="6-digit PIN code" autocomplete="off" maxlength="6">
+                        <input type="text" formControlName="BillingPINCode" matInput placeholder="6-digit PIN code"
+                            autocomplete="off" maxlength="6">
+                        <mat-hint>Example: 600001</mat-hint>
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
@@ -231,7 +249,9 @@
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>Phone No</mat-label>
-                        <input type="text" formControlName="Phone" matInput placeholder="+91-XXXXXXXXXX" autocomplete="off">
+                        <input type="text" formControlName="Phone" matInput placeholder="+91-XXXXXXXXXX"
+                            autocomplete="off">
+                        <mat-hint>Example: +91-9876543210</mat-hint>
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-4">
@@ -244,17 +264,22 @@
                     <mat-form-field appearance="outline">
                         <mat-label>Email</mat-label>
                         <input type="text" formControlName="UserEmail" matInput placeholder="" autocomplete="off">
+                        <mat-hint>Example: contact@company.com</mat-hint>
+                        <mat-error *ngIf="clientForm.get('UserEmail')?.invalid && clientForm.get('UserEmail')?.touched">
+                            Please enter a valid email address
+                        </mat-error>
                     </mat-form-field>
                 </div>
             </div>
-                                                            <div class="row">
+            <div class="row">
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
                     <h2><span>Compliance Details</span></h2>
                 </div>
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                     <div class="mb-3">
                         <label class="font-weight-bold">Client Compliance Status</label>
-                        <mat-radio-group aria-label="Compliance Status" formControlName="ClientComplianceStatus" class="mt-2">
+                        <mat-radio-group aria-label="Compliance Status" formControlName="ClientComplianceStatus"
+                            class="mt-2">
                             <div class="row">
                                 <div class="col-12 col-md-6">
                                     <div class="border rounded p-3 mb-3">
@@ -262,7 +287,8 @@
                                             <strong>Applicable</strong>
                                         </mat-radio-button>
                                         <div class="text-muted small">
-                                            All statutory compliance required including GST, PAN, TAN, CIN, PF/ESI, and labour laws.
+                                            All statutory compliance required including GST, PAN, TAN, CIN, PF/ESI, and
+                                            labour laws.
                                         </div>
                                     </div>
                                 </div>
@@ -272,7 +298,8 @@
                                             <strong>Not Applicable</strong>
                                         </mat-radio-button>
                                         <div class="text-muted small">
-                                            Exempt from compliance requirements - government entities, non-profits, educational institutions.
+                                            Exempt from compliance requirements - government entities, non-profits,
+                                            educational institutions.
                                         </div>
                                     </div>
                                 </div>
@@ -288,10 +315,7 @@
                 <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Date of Agreement Start</mat-label>
-                        <input 
-                            matInput 
-                            [matDatepicker]="picker" 
-                            formControlName="AgreementStart"
+                        <input matInput [matDatepicker]="picker" formControlName="AgreementStart"
                             (dateChange)="changeAgreementStart('change', $event)">
                         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                         <mat-datepicker #picker></mat-datepicker>
@@ -300,11 +324,9 @@
                 <div class="col-12 col-sm-12 col-md-6 col-lg-6">
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Date of Agreement End</mat-label>
-                        <input 
-                            matInput 
-                            [matDatepicker]="picker1" 
-                            formControlName="AgreementEnd"
-                            (dateChange)="changeAgreementEnd('change', $event)"> <!-- Ensure no required attribute is present -->
+                        <input matInput [matDatepicker]="picker1" formControlName="AgreementEnd"
+                            (dateChange)="changeAgreementEnd('change', $event)">
+                        <!-- Ensure no required attribute is present -->
                         <mat-datepicker-toggle matSuffix [for]="picker1"></mat-datepicker-toggle>
                         <mat-datepicker #picker1></mat-datepicker>
                     </mat-form-field>
@@ -315,10 +337,10 @@
                     <mat-label>Master Client</mat-label>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-6">
-                    <mat-checkbox formControlName="IsClientHeadQuarters"
-                        (change)="onCheckboxChange($event)">
+                    <mat-checkbox formControlName="IsClientHeadQuarters" (change)="onCheckboxChange($event)">
                     </mat-checkbox>
-                    <mat-form-field appearance="outline" [ngClass]="{'w-100' : !clientForm.get('IsClientHeadQuarters')?.value}">
+                    <mat-form-field appearance="outline"
+                        [ngClass]="{'w-100' : !clientForm.get('IsClientHeadQuarters')?.value}">
                         <mat-label>Super Client Code</mat-label>
                         <mat-select formControlName="SuperClientCode">
                             <mat-option *ngFor="let client of clientModelDropdown" [value]="client.Code">
@@ -345,9 +367,9 @@
                         <button class="btn wlt-c-furg-btn-gray mr-3" mat-dialog-close (click)="clearClientDetails()">
                             Clear</button>
                         <button *ngIf="this.userAccessModel.createAccess == true || this.userAccessModel.updateAccess == true 
-                        || currentUser == 'superadmin'" 
-                        class="btn wlt-c-furg-btn-primary" (click)="savebuttonClick()"
-                            [disabled]="clientForm.invalid"> {{clientForm.get('Id')?.value === 0 ? 'Save' : 'Update' }}</button>
+                        || currentUser == 'superadmin'" class="btn wlt-c-furg-btn-primary" (click)="savebuttonClick()"
+                            [disabled]="clientForm.invalid"> {{clientForm.get('Id')?.value === 0 ? 'Save' : 'Update'
+                            }}</button>
                     </div>
                 </div>
             </div>

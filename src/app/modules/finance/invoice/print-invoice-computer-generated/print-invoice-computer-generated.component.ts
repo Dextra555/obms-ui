@@ -122,15 +122,15 @@ export class PrintInvoiceComputerGeneratedComponent implements OnInit {
     if (data.dataRows && data.dataRows.length > 0) {
       data.dataRows.forEach((row: any, index: number) => {
         const sno = (index + 1).toString();
-        const hsnCode = this.escapeHtml(row.hsnSacCode || row.hsn_code || '9985');
+        const hsnCode = this.escapeHtml(row.hsnSacCode || row.hsn_code || '');
         const description = this.escapeHtml(row.description || 'Security Services');
         const duties = this.escapeHtml(row.dutiesTaxes || row.duties || '');
         const qty = parseFloat(row.units || row.qty || 0).toFixed(0);
-        
+
         // Use Indian formatting for rate and amount
         const rateFormatted = formatCurrency(row.rate || 0);
         const amountFormatted = formatCurrency(row.amount || 0);
-        
+
         dataRowsHtml += `
         <tr>
             <td class="text-center">${sno}</td>
@@ -176,7 +176,7 @@ export class PrintInvoiceComputerGeneratedComponent implements OnInit {
       // Work Order Details
       .replace(/{{WorkOrderNo}}/g, this.escapeHtml(invoice.workOrderNoFormatted || 'N/A'))
       .replace(/{{WorkOrderDate}}/g, this.escapeHtml(invoice.workOrderDate || 'N/A'))
-      .replace(/{{SACCode}}/g, this.escapeHtml(invoice.sacCode || '998715'))
+      .replace(/{{SACCode}}/g, this.escapeHtml(invoice.sacCode || ''))
       // Statutory Details
       .replace(/{{PAN}}/g, this.escapeHtml(statutory.pan || company.pan || 'AACCF8611P'))
       .replace(/{{GSTIN}}/g, this.escapeHtml(statutory.gstin || company.gstin || ''))
@@ -198,16 +198,18 @@ export class PrintInvoiceComputerGeneratedComponent implements OnInit {
 
     // NEW: Handle GST based on intra-state or inter-state
     if (isIntraState) {
-      // Intra-state: Show CGST (9%) + SGST (9%)
+      // Intra-state: Show CGST (9%) + SGST (9%), hide IGST row
       html = html
         .replace(/{{CGSTPct}}/g, (totals.cgstPct || 9).toString())
         .replace(/{{SGSTPct}}/g, (totals.sgstPct || 9).toString())
         .replace(/{{CGSTAmount}}/g, formatCurrency(totals.cgstAmount || 0))
         .replace(/{{SGSTAmount}}/g, formatCurrency(totals.sgstAmount || 0))
-        .replace(/{{IGSTPct}}/g, (totals.igstPct || 18).toString())
+        .replace(/{{IGSTPct}}/g, '0')
         .replace(/{{IGSTAmount}}/g, '₹ 0.00');
+      // Hide IGST row for intra-state using class selector
+      html = html.replace(/<tr[^>]*class="igst-row"[^>]*>[\s\S]*?<\/tr>/gi, '');
     } else {
-      // Inter-state: Show IGST (18%) only
+      // Inter-state: Show IGST (18%) only, hide CGST/SGST rows
       html = html
         .replace(/{{CGSTPct}}/g, '0')
         .replace(/{{SGSTPct}}/g, '0')
@@ -215,6 +217,9 @@ export class PrintInvoiceComputerGeneratedComponent implements OnInit {
         .replace(/{{SGSTAmount}}/g, '₹ 0.00')
         .replace(/{{IGSTPct}}/g, (totals.igstPct || 18).toString())
         .replace(/{{IGSTAmount}}/g, formatCurrency(totals.igstAmount || 0));
+      // Hide CGST and SGST rows for inter-state using class selectors
+      html = html.replace(/<tr[^>]*class="cgst-row"[^>]*>[\s\S]*?<\/tr>/gi, '');
+      html = html.replace(/<tr[^>]*class="sgst-row"[^>]*>[\s\S]*?<\/tr>/gi, '');
     }
 
     // Continue with remaining placeholders

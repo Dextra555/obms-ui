@@ -33,9 +33,21 @@
         }
 
         @media print {
-            body { padding: 0; margin: 0; }
-            .invoice-container { border: var(--border-thick) !important; width: 100% !important; margin: 0 !important; }
-            @page { size: A4; margin: 1cm; }
+            body {
+                padding: 0;
+                margin: 0;
+            }
+
+            .invoice-container {
+                border: var(--border-thick) !important;
+                width: 100% !important;
+                margin: 0 !important;
+            }
+
+            @page {
+                size: A4;
+                margin: 1cm;
+            }
         }
 
         .invoice-container {
@@ -49,42 +61,46 @@
         /* Header Section */
         .header-top {
             display: flex;
-            padding: 15px;
+            padding: 10px 5px;
             border-bottom: var(--border-thin);
             align-items: flex-start;
+            gap: 10px;
         }
 
         .logo-section {
             width: 25%;
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
 
         .company-logo {
-            max-width: 140px;
+            max-width: 120px;
             height: auto;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            object-fit: contain;
         }
 
         .tagline {
-            font-size: 11px;
-            font-weight: 500;
+            font-size: 10px;
+            font-weight: 600;
             color: var(--gray-500);
             font-style: italic;
+            text-align: center;
+            letter-spacing: 0.5px;
         }
 
         .address-section {
             flex: 1;
-            padding: 0 15px;
+            padding: 0 5px;
             border-left: var(--border-thin);
             border-right: var(--border-thin);
-            line-height: 1.4;
         }
 
         .company-name {
             font-size: 18px;
             font-weight: 700;
-            margin-bottom: 6px;
+            margin-bottom: 3px;
             color: #000;
         }
 
@@ -104,18 +120,17 @@
         .cert-icons-row {
             display: flex;
             gap: 8px;
+            align-items: center;
         }
 
         .cert-thumb {
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
             border: 0.5px solid #ddd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 7px;
             border-radius: 50%;
-            background: #f9f9f9;
+            background: #fff;
+            padding: 3px;
         }
 
         .iso-box {
@@ -129,36 +144,41 @@
         /* Title Area */
         .main-title-bar {
             text-align: center;
-            padding: 5px;
+            padding: 8px 12px;
             border-bottom: var(--border-thin);
             background: var(--bg-light);
         }
 
         .main-title-bar h1 {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            margin-bottom: 4px;
         }
 
         .sub-title {
             font-size: 9px;
             font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* Invoice Meta Bar */
         .invoice-meta-bar {
             display: flex;
             border-bottom: var(--border-thin);
+            min-height: 50px;
         }
 
         .meta-to {
-            width: 60px;
-            padding: 6px 10px;
+            width: 80px;
+            padding: 8px 12px;
             font-weight: 700;
+            font-size: 10px;
             border-right: var(--border-thin);
             display: flex;
             align-items: center;
+            background: var(--bg-light);
         }
 
         .meta-inv-details {
@@ -168,23 +188,39 @@
         }
 
         .inv-cell-box {
-            width: 200px;
+            width: 220px;
             border-left: var(--border-thin);
         }
 
         .inv-cell-row {
-            padding: 6px 10px;
+            padding: 8px 12px;
             display: flex;
             justify-content: space-between;
+            font-size: 9px;
         }
 
-        .inv-cell-row:first-child { border-bottom: var(--border-thin); }
-        .inv-cell-row span:first-child { font-weight: 700; }
+        .inv-cell-row:first-child {
+            border-bottom: var(--border-thin);
+        }
+
+        .inv-cell-row span:first-child {
+            font-weight: 700;
+            color: var(--gray-700);
+        }
+
+        .inv-cell-row span:last-child {
+            font-weight: 600;
+        }
 
         /* Party Details Section */
         .parties-grid {
             display: flex;
             border-bottom: var(--border-thin);
+            min-height: 100px;
+        }
+
+        p {
+            margin-bottom: 0.3rem;
         }
 
         .party-col {
@@ -193,37 +229,49 @@
             flex-direction: column;
         }
 
-        .party-col:first-child { border-right: var(--border-thin); }
+        .party-col:first-child {
+            border-right: var(--border-thin);
+        }
 
         .party-head {
             background: var(--bg-light);
-            padding: 6px 10px;
+            padding: 8px 12px;
             border-bottom: var(--border-thin);
             font-weight: 700;
             font-size: 9px;
             text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .party-body {
-            padding: 10px;
-            min-height: 80px;
+            padding: 12px;
+            min-height: 85px;
+            line-height: 1.5;
         }
 
         .party-body strong {
             display: block;
             font-size: 11px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .party-body p {
+            margin-bottom: 4px;
+            font-size: 9px;
+            color: var(--gray-700);
         }
 
         /* Work Order Bar */
         .work-order-full-bar {
             border-bottom: var(--border-thin);
-            padding: 6px;
+            padding: 8px 12px;
             text-align: center;
             font-weight: 700;
             background: var(--bg-light);
-            font-size: 11px;
+            font-size: 10px;
+            letter-spacing: 0.3px;
         }
 
         /* Main Table Styles */
@@ -243,7 +291,9 @@
             text-align: center;
         }
 
-        .invoice-table th:last-child { border-right: none; }
+        .invoice-table th:last-child {
+            border-right: none;
+        }
 
         .invoice-table td {
             border-right: var(--border-thin);
@@ -252,7 +302,9 @@
             vertical-align: top;
         }
 
-        .invoice-table td:last-child { border-right: none; }
+        .invoice-table td:last-child {
+            border-right: none;
+        }
 
         /* GST Meta row above table body */
         .gst-meta-row td {
@@ -279,29 +331,35 @@
 
         /* Footer Info Styles */
         .footer-content {
-            padding: 12px;
+            padding: 15px 12px;
             border-bottom: var(--border-thin);
         }
 
         .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px 20px;
             margin-bottom: 15px;
         }
 
         .info-item {
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            font-size: 9px;
+            line-height: 1.4;
         }
 
-        .info-label { font-weight: 700; }
+        .info-label {
+            font-weight: 700;
+        }
 
         .declaration-ol {
             margin: 10px 0 15px 20px;
             font-size: 9px;
         }
 
-        .declaration-ol li { margin-bottom: 2px; }
+        .declaration-ol li {
+            margin-bottom: 2px;
+        }
 
         .terms-box {
             margin-top: 15px;
@@ -309,7 +367,11 @@
             border-top: var(--border-thin);
         }
 
-        .terms-head { font-weight: 700; text-decoration: underline; margin-bottom: 5px; }
+        .terms-head {
+            font-weight: 700;
+            text-decoration: underline;
+            margin-bottom: 5px;
+        }
 
         /* Signature & Stamp */
         .submission-seal {
@@ -358,35 +420,47 @@
         }
 
         /* Helpers */
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .bold { font-weight: 700; }
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: 700;
+        }
     </style>
 </head>
 
 <body>
     <div class="invoice-container">
-        <div style="text-align: center; font-size: 18px; font-weight: bold; padding: 10px; border-bottom: 1.5px solid #000;">FreightWatch G Security Services India Pvt. Ltd</div>
         <!-- HEADER -->
         <div class="header-top">
             <div class="logo-section">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="Logo" class="company-logo" id="company-logo">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+                    alt="Logo" class="company-logo" id="company-logo">
                 <div class="tagline">Securing Global Trade</div>
             </div>
             <div class="address-section">
-                <h2 class="company-name">{{CompanyName}}</h2>
+                <h2 class="company-name">FreightWatch G Security Services India Pvt. Ltd.</h2>
                 <div class="contact-info">
-                    <p><strong>India Head Office :</strong></p>
-                    <p>{{CompanyAddress}}</p>
-                    <p>Tel : {{CompanyPhone}} | E-mail : {{CompanyEmail}}</p>
-                    <p>Co.Reg. /CIN No. : {{CINNo}} | Website: {{CompanyWebsite}}</p>
+                    <p><strong>India Head Office :</strong> No.397 (old no.281)</p>
+                    <p>Anna Salai, Precision Plaza,</p>
+                    <p>1st Floor, Teynampet, Tamilnadu,</p>
+                    <p>Chennai, India - 600018</p>
+                    <p>Tel : +91 4440050684</p>
+                    <p>E-mail : info@fwgindia.com</p>
+                    <p>Co.Reg. /CIN No. : U74920TN2005PTC057775</p>
+                    <p>Website: www.fwgindia.com</p>
                 </div>
             </div>
             <div class="cert-section">
                 <div class="cert-icons-row">
-                    <div class="cert-thumb">IAF</div>
-                    <div class="cert-thumb">UAF</div>
-                    <div class="cert-thumb">BMG</div>
+                    <img src="assets/img/iaf.jfif" alt="IAF" class="cert-thumb">
+                    <img src="assets/img/uaf.jfif" alt="UAF" class="cert-thumb">
+                    <img src="assets/img/bmg.jfif" alt="BMG" class="cert-thumb">
                 </div>
                 <div class="iso-box">CERTIFIED ISO 9001 : 2015</div>
             </div>
@@ -443,6 +517,13 @@
         <!-- TABLE -->
         <table class="invoice-table">
             <thead>
+                <tr class="gst-meta-row">
+                    <td colspan="7" style="text-align: center;">
+                        <span>GST No.: {{BillingGSTIN}}</span> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+                        <span>State : {{BillingState}}</span> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+                        <span>Code : {{SACCode}}</span>
+                    </td>
+                </tr>
                 <tr>
                     <th style="width: 40px;">S.No</th>
                     <th>Particulars</th>
@@ -454,34 +535,38 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="gst-meta-row">
-                    <td colspan="7">
-                        <span>GST No.: {{BillingGSTIN}}</span> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 
-                        <span>State : {{BillingState}}</span> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; 
-                        <span>Code : {{SACCode}}</span>
-                    </td>
-                </tr>
                 {{DataRows}}
-                
+
                 <!-- SUMMARY -->
                 <tr>
-                    <td colspan="5" rowspan="4" style="vertical-align: bottom; border-top: var(--border-thin);">
-                        <p style="padding: 10px;"><span class="bold">Rupees :</span> {{AmountInWords}}</p>
-                    </td>
+                    <td colspan="5"></td>
                     <td class="summary-total-label">TOTAL</td>
                     <td class="summary-total-value">{{Subtotal}}</td>
                 </tr>
-                <tr>
+                <tr class="cgst-row">
+                    <td colspan="5"></td>
                     <td class="summary-total-label">CGST - {{CGSTPct}}%</td>
                     <td class="summary-total-value">{{CGSTAmount}}</td>
                 </tr>
-                <tr>
+                <tr class="sgst-row">
+                    <td colspan="5"></td>
                     <td class="summary-total-label">SGST - {{SGSTPct}}%</td>
                     <td class="summary-total-value">{{SGSTAmount}}</td>
                 </tr>
-                <tr>
+                <tr class="igst-row">
+                    <td colspan="5"></td>
+                    <td class="summary-total-label">IGST - {{IGSTPct}}%</td>
+                    <td class="summary-total-value">{{IGSTAmount}}</td>
+                </tr>
+                <tr style="border-top: var(--border-thin); padding: 10px;">
+                    <td colspan="5"></td>
                     <td class="summary-total-label" style="font-size: 11px;">Grand Total</td>
                     <td class="summary-total-value" style="font-size: 11px;">{{GrandTotal}}</td>
+                </tr>
+                <tr>
+                    <td colspan="7" style="vertical-align: bottom;">
+                        <span class="bold">Rupees :</span> {{AmountInWords}}
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -492,7 +577,7 @@
             <div class="info-item"><span class="bold">Notes :</span> {{ThankYouMessage}}</div>
             <br>
             <div class="info-item"><span class="bold">Bank Name :</span> {{BankName}}, {{BankBranch}}</div>
-            
+
             <div class="info-grid" style="margin-top: 5px;">
                 <div><span class="bold">A/C No :</span> {{AccountNo}}</div>
                 <div><span class="bold">IFSC Code :</span> {{IFSCCode}}</div>
@@ -503,15 +588,20 @@
             </div>
 
             <ol class="declaration-ol">
-                <li>Declaration: We declare that this invoice shows the Actual value of the services described and that all particulars are true and correct.</li>
+                <li>Declaration: We declare that this invoice shows the Actual value of the services described and that
+                    all particulars are true and correct.</li>
                 <li>Queries: If any, regarding the invoice, please contact us immediately.</li>
                 <li>"This invoice is subject to provisions of MSMED Act, 2006".</li>
             </ol>
 
             <div class="terms-box">
                 <div class="terms-head">Terms & Conditions</div>
-                <p>Please remit the payment in our current account through NEFT/ Account Payee Cheque in favour of "<span class="bold">{{CompanyName}}</span>"</p>
-                <p style="font-style: italic; margin-top: 8px; color: var(--gray-700);">Arrears in payments are subject to interest @12% p.a. Any discrepancy in this invoice must be notified to us in writing within five days of receipt, otherwise it will be treated as accepted. For any queries please contact : {{CompanyPhone}}</p>
+                <p>Please remit the payment in our current account through NEFT/ Account Payee Cheque in favour of
+                    "<span class="bold">{{CompanyName}}</span>"</p>
+                <p style="font-style: italic; margin-top: 8px; color: var(--gray-700);">Arrears in payments are subject
+                    to interest @12% p.a. Any discrepancy in this invoice must be notified to us in writing within five
+                    days of receipt, otherwise it will be treated as accepted. For any queries please contact :
+                    {{CompanyPhone}}</p>
             </div>
         </div>
 
