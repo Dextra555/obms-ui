@@ -43,36 +43,37 @@
     .invoice-container {
         background: white;
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         padding: 20px;
     }
-    
+
     .invoice-display {
         background: white;
         border-radius: 8px;
         overflow: hidden;
     }
-    
+
     .alert {
         border-radius: 8px;
         border-left: 4px solid #17a2b8;
     }
-    
+
     @media print {
+
         .wlt-c-furg-content-header,
         .container-fluid.mb-3,
         .row.mb-3,
         .no-print {
             display: none !important;
         }
-        
+
         .invoice-container {
             box-shadow: none !important;
             margin: 0 !important;
             padding: 0 !important;
             border-radius: 0 !important;
         }
-        
+
         .invoice-display {
             box-shadow: none !important;
             margin: 0 !important;

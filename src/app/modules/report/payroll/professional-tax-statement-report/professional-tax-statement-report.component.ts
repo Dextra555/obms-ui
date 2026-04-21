@@ -23,7 +23,7 @@ export class ProfessionalTaxStatementReportComponent implements OnInit {
   warningMessage: string = '';
   errorMessage: string = '';
   successMessage: string = '';
-  
+
   branchModel!: BranchModel[];
   clientModel!: ClientModel[];
   currentUser: string = '';
@@ -52,10 +52,10 @@ export class ProfessionalTaxStatementReportComponent implements OnInit {
   reportTemplate: string = '';
 
   constructor(
-    public sanitizer: DomSanitizer, 
-    private fb: FormBuilder, 
+    public sanitizer: DomSanitizer,
+    private fb: FormBuilder,
     private http: HttpClient,
-    private _dataService: DatasharingService, 
+    private _dataService: DatasharingService,
     private _masterService: MastermoduleService,
     private _payrollService: PayrollModuleService,
     private router: Router
@@ -79,7 +79,7 @@ export class ProfessionalTaxStatementReportComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) this._dataService.scrollToTop();
     });
-    
+
     this.currentUser = sessionStorage.getItem('username')!;
     if (!this.currentUser) {
       this._dataService.getUsername().subscribe((username) => { this.currentUser = username; });
@@ -184,7 +184,9 @@ export class ProfessionalTaxStatementReportComponent implements OnInit {
     if (apiData?.totals) {
       const t = apiData.totals;
       allData['TotalGross'] = fmt(t['TotalGross'] ?? t['totalGross'] ?? 0);
-      allData['TotalPT']    = fmt(t['TotalPT']    ?? t['totalPT']    ?? 0);
+      allData['TotalPT'] = fmt(t['TotalPT'] ?? t['totalPT'] ?? 0);
+      allData['TotalEmployees'] = t['TotalEmployees'] ?? 0;
+      allData['TotalApplicable'] = t['TotalApplicable'] ?? 0;
     }
 
     // Replace {{Key}} and {{Key || 'default'}} placeholders
@@ -195,9 +197,9 @@ export class ProfessionalTaxStatementReportComponent implements OnInit {
         return defaultVal !== undefined ? defaultVal : '';
       });
 
-    let rowHtml = '<tr><td colspan="7" style="text-align:center;color:#888;">No records found for the selected period.</td></tr>';
+    let rowHtml = '<tr><td colspan="9" style="text-align:center;color:#888;">No records found for the selected period.</td></tr>';
     if (apiData?.rows && apiData.rows.length > 0) {
-      rowHtml = apiData.rows.map((r: any, i: number) => this.buildRow(r, i, meta.State)).join('');
+      rowHtml = apiData.rows.map((r: any, i: number) => this.buildRow(r, i)).join('');
     }
     filled = filled.replace(/{{DataRows}}/g, rowHtml);
 
@@ -206,17 +208,23 @@ export class ProfessionalTaxStatementReportComponent implements OnInit {
     return filled;
   }
 
-  private buildRow(row: any, index: number, stateName: string): string {
-    // Backend returns: empCode, empName, gross, pt, panNo
+  private buildRow(row: any, index: number): string {
+    // Backend returns: sno, empCode, empName, panNo, state, daysWorked, gross, pt, isApplicable
     const fmt = (v: any) => (v != null ? Number(v).toLocaleString('en-IN') : '0');
     return `<tr>
       <td class="text-center">${row.sno ?? index + 1}</td>
       <td>${row.empCode ?? row.employeeCode ?? ''}</td>
       <td>${row.empName ?? row.employeeName ?? ''}</td>
-      <td>${row.panNo ?? row.ptNo ?? ''}</td>
-      <td>${row.state ?? stateName ?? ''}</td>
+      <td>${row.panNo ?? ''}</td>
+      <td>${row.state ?? ''}</td>
+      <td class="text-center">${row.daysWorked ?? 0}</td>
       <td class="text-right">${fmt(row.gross ?? row.grossSalary)}</td>
       <td class="text-right">${fmt(row.pt ?? row.ptAmount)}</td>
+      <td class="text-center">
+        <span class="badge ${row.isApplicable ? 'badge-success' : 'badge-warning'}">
+          ${row.isApplicable ? 'Yes' : 'No'}
+        </span>
+      </td>
     </tr>`;
   }
 
