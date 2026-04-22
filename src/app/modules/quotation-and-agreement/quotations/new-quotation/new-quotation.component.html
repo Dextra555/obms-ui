@@ -106,6 +106,14 @@
 
         </div>
 
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+
+          <button type="button" class="btn wlt-c-furg-btn-secondary mr-3" (click)="chkNormal('N')"> Normal</button>
+
+          <button type="button" class="btn wlt-c-furg-btn-secondary mr-3" (click)="chkLumpSum('L')"> Lump sum</button>
+
+        </div>
+
       </div>
 
       <div class="mt-2">
@@ -120,13 +128,13 @@
 
               <th class="mat-header-cell">Type</th>
 
-              <th class="mat-header-cell">Guards</th>
-
               <th class="mat-header-cell">Per Month</th>
 
-              <th class="mat-header-cell">Per Day Rate</th>
+              <th class="mat-header-cell">Guards</th>
 
-              <th class="mat-header-cell">Per Hours</th>
+              <th class="mat-header-cell">Per Hours Rate</th>
+
+              <th class="mat-header-cell">Per Day</th>
 
               <th class="mat-header-cell">Working<br/> Hours</th>
 
@@ -180,9 +188,9 @@
 
               <td class="mat-cell">
 
-                <mat-form-field appearance="outline" style="width: 45px !important;">
+                <mat-form-field appearance="outline" style="width: 80px !important;">
 
-                  <input type="text" formControlName="NoOfGuards" (input)="DetailRowChange()" matInput placeholder=""
+                  <input type="text" formControlName="PerMonth" (input)="onPerMonthChange()" matInput placeholder=""
 
                          autocomplete="off">
 
@@ -192,9 +200,9 @@
 
               <td class="mat-cell">
 
-                <mat-form-field appearance="outline" style="width: 80px !important;">
+                <mat-form-field appearance="outline" style="width: 45px !important;">
 
-                  <input type="text" formControlName="PerMonth" (input)="onPerMonthChange()" matInput placeholder=""
+                  <input type="text" formControlName="NoOfGuards" (input)="DetailRowChange()" matInput placeholder=""
 
                          autocomplete="off">
 
@@ -222,13 +230,13 @@
 
                          autocomplete="off">
 
-                  <button type="button" mat-icon-button matSuffix (click)="openCommercialDetails()" matTooltip="Commercial Breakdown">
-
-                    <mat-icon>payments</mat-icon>
-
-                  </button>
-
                 </mat-form-field>
+
+                <button type="button" class="btn btn-sm btn-info ml-1 wlt-c-furg-btn-enhanced" (click)="openCommercialDetails()">
+
+                  <i class="fas fa-calculator"></i> PER HEAD
+
+                </button>
 
               </td>
 
@@ -236,7 +244,7 @@
 
                 <mat-form-field appearance="outline" style="width: 45px !important;">
 
-                  <input type="text" formControlName="NoOfHours" (input)="DetailRowChange()" matInput placeholder=""
+                  <input type="text" formControlName="NoOfHours" (input)="onNoOfHoursChange()" matInput placeholder=""
 
                          autocomplete="off">
 
@@ -486,7 +494,7 @@
 
               <ng-container matColumnDef="PerDay">
 
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Per Hours</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Per Day</th>
 
                 <td mat-cell *matCellDef="let element" class="text-left"> {{element.Rate}} </td>
 
@@ -494,7 +502,7 @@
 
               <ng-container matColumnDef="Rate">
 
-                <th mat-header-cell *matHeaderCellDef mat-sort-header> Per Day Rate</th>
+                <th mat-header-cell *matHeaderCellDef mat-sort-header> Per Hours Rate</th>
 
                 <td mat-cell *matCellDef="let element" class="text-left"> {{element.PerDay}} </td>
 

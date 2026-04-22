@@ -56,9 +56,9 @@ export interface IItemDetails {
 
   NoOfGuards: number,
 
-  PerDay?: number,
+  PerDay: number,
 
-  PerMonth?: number,
+  PerMonth: number,
 
   Rate: number,
 
@@ -240,7 +240,14 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
-    this.ID = this.activatedRoute.snapshot.params['ID'];
+    this.activatedRoute.params.subscribe(params => {
+      this.ID = params['ID'];
+      
+      // Trigger edit mode if ID is present
+      if (this.ID != 0 && this.ID != undefined) {
+        this.loadAgreementForEdit(this.ID);
+      }
+    });
 
     this.frm = this.fb.group({
 
@@ -410,7 +417,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
-      // 2. Handle Quotation Forwarding or Agreement Edit
+      // 2. Handle Quotation Forwarding
 
       this.activatedRoute.queryParams.subscribe(params => {
 
@@ -420,41 +427,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
           this.loadQuotationData(qId);
 
-        } else if (this.ID != 0 && this.ID != undefined) {
-
-          // Edit Mode
-
-          this.isEdit = true;
-
-          this.service.getAgreementById(this.ID).subscribe((d: any) => {
-
-            let res = d['Result'] || d;
-
-            let agreement = res['agreement'] || res['Agreement'];
-
-            let agreementDetails = res['agreementDetails'] || res['AgreementDetails'] || res['details'] || [];
-
-
-
-            this.frm.patchValue(agreement);
-
-            if (agreement.Branch) {
-
-              this.getClientsByBranchID(agreement.Branch);
-
-            }
-
-
-
-            this.details = agreementDetails.map((row: any) => this.mapItemDetails(row));
-
-            this.detailDataSource();
-
-            this.hideLoadingSpinner();
-
-          });
-
-        } else {
+        } else if (this.ID == 0 || this.ID == undefined) {
 
           this.hideLoadingSpinner();
 
@@ -692,6 +665,12 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
+    // Sync PerDay and PerMonth values from form to details array
+    this.details.forEach((detail: any) => {
+      detail.PerDay = parseFloat(detail.PerDay) || 0;
+      detail.PerMonth = parseFloat(detail.PerMonth) || 0;
+    });
+
     // Rename nested form group 'details' to 'agreementDetails' as expected by backend
 
     data['agreementDetails'] = this.details;
@@ -708,58 +687,108 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     data['AgreementDate'] = this.returnDate(this.frm.get('AgreementDate')?.value);
 
-    let msg = "";
+    console.log('isEdit:', this.isEdit, 'ID:', this.ID, 'AgreementDate:', data['AgreementDate']);
 
-    this.service.save(data).subscribe({
-
-      next: (d: any) => {
-
-        if (this.isEdit) {
-
-          msg = 'Successfully Updated Agreement Details';
-
-        } else {
-
-          msg = 'Successfully Saved Agreement Details';
-
+    // Validation: Check if agreement has invoices and prevent editing in the same month
+    if (this.isEdit && this.ID > 0) {
+      console.log('Validation triggered - checking final invoice date...');
+      this.service.getFinalInvoiceDate(this.ID).subscribe((finalInvoiceDate: any) => {
+        console.log('Final Invoice Date response:', finalInvoiceDate);
+        console.log('Is array:', Array.isArray(finalInvoiceDate), 'Length:', finalInvoiceDate?.length);
+        
+        // Handle array response from backend
+        let hasInvoiceInNewMonth = false;
+        let newAgreementDate = new Date(data['AgreementDate']);
+        
+        if (Array.isArray(finalInvoiceDate) && finalInvoiceDate.length > 0) {
+          console.log('All invoices in array:', finalInvoiceDate);
+          
+          // Check if any invoice is in the same month as the new agreement date
+          const newMonth = newAgreementDate.getMonth();
+          const newYear = newAgreementDate.getFullYear();
+          
+          for (let invoice of finalInvoiceDate) {
+            let invoiceDate: Date | null = null;
+            if (invoice && invoice.InvoiceDate) {
+              invoiceDate = new Date(invoice.InvoiceDate);
+            } else if (invoice && invoice.InvoicePeriod) {
+              invoiceDate = new Date(invoice.InvoicePeriod);
+            } else if (invoice && typeof invoice === 'string') {
+              invoiceDate = new Date(invoice);
+            } else if (invoice && invoice.Date) {
+              invoiceDate = new Date(invoice.Date);
+            }
+            
+            if (invoiceDate) {
+              const invoiceMonth = invoiceDate.getMonth();
+              const invoiceYear = invoiceDate.getFullYear();
+              
+              console.log('Invoice date:', invoiceDate, 'Invoice Year/Month:', invoiceYear, invoiceMonth, 'New Year/Month:', newYear, newMonth);
+              
+              // Check if invoice is in the same month as new agreement date
+              if (invoiceYear === newYear && invoiceMonth === newMonth) {
+                hasInvoiceInNewMonth = true;
+                console.log('Found invoice in same month as new agreement date');
+                break;
+              }
+            }
+          }
         }
+        
+        if (hasInvoiceInNewMonth) {
+          console.log('Validation FAILED - invoice exists in the same month as new agreement date');
+          Swal.fire({
+            title: 'Warning Message',
+            text: `New Agreement Period can not be less than ${newAgreementDate.toISOString().substring(0, 7)}`,
+            icon: 'warning',
+            width: '600px',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+          });
+          return; // Prevent save
+        } else {
+          console.log('Validation PASSED - no invoices in the same month as new agreement date');
+        }
+        
+        // If validation passes or no invoices, proceed with save
+        this.saveAgreement(data);
+      });
+      return; // Wait for async validation
+    }
 
+    console.log('Skipping validation - not an edit or ID is 0');
+    // For new agreements or when validation is not needed
+    this.saveAgreement(data);
+
+  }
+
+  saveAgreement(data: any) {
+    let msg = "";
+    this.service.save(data).subscribe({
+      next: (d: any) => {
+        if (this.isEdit) {
+          msg = 'Successfully Updated Agreement Details';
+        } else {
+          msg = 'Successfully Saved Agreement Details';
+        }
         Swal.fire({
-
           toast: true,
-
           position: 'top',
-
           showConfirmButton: false,
-
           title: 'Success',
-
           text: msg,
-
           icon: 'success',
-
           showCloseButton: false,
-
           timer: 3000,
-
         }).then(() => {
-
           this.route.navigate(['/quotation-and-agreement/agreements']);
-
         });
-
       },
-
       error: (err: any) => {
-
         this.handleErrors(err);
-
         Swal.fire('Error', 'Failed to save agreement details', 'error');
-
       }
-
     });
-
   }
 
 
@@ -831,11 +860,15 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
     if (action == 'add') {
 
       details['ID'] = 0;
+      details['PerDay'] = details['PerDay'] || 0;
+      details['PerMonth'] = details['PerMonth'] || 0;
 
       this.details.push(details);
 
     } else if (details['index'] >= 0 && action == 'update') {
 
+      details['PerDay'] = details['PerDay'] || 0;
+      details['PerMonth'] = details['PerMonth'] || 0;
       this.details[details['index']] = details;
 
     }
@@ -865,6 +898,92 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
   }
 
 
+
+  loadAgreementForEdit(agreementID: any) {
+    this.isEdit = true;
+    this.service.getAgreementById(agreementID).subscribe((d: any) => {
+      console.log('Full backend response for agreement ID', agreementID, ':', d);
+      let res = d['Result'] || d;
+      console.log('Res object:', res);
+      
+      let agreement = res['agreement'] || res['Agreement'];
+      let agreementDetails = res['agreementDetails'] || res['AgreementDetails'] || res['details'] || [];
+
+      this.frm.patchValue(agreement);
+
+      if (agreement.Branch) {
+        this.getClientsByBranchID(agreement.Branch);
+      }
+
+      this.details = agreementDetails.map((row: any) => this.mapItemDetails(row));
+      this.detailDataSource();
+      this.hideLoadingSpinner();
+
+      // Check for warning message from backend response
+      if (res['WarningMessage'] || res['warningMessage'] || res['Message'] || res['message']) {
+        const warningMsg = res['WarningMessage'] || res['warningMessage'] || res['Message'] || res['message'];
+        Swal.fire({
+          title: 'Warning Message',
+          text: warningMsg,
+          icon: 'warning',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'OK'
+        });
+      } else {
+        // Check if invoices are posted for this agreement
+        this.service.getFinalInvoiceDate(agreementID).subscribe((finalInvoiceDate: any) => {
+          console.log('Final Invoice Date response:', finalInvoiceDate);
+          console.log('Agreement start date:', agreement.AgreementDate);
+          
+          if (Array.isArray(finalInvoiceDate) && finalInvoiceDate.length > 0) {
+            const agreementStartDate = new Date(agreement.AgreementDate);
+            const agreementMonth = agreementStartDate.getMonth();
+            const agreementYear = agreementStartDate.getFullYear();
+            
+            // Check if any invoice is in the same month or after the agreement start date
+            let hasConflictingInvoice = false;
+            let conflictingMonth = '';
+            
+            for (let invoice of finalInvoiceDate) {
+              let invoiceDate = null;
+              if (invoice.InvoiceDate) {
+                invoiceDate = new Date(invoice.InvoiceDate);
+              } else if (invoice.InvoicePeriod) {
+                invoiceDate = new Date(invoice.InvoicePeriod);
+              } else if (typeof invoice === 'string') {
+                invoiceDate = new Date(invoice);
+              } else if (invoice.Date) {
+                invoiceDate = new Date(invoice.Date);
+              }
+              
+              if (invoiceDate) {
+                const invoiceMonth = invoiceDate.getMonth();
+                const invoiceYear = invoiceDate.getFullYear();
+                
+                // Check if invoice is in the same month or after the agreement start date
+                if (invoiceYear > agreementYear || (invoiceYear === agreementYear && invoiceMonth >= agreementMonth)) {
+                  hasConflictingInvoice = true;
+                  conflictingMonth = invoiceDate.toISOString().substring(0, 7);
+                  console.log('Found conflicting invoice:', invoiceDate, 'Agreement:', agreementStartDate);
+                  break;
+                }
+              }
+            }
+            
+            if (hasConflictingInvoice) {
+              Swal.fire({
+                title: 'Warning Message',
+                text: `New Agreement Period can not be less than ${conflictingMonth} already posted invoice documents`,
+                icon: 'warning',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+              });
+            }
+          }
+        });
+      }
+    });
+  }
 
   private mapItemDetails(d: any): IItemDetails {
 
@@ -1356,13 +1475,18 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     this.service.getClientsByBranchID(value).subscribe((d: any) => {
 
-      console.log(d);
+      console.log('getClientsByBranchID response:', d);
 
       let data = d['agreements'];
 
       this.clientList = d['clients'];
 
-      this.agreementDataSource = new MatTableDataSource(data['Result']);
+      // Check if data has Result property or use data directly
+      let agreementsData = data['Result'] || data || [];
+
+      console.log('Agreements data:', agreementsData);
+
+      this.agreementDataSource = new MatTableDataSource(agreementsData);
 
       this.agreementDataSource.sort = this.sort;
 
@@ -1724,7 +1848,9 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     const noOfDays = parseFloat(this.frm.get('details.NoOfDays')?.value || 30);
 
-    
+    const noOfHours = parseFloat(this.frm.get('details.NoOfHours')?.value || 8);
+
+
 
     if (perMonth > 0 && noOfDays > 0) {
 
@@ -1732,9 +1858,39 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
       this.frm.get('details.PerDay')?.setValue(this.formatCurrency(perDay));
 
-      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perDay));
 
-      
+
+      // Calculate per hour rate
+      const perHour = perDay / noOfHours;
+
+      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHour));
+
+
+
+      this.DetailRowChange();
+
+    }
+
+  }
+
+
+
+  onNoOfHoursChange(): void {
+
+    const perDay = parseFloat(this.frm.get('details.PerDay')?.value || 0);
+
+    const noOfHours = parseFloat(this.frm.get('details.NoOfHours')?.value || 8);
+
+
+
+    if (perDay > 0 && noOfHours > 0) {
+
+      // Recalculate per hour rate when working hours change
+      const perHour = perDay / noOfHours;
+
+      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHour));
+
+
 
       this.DetailRowChange();
 
@@ -1784,7 +1940,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     const tNoOfGuards = this.frm.get('details.NoOfGuards')?.value;
 
-    const tRate = this.frm.get('details.Rate')?.value;
+    const tPerDay = this.frm.get('details.PerDay')?.value;
 
     const tNoOfHours = this.frm.get('details.NoOfHours')?.value;
 
@@ -1810,7 +1966,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     if (parseInt("0" + tNoOfGuards, 10) === 0) {
 
-      vMonthTotal = parseFloat(tRate) * parseFloat(tNoOfDays);
+      vMonthTotal = parseFloat(tPerDay) * parseFloat(tNoOfDays);
 
     } else {
 
@@ -1818,7 +1974,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
         parseFloat(tNoOfGuards) *
 
-        parseFloat(tRate) *
+        parseFloat(tPerDay) *
 
         parseFloat(tNoOfDays)
 
@@ -1830,27 +1986,27 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     if (!(parseInt("0" + tNoOfGuards, 10) === 0 ||
 
-      parseInt("0" + tRate, 10) === 0 ||
+      parseInt("0" + tPerDay, 10) === 0 ||
 
       parseInt("0" + tNoOfDays, 10) === 0)) {
 
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(vMonthTotal));
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
 
     } else if (this.type == 'S') {
 
       console.log("tNoOfGuards" + tNoOfGuards);
 
-      console.log("tRate" + tRate);
+      console.log("tPerDay" + tPerDay);
 
-      vMonthTotal = tNoOfGuards * tRate;
+      vMonthTotal = tNoOfGuards * tPerDay;
 
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(vMonthTotal));
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
 
     } else if (this.type == 'H') {
 
-      vMonthTotal = tNoOfHours * tRate;
+      vMonthTotal = tNoOfHours * tPerDay;
 
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(vMonthTotal));
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
 
     } else {
 
@@ -1860,7 +2016,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
-    this.frm.get('details.YearTotal')?.setValue(this.formatCurrency(vMonthTotal * 12));
+    this.frm.get('details.YearTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal * 12)));
 
 
 
