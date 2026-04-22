@@ -15,7 +15,7 @@ import Swal from 'sweetalert2';
 export class DesignationMasterComponent implements OnInit {
   designations: Designation[] = [];
   dataSource!: MatTableDataSource<Designation>;
-  displayedColumns: string[] = ['DesignationId', 'DepartmentName', 'DesignationCode', 'DesignationName', 'IsActive', 'action'];
+  displayedColumns: string[] = ['DesignationId', 'DepartmentName', 'DesignationName', 'IsActive', 'action'];
 
   frm!: FormGroup;
   isEdit: boolean = false;
@@ -44,8 +44,9 @@ export class DesignationMasterComponent implements OnInit {
   initializeForm(): void {
     this.frm = this.fb.group({
       DesignationId: [0],
-      DesignationCode: ['', [Validators.required, Validators.maxLength(100)]],
+      DesignationCode: [''],
       DesignationName: ['', [Validators.required, Validators.maxLength(200)]],
+      Description: [''],
       DepartmentId: [null],
       IsActive: [true]
     });
@@ -98,6 +99,7 @@ export class DesignationMasterComponent implements OnInit {
       DesignationId: 0,
       DesignationCode: '',
       DesignationName: '',
+      Description: '',
       DepartmentId: this.selectedDepartmentId,
       IsActive: true
     });
@@ -111,6 +113,7 @@ export class DesignationMasterComponent implements OnInit {
       DesignationId: designation.DesignationId,
       DesignationCode: designation.DesignationCode,
       DesignationName: designation.DesignationName,
+      Description: designation.Description || '',
       DepartmentId: designation.DepartmentId,
       IsActive: designation.IsActive
     });
@@ -125,6 +128,10 @@ export class DesignationMasterComponent implements OnInit {
 
     const designation: Designation = this.frm.value;
     designation.DesignationId = this.currentDesignationId;
+    
+    console.log('Form value:', this.frm.value);
+    console.log('Designation object being sent:', designation);
+    console.log('DepartmentId value:', designation.DepartmentId);
 
     if (this.isEdit) {
       this.designationService.update(this.currentDesignationId, designation).subscribe({

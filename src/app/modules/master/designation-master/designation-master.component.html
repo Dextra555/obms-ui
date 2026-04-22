@@ -58,11 +58,6 @@
           </td>
         </ng-container>
 
-        <ng-container matColumnDef="DesignationCode">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header> Designation Code</th>
-          <td mat-cell *matCellDef="let element"> {{element.DesignationCode}} </td>
-        </ng-container>
-
         <ng-container matColumnDef="DesignationName">
           <th mat-header-cell *matHeaderCellDef mat-sort-header> Designation Name</th>
           <td mat-cell *matCellDef="let element"> {{element.DesignationName}} </td>
@@ -118,7 +113,7 @@
 
     <form [formGroup]="frm" (ngSubmit)="onSave()">
       <div class="row">
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
           <mat-form-field appearance="outline">
             <mat-label>Department</mat-label>
             <mat-select formControlName="DepartmentId" [compareWith]="compareDepartment">
@@ -130,17 +125,7 @@
           </mat-form-field>
         </div>
 
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-          <mat-form-field appearance="outline">
-            <mat-label>Designation Code</mat-label>
-            <input matInput formControlName="DesignationCode" placeholder="Enter designation code" maxlength="100">
-            <mat-error *ngIf="frm.get('DesignationCode')?.hasError('required')">
-              Designation code is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
           <mat-form-field appearance="outline">
             <mat-label>Designation Name</mat-label>
             <input matInput formControlName="DesignationName" placeholder="Enter designation name" maxlength="200">
@@ -150,6 +135,9 @@
           </mat-form-field>
         </div>
       </div>
+
+      <input type="hidden" formControlName="DesignationCode">
+      <input type="hidden" formControlName="Description">
 
 
       <div class="row">

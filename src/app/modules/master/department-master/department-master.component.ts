@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 export class DepartmentMasterComponent implements OnInit {
   departments: Department[] = [];
   dataSource!: MatTableDataSource<Department>;
-  displayedColumns: string[] = ['DepartmentId', 'DepartmentCode', 'DepartmentName', 'Description', 'IsActive', 'action'];
+  displayedColumns: string[] = ['DepartmentId', 'DepartmentName', 'IsActive', 'action'];
   
   frm!: FormGroup;
   isEdit: boolean = false;
@@ -38,9 +38,9 @@ export class DepartmentMasterComponent implements OnInit {
   initializeForm(): void {
     this.frm = this.fb.group({
       DepartmentId: [0],
-      DepartmentCode: ['', [Validators.required, Validators.maxLength(100)]],
+      DepartmentCode: [''],
       DepartmentName: ['', [Validators.required, Validators.maxLength(200)]],
-      Description: ['', Validators.maxLength(500)],
+      Description: [''],
       IsActive: [true]
     });
   }
@@ -145,7 +145,16 @@ export class DepartmentMasterComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error deleting department:', error);
-            this.showMessage('Error deleting department: ' + (error.error || error.message), 'error');
+            // Extract the proper error message from the backend response
+            let errorMessage = 'Error deleting department';
+            if (error.error && error.error.message) {
+              errorMessage = error.error.message;
+            } else if (error.error && typeof error.error === 'string') {
+              errorMessage = error.error;
+            } else if (error.message) {
+              errorMessage = error.message;
+            }
+            this.showMessage(errorMessage, 'error');
           }
         });
       }
