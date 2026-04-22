@@ -452,6 +452,18 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
             this.hideLoadingSpinner();
 
+            // Check for warning message and display as popup
+            if (res['WarningMessage'] || res['warningMessage'] || res['Message'] || res['message']) {
+              const warningMsg = res['WarningMessage'] || res['warningMessage'] || res['Message'] || res['message'];
+              Swal.fire({
+                title: 'Warning Message',
+                text: warningMsg,
+                icon: 'warning',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+              });
+            }
+
           });
 
         } else {
@@ -714,58 +726,108 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     data['AgreementDate'] = this.returnDate(this.frm.get('AgreementDate')?.value);
 
-    let msg = "";
+    console.log('isEdit:', this.isEdit, 'ID:', this.ID, 'AgreementDate:', data['AgreementDate']);
 
-    this.service.save(data).subscribe({
-
-      next: (d: any) => {
-
-        if (this.isEdit) {
-
-          msg = 'Successfully Updated Agreement Details';
-
-        } else {
-
-          msg = 'Successfully Saved Agreement Details';
-
+    // Validation: Check if agreement has invoices and prevent editing in the same month
+    if (this.isEdit && this.ID > 0) {
+      console.log('Validation triggered - checking final invoice date...');
+      this.service.getFinalInvoiceDate(this.ID).subscribe((finalInvoiceDate: any) => {
+        console.log('Final Invoice Date response:', finalInvoiceDate);
+        console.log('Is array:', Array.isArray(finalInvoiceDate), 'Length:', finalInvoiceDate?.length);
+        
+        // Handle array response from backend
+        let hasInvoiceInNewMonth = false;
+        let newAgreementDate = new Date(data['AgreementDate']);
+        
+        if (Array.isArray(finalInvoiceDate) && finalInvoiceDate.length > 0) {
+          console.log('All invoices in array:', finalInvoiceDate);
+          
+          // Check if any invoice is in the same month as the new agreement date
+          const newMonth = newAgreementDate.getMonth();
+          const newYear = newAgreementDate.getFullYear();
+          
+          for (let invoice of finalInvoiceDate) {
+            let invoiceDate: Date | null = null;
+            if (invoice && invoice.InvoiceDate) {
+              invoiceDate = new Date(invoice.InvoiceDate);
+            } else if (invoice && invoice.InvoicePeriod) {
+              invoiceDate = new Date(invoice.InvoicePeriod);
+            } else if (invoice && typeof invoice === 'string') {
+              invoiceDate = new Date(invoice);
+            } else if (invoice && invoice.Date) {
+              invoiceDate = new Date(invoice.Date);
+            }
+            
+            if (invoiceDate) {
+              const invoiceMonth = invoiceDate.getMonth();
+              const invoiceYear = invoiceDate.getFullYear();
+              
+              console.log('Invoice date:', invoiceDate, 'Invoice Year/Month:', invoiceYear, invoiceMonth, 'New Year/Month:', newYear, newMonth);
+              
+              // Check if invoice is in the same month as new agreement date
+              if (invoiceYear === newYear && invoiceMonth === newMonth) {
+                hasInvoiceInNewMonth = true;
+                console.log('Found invoice in same month as new agreement date');
+                break;
+              }
+            }
+          }
         }
+        
+        if (hasInvoiceInNewMonth) {
+          console.log('Validation FAILED - invoice exists in the same month as new agreement date');
+          Swal.fire({
+            title: 'Warning Message',
+            text: `New Agreement Period can not be less than ${newAgreementDate.toISOString().substring(0, 7)}`,
+            icon: 'warning',
+            width: '600px',
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+          });
+          return; // Prevent save
+        } else {
+          console.log('Validation PASSED - no invoices in the same month as new agreement date');
+        }
+        
+        // If validation passes or no invoices, proceed with save
+        this.saveAgreement(data);
+      });
+      return; // Wait for async validation
+    }
 
+    console.log('Skipping validation - not an edit or ID is 0');
+    // For new agreements or when validation is not needed
+    this.saveAgreement(data);
+
+  }
+
+  saveAgreement(data: any) {
+    let msg = "";
+    this.service.save(data).subscribe({
+      next: (d: any) => {
+        if (this.isEdit) {
+          msg = 'Successfully Updated Agreement Details';
+        } else {
+          msg = 'Successfully Saved Agreement Details';
+        }
         Swal.fire({
-
           toast: true,
-
           position: 'top',
-
           showConfirmButton: false,
-
           title: 'Success',
-
           text: msg,
-
           icon: 'success',
-
           showCloseButton: false,
-
           timer: 3000,
-
         }).then(() => {
-
           this.route.navigate(['/quotation-and-agreement/agreements']);
-
         });
-
       },
-
       error: (err: any) => {
-
         this.handleErrors(err);
-
         Swal.fire('Error', 'Failed to save agreement details', 'error');
-
       }
-
     });
-
   }
 
 
@@ -1366,13 +1428,18 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     this.service.getClientsByBranchID(value).subscribe((d: any) => {
 
-      console.log(d);
+      console.log('getClientsByBranchID response:', d);
 
       let data = d['agreements'];
 
       this.clientList = d['clients'];
 
-      this.agreementDataSource = new MatTableDataSource(data['Result']);
+      // Check if data has Result property or use data directly
+      let agreementsData = data['Result'] || data || [];
+
+      console.log('Agreements data:', agreementsData);
+
+      this.agreementDataSource = new MatTableDataSource(agreementsData);
 
       this.agreementDataSource.sort = this.sort;
 

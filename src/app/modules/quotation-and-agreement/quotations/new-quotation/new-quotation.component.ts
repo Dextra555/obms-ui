@@ -1280,11 +1280,17 @@ export class NewQuotationComponent {
 
     this.service.getClientsByBranchID(value).subscribe((d: any) => {
 
+      console.log('getClientsByBranchID response (quotation):', d);
+
       let data = d['quotations'] || d['agreements'];
 
       this.clientList = d['clients'];
 
-      this.quotationDataSource = new MatTableDataSource(data?.Result || data || []);
+      let quotationsData = data?.Result || data || [];
+
+      console.log('Quotations data:', quotationsData);
+
+      this.quotationDataSource = new MatTableDataSource(quotationsData);
 
       this.quotationDataSource.sort = this.sort;
 
