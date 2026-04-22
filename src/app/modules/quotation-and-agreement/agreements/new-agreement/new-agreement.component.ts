@@ -240,7 +240,14 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
-    this.ID = this.activatedRoute.snapshot.params['ID'];
+    this.activatedRoute.params.subscribe(params => {
+      this.ID = params['ID'];
+      
+      // Trigger edit mode if ID is present
+      if (this.ID != 0 && this.ID != undefined) {
+        this.loadAgreementForEdit(this.ID);
+      }
+    });
 
     this.frm = this.fb.group({
 
@@ -410,7 +417,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
-      // 2. Handle Quotation Forwarding or Agreement Edit
+      // 2. Handle Quotation Forwarding
 
       this.activatedRoute.queryParams.subscribe(params => {
 
@@ -420,53 +427,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
           this.loadQuotationData(qId);
 
-        } else if (this.ID != 0 && this.ID != undefined) {
-
-          // Edit Mode
-
-          this.isEdit = true;
-
-          this.service.getAgreementById(this.ID).subscribe((d: any) => {
-
-            let res = d['Result'] || d;
-
-            let agreement = res['agreement'] || res['Agreement'];
-
-            let agreementDetails = res['agreementDetails'] || res['AgreementDetails'] || res['details'] || [];
-
-
-
-            this.frm.patchValue(agreement);
-
-            if (agreement.Branch) {
-
-              this.getClientsByBranchID(agreement.Branch);
-
-            }
-
-
-
-            this.details = agreementDetails.map((row: any) => this.mapItemDetails(row));
-
-            this.detailDataSource();
-
-            this.hideLoadingSpinner();
-
-            // Check for warning message and display as popup
-            if (res['WarningMessage'] || res['warningMessage'] || res['Message'] || res['message']) {
-              const warningMsg = res['WarningMessage'] || res['warningMessage'] || res['Message'] || res['message'];
-              Swal.fire({
-                title: 'Warning Message',
-                text: warningMsg,
-                icon: 'warning',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'OK'
-              });
-            }
-
-          });
-
-        } else {
+        } else if (this.ID == 0 || this.ID == undefined) {
 
           this.hideLoadingSpinner();
 
@@ -937,6 +898,92 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
   }
 
 
+
+  loadAgreementForEdit(agreementID: any) {
+    this.isEdit = true;
+    this.service.getAgreementById(agreementID).subscribe((d: any) => {
+      console.log('Full backend response for agreement ID', agreementID, ':', d);
+      let res = d['Result'] || d;
+      console.log('Res object:', res);
+      
+      let agreement = res['agreement'] || res['Agreement'];
+      let agreementDetails = res['agreementDetails'] || res['AgreementDetails'] || res['details'] || [];
+
+      this.frm.patchValue(agreement);
+
+      if (agreement.Branch) {
+        this.getClientsByBranchID(agreement.Branch);
+      }
+
+      this.details = agreementDetails.map((row: any) => this.mapItemDetails(row));
+      this.detailDataSource();
+      this.hideLoadingSpinner();
+
+      // Check for warning message from backend response
+      if (res['WarningMessage'] || res['warningMessage'] || res['Message'] || res['message']) {
+        const warningMsg = res['WarningMessage'] || res['warningMessage'] || res['Message'] || res['message'];
+        Swal.fire({
+          title: 'Warning Message',
+          text: warningMsg,
+          icon: 'warning',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'OK'
+        });
+      } else {
+        // Check if invoices are posted for this agreement
+        this.service.getFinalInvoiceDate(agreementID).subscribe((finalInvoiceDate: any) => {
+          console.log('Final Invoice Date response:', finalInvoiceDate);
+          console.log('Agreement start date:', agreement.AgreementDate);
+          
+          if (Array.isArray(finalInvoiceDate) && finalInvoiceDate.length > 0) {
+            const agreementStartDate = new Date(agreement.AgreementDate);
+            const agreementMonth = agreementStartDate.getMonth();
+            const agreementYear = agreementStartDate.getFullYear();
+            
+            // Check if any invoice is in the same month or after the agreement start date
+            let hasConflictingInvoice = false;
+            let conflictingMonth = '';
+            
+            for (let invoice of finalInvoiceDate) {
+              let invoiceDate = null;
+              if (invoice.InvoiceDate) {
+                invoiceDate = new Date(invoice.InvoiceDate);
+              } else if (invoice.InvoicePeriod) {
+                invoiceDate = new Date(invoice.InvoicePeriod);
+              } else if (typeof invoice === 'string') {
+                invoiceDate = new Date(invoice);
+              } else if (invoice.Date) {
+                invoiceDate = new Date(invoice.Date);
+              }
+              
+              if (invoiceDate) {
+                const invoiceMonth = invoiceDate.getMonth();
+                const invoiceYear = invoiceDate.getFullYear();
+                
+                // Check if invoice is in the same month or after the agreement start date
+                if (invoiceYear > agreementYear || (invoiceYear === agreementYear && invoiceMonth >= agreementMonth)) {
+                  hasConflictingInvoice = true;
+                  conflictingMonth = invoiceDate.toISOString().substring(0, 7);
+                  console.log('Found conflicting invoice:', invoiceDate, 'Agreement:', agreementStartDate);
+                  break;
+                }
+              }
+            }
+            
+            if (hasConflictingInvoice) {
+              Swal.fire({
+                title: 'Warning Message',
+                text: `New Agreement Period can not be less than ${conflictingMonth} already posted invoice documents`,
+                icon: 'warning',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'OK'
+              });
+            }
+          }
+        });
+      }
+    });
+  }
 
   private mapItemDetails(d: any): IItemDetails {
 
