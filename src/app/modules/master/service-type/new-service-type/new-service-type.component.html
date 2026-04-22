@@ -1,0 +1,80 @@
+<div class="wlt-c-furg-content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+        <h1 class="mb-1">{{isEdit ? 'Edit Service Type' : 'Create Service Type'}}</h1>
+      </div><!-- /.col -->
+      <div class="col-12 col-sm-12 col-md-6 col-lg-6 my-1">
+        <ol class="breadcrumb float-md-right">
+          <li class="breadcrumb-item"><a routerLink="/dashboard">Master</a></li>
+          <li class="breadcrumb-item"><a routerLink="/master/service-type">Service Type</a></li>
+          <li class="breadcrumb-item active">{{isEdit ? 'Edit' : 'Create'}}</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+
+<mat-card>
+  <mat-card-content>
+    <form [formGroup]="serviceTypeForm" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Service Name</mat-label>
+            <input matInput formControlName="serviceName" placeholder="Enter service name">
+            <mat-error *ngIf="serviceTypeForm.get('serviceName')?.hasError('required')">
+              Service Name is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>HSN Code</mat-label>
+            <input matInput formControlName="hsnCode" placeholder="Enter HSN code">
+            <mat-error *ngIf="serviceTypeForm.get('hsnCode')?.hasError('required')">
+              HSN Code is required
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-12 col-md-6 col-lg-6">
+          <mat-checkbox formControlName="isActive" class="mt-3">
+            Active Status
+          </mat-checkbox>
+          <mat-hint class="d-block">Uncheck to deactivate this service type</mat-hint>
+        </div>
+      </div>
+
+
+
+      <div class="row mt-3">
+        <div class="col-12">
+          <div class="text-right">
+            <button type="button" mat-raised-button color="accent" class="mr-2" (click)="cancel()">
+              <mat-icon>cancel</mat-icon>
+              Cancel
+            </button>
+            <button type="submit" mat-raised-button color="primary"
+              [disabled]="serviceTypeForm.invalid || showLoadingSpinner">
+              <mat-icon>save</mat-icon>
+              {{isEdit ? 'Update' : 'Create'}} Service Type
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<!-- Loading Spinner -->
+<div [style.display]="showLoadingSpinner ? 'block' : 'none'"
+  style="margin-top: -20.5rem; display: block; margin-left: -6.5rem;">
+  <div class="d-flex justify-content-center">
+    <span class="loader"></span>
+  </div>
+</div>

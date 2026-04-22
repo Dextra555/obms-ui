@@ -1,111 +1,216 @@
 import { Component } from '@angular/core';
+
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+
+import { Router, ActivatedRoute } from '@angular/router';
+
 import { ServiceTypeService } from '../../../../service/service-type.service';
+
 import { ServiceType } from '../../../../model/service-type.model';
+
 import Swal from 'sweetalert2';
 
+
+
 @Component({
+
   selector: 'app-new-service-type',
-  template: `
-    <div class="container">
-      <h2>{{isEdit ? 'Edit Service Type' : 'Create Service Type'}}</h2>
-      
-      <form [formGroup]="serviceTypeForm" (ngSubmit)="onSubmit()">
-        <div class="form-grid">
-          <mat-form-field appearance="outline">
-            <mat-label>Service Name</mat-label>
-            <input matInput formControlName="serviceName" placeholder="Enter service name">
-          </mat-form-field>
-          
-          <mat-form-field appearance="outline">
-            <mat-label>Service Code</mat-label>
-            <input matInput formControlName="serviceCode" placeholder="Enter service code">
-          </mat-form-field>
-          
-          <mat-form-field appearance="outline">
-            <mat-label>HSN Code</mat-label>
-            <input matInput formControlName="hsnCode" placeholder="Enter HSN code">
-          </mat-form-field>
-          
-          <mat-form-field appearance="outline">
-            <mat-label>Description</mat-label>
-            <textarea matInput formControlName="description" placeholder="Enter description"></textarea>
-          </mat-form-field>
-        </div>
-        
-        <div class="form-actions">
-          <button type="submit" mat-raised-button color="primary" [disabled]="serviceTypeForm.invalid">
-            {{isEdit ? 'Update' : 'Create'}}
-          </button>
-          <button type="button" mat-raised-button color="accent" (click)="cancel()">
-            Cancel
-          </button>
-        </div>
-      </form>
-    </div>
-  `,
-  styles: [`
-    .container {
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 20px;
-    }
-    
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-      margin-top: 20px;
-    }
-    
-    .mat-form-field {
-      width: 100%;
-    }
-  `]
+
+  templateUrl: './new-service-type.component.html',
+
+  styleUrls: ['./new-service-type.component.css']
+
 })
+
 export class NewServiceTypeComponent {
+
   isEdit = false;
+
   serviceTypeForm!: FormGroup;
-  
+
+  showLoadingSpinner = false;
+
+  serviceTypeId: number | null = null;
+
+
+
   constructor(
+
     private fb: FormBuilder,
+
     private serviceTypeService: ServiceTypeService,
-    private router: Router
-  ) {}
+
+    private router: Router,
+
+    private route: ActivatedRoute
+
+  ) { }
+
+
 
   ngOnInit(): void {
+
     this.serviceTypeForm = this.fb.group({
+
       serviceName: ['', Validators.required],
-      serviceCode: ['', Validators.required],
+
       hsnCode: ['', Validators.required],
-      description: ['']
+
+      pricingModel: ['Standard'],
+
+      isActive: [true]
+
     });
+
+
+
+    // Check if we're in edit mode
+
+    this.route.params.subscribe(params => {
+
+      if (params['id']) {
+
+        this.isEdit = true;
+
+        this.serviceTypeId = +params['id'];
+
+        this.loadServiceTypeData(this.serviceTypeId);
+
+      }
+
+    });
+
   }
+
+
+
+  loadServiceTypeData(id: number): void {
+
+    this.showLoadingSpinner = true;
+
+    this.serviceTypeService.getServiceTypeById(id).subscribe({
+
+      next: (data: ServiceType) => {
+
+        this.serviceTypeForm.patchValue({
+
+          serviceName: data.ServiceName,
+
+          hsnCode: data.HSNCode,
+
+          isActive: data.IsActive
+
+        });
+
+        this.showLoadingSpinner = false;
+
+      },
+
+      error: (error: any) => {
+
+        Swal.fire('Error', 'Failed to load service type data', 'error');
+
+        this.showLoadingSpinner = false;
+
+      }
+
+    });
+
+  }
+
+
 
   onSubmit(): void {
+
     if (this.serviceTypeForm.valid) {
+
       const serviceTypeData = this.serviceTypeForm.value;
-      
-      this.serviceTypeService.createServiceType(serviceTypeData).subscribe({
-        next: () => {
-          Swal.fire('Success', 'Service type created successfully', 'success');
-          this.router.navigate(['/master/service-type']);
-        },
-        error: (error: any) => {
-          Swal.fire('Error', 'Failed to create service type', 'error');
-        }
-      });
+
+      this.showLoadingSpinner = true;
+
+
+
+      if (this.isEdit && this.serviceTypeId) {
+
+        // Map form data to update DTO
+
+        const updateData = {
+
+          Id: this.serviceTypeId,
+
+          ServiceName: serviceTypeData.serviceName,
+
+          HSNCode: serviceTypeData.hsnCode,
+
+          IsActive: serviceTypeData.isActive
+
+        };
+
+        this.serviceTypeService.updateServiceType(this.serviceTypeId, updateData).subscribe({
+
+          next: () => {
+
+            Swal.fire('Success', 'Service type updated successfully', 'success');
+
+            this.router.navigate(['/master/service-type']);
+
+          },
+
+          error: (error: any) => {
+
+            Swal.fire('Error', 'Failed to update service type', 'error');
+
+            this.showLoadingSpinner = false;
+
+          }
+
+        });
+
+      } else {
+
+        // Map form data to create DTO
+
+        const createData = {
+
+          ServiceName: serviceTypeData.serviceName,
+
+          HSNCode: serviceTypeData.hsnCode
+
+        };
+
+        this.serviceTypeService.createServiceType(createData).subscribe({
+
+          next: () => {
+
+            Swal.fire('Success', 'Service type created successfully', 'success');
+
+            this.router.navigate(['/master/service-type']);
+
+          },
+
+          error: (error: any) => {
+
+            Swal.fire('Error', 'Failed to create service type', 'error');
+
+            this.showLoadingSpinner = false;
+
+          }
+
+        });
+
+      }
+
     }
+
   }
 
+
+
   cancel(): void {
+
     this.router.navigate(['/master/service-type']);
+
   }
+
 }
+

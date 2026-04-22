@@ -27,9 +27,7 @@
       </div>
       <div class="col-12 col-sm-12 col-md-8 col-lg-8 order-1 order-md-2">
         <div class="text-right pt-2">
-          <button *ngIf="this.userAccessModel.createAccess == true || currentUser == 'superadmin'"
-            class="btn wlt-c-furg-btn-primary"
-            (click)="addNewServiceType()">
+          <button class="btn wlt-c-furg-btn-primary" (click)="addNewServiceType()">
             <mat-icon>add</mat-icon><span>New Service Type</span>
           </button>
         </div>
@@ -39,29 +37,12 @@
     <div class="table-responsive" *ngIf="!showLoadingSpinner && !errorMessage">
       <table mat-table [dataSource]="dataSource" class="wlt-table table-striped" matSort
         (matSortChange)="announceSortChange($event)">
-        
+
         <!-- Service Name Column -->
         <ng-container matColumnDef="serviceName">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Service Name</th>
           <td mat-cell *matCellDef="let row">
             <strong>{{ row.ServiceName }}</strong>
-          </td>
-        </ng-container>
-
-        <!-- Service Code Column -->
-        <ng-container matColumnDef="serviceCode">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Service Code</th>
-          <td mat-cell *matCellDef="let row">
-            <code class="text-primary">{{ row.ServiceCode }}</code>
-          </td>
-        </ng-container>
-
-        <!-- Description Column -->
-        <ng-container matColumnDef="description">
-          <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
-          <td mat-cell *matCellDef="let row">
-            <span *ngIf="row.Description">{{ row.Description }}</span>
-            <span class="text-muted" *ngIf="!row.Description">-</span>
           </td>
         </ng-container>
 
@@ -86,19 +67,12 @@
         <ng-container matColumnDef="action" stickyEnd>
           <th mat-header-cell *matHeaderCellDef style="text-align:center; width: 120px;">Actions</th>
           <td mat-cell *matCellDef="let row" style="text-align:center;">
-            <a *ngIf="(this.userAccessModel.readAccess == true || currentUser == 'superadmin')" 
-               style="cursor:pointer;" class="wlt-c-furg-text-primary mr-2" matTooltip="View"
-               (click)="viewServiceTypeDetails(row)">
-              <mat-icon aria-hidden="false" aria-label="view icon">visibility</mat-icon>
-            </a>
-            <a *ngIf="(this.userAccessModel.readAccess == true || currentUser == 'superadmin')" 
-               style="cursor:pointer;" class="wlt-c-furg-text-warning mr-2" matTooltip="Edit"
-               (click)="editServiceType(row)">
+            <a style="cursor:pointer;" class="wlt-c-furg-text-warning mr-2" matTooltip="Edit"
+              (click)="editServiceType(row)">
               <mat-icon aria-hidden="false" aria-label="edit icon">edit</mat-icon>
             </a>
-            <a *ngIf="(this.userAccessModel.deleteAccess == true || currentUser == 'superadmin')"
-               style="cursor:pointer;" class="wlt-c-furg-text-danger" matTooltip="Delete"
-               (click)="deleteServiceType(row.id)">
+            <a style="cursor:pointer;" class="wlt-c-furg-text-danger" matTooltip="Delete"
+              (click)="deleteServiceType(row.Id)">
               <mat-icon aria-hidden="false" aria-label="trash icon">delete_outline</mat-icon>
             </a>
           </td>
@@ -108,11 +82,7 @@
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
 
-      <mat-paginator 
-        [pageSizeOptions]="[10, 20, 30]"
-        [pageSize]="10"
-        showFirstLastButtons
-        showPageSizeOptions
+      <mat-paginator [pageSizeOptions]="[10, 20, 30]" [pageSize]="10" showFirstLastButtons showPageSizeOptions
         aria-label="Select page of service types">
       </mat-paginator>
     </div>

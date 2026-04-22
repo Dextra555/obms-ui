@@ -21,7 +21,7 @@ export class ServiceTypeComponent implements AfterViewInit {
   serviceTypes: ServiceType[] = [];
   showLoadingSpinner: boolean = false;
   displayedColumns: string[] = [
-    'serviceName', 'serviceCode', 'description', 'hsnCode', 
+    'serviceName', 'hsnCode',
     'isActive', 'action'
   ];
   dataSource: any;
@@ -70,7 +70,7 @@ export class ServiceTypeComponent implements AfterViewInit {
         if (data && data.length > 0) {
           this.serviceTypes = data;
           this.dataSource = new MatTableDataSource(data);
-          
+
           setTimeout(() => {
             if (this.dataSource != null && this.dataSource != undefined) {
               this.dataSource.paginator = this.paginator;
@@ -165,13 +165,9 @@ export class ServiceTypeComponent implements AfterViewInit {
 
   addNewServiceType(): void {
     // Navigate to add page or open dialog
-    this._router.navigate(['/master/service-type/add']);
+    this._router.navigate(['/master/service-type/new']);
   }
 
-  viewServiceTypeDetails(serviceType: ServiceType): void {
-    // Navigate to details page or open dialog
-    this._router.navigate(['/master/service-type/details', serviceType.Id]);
-  }
 
   refreshData(): void {
     this.getServiceTypeList();

@@ -1,9 +1,9 @@
 export interface ServiceType {
   Id: number;
   ServiceName: string;
-  ServiceCode: string;
-  Description?: string;
+  ServiceCode?: string;
   HSNCode: string;
+  PricingModel?: string;
   IsActive: boolean;
   CreatedDate: Date;
   CreatedBy: string;
@@ -13,15 +13,15 @@ export interface ServiceType {
 
 export interface ServiceTypeCreate {
   ServiceName: string;
-  ServiceCode: string;
-  Description?: string;
+  ServiceCode?: string;
   HSNCode: string;
+  PricingModel?: string;
 }
 
 export interface ServiceTypeUpdate {
   Id: number;
   ServiceName: string;
-  Description?: string;
   HSNCode: string;
+  PricingModel?: string;
   IsActive: boolean;
 }

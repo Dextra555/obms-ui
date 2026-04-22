@@ -26,17 +26,20 @@
                 <li class="nav-item" routerLink="/master/esi-slab"><a class="nav-link">ESI Slab</a></li>
                 <li class="nav-item" routerLink="/master/tds-slab"><a class="nav-link">TDS Slab</a></li>
                 <li class="nav-item" routerLink="/master/gst-slab"><a class="nav-link">GST Slab</a></li>
-                <li class="nav-item" routerLink="/master/professional-tax-slab"><a class="nav-link">Professional Tax Slab</a></li>
+                <li class="nav-item" routerLink="/master/professional-tax-slab"><a class="nav-link">Professional Tax
+                    Slab</a></li>
                 <li class="nav-item" routerLink="/master/service-type"><a class="nav-link">Service Type Slab</a></li>
-                <li class="nav-item" routerLink="/master/department-master"><a class="nav-link">Department Master</a></li>
-                <li class="nav-item" routerLink="/master/designation-master"><a class="nav-link">Designation Master</a></li>
-                <li class="nav-item" routerLink="/master/income-tax-slab"><a class="nav-link">Income Tax Slab </a></li>
+                <li class="nav-item" routerLink="/master/department-master"><a class="nav-link">Department Master</a>
+                </li>
+                <li class="nav-item" routerLink="/master/designation-master"><a class="nav-link">Designation Master</a>
+                </li>
                 <li class="nav-item" routerLink="/master/leave-slab"><a class="nav-link">Leave Slab</a></li>
                 <!-- <li class="nav-item" routerLink="/master/salary-slab"><a class="nav-link">Salary Slab</a></li>
                 <li class="nav-item" > <a class="nav-link">Salary Slab(Non Structure) </a></li> -->
                 <li class="nav-item" routerLink="/master/employee-master"><a class="nav-link">Employee Master</a></li>
-                <li class="nav-item" routerLink="/master/employee-transfer"><a class="nav-link">Employee Transfer</a></li>
-                <li class="nav-item" routerLink="/master/employee-history"><a class="nav-link">Employee Transfer History</a></li>
+                <li class="nav-item" routerLink="/master/employee-transfer"><a class="nav-link">Employee Transfer</a>
+                </li>
+               
                 <!--<li class="nav-item" [routerLink]="['/master/report/user-report']"> <a class="nav-link">User Report</a></li>-->
               </ul>
             </div>
@@ -56,7 +59,8 @@
                     Report</a></li>
                 <li class="nav-item" [routerLink]="['master/report/employee-list']"><a class="nav-link">Employee
                     List</a></li>
-                <li class="nav-item" [routerLink]="['master/report/kkdn']"><a class="nav-link">KKDN</a></li>
+                 <li class="nav-item" routerLink="/master/employee-history"><a class="nav-link">Employee Transfer
+                    History</a></li>
               </ul>
             </div>
           </li>
@@ -70,7 +74,8 @@
           <li class="nav-item">
             <div class="collapse" [ngClass]="{'show': isSubmenuOpen('quotation')}">
               <ul class="nav flex-column wlt-c-furg-sub-menu">
-                <li class="nav-item" routerLink="/quotation-and-agreement/quotations"><a class="nav-link">Quotations</a></li>
+                <li class="nav-item" routerLink="/quotation-and-agreement/quotations"><a class="nav-link">Quotations</a>
+                </li>
                 <li class="nav-item" routerLink="/quotation-and-agreement/agreements"><a class="nav-link">Agreements</a>
                 </li>
                 <li class="nav-item" routerLink="/quotation-and-agreement/agreements-discount-report"><a
@@ -91,10 +96,11 @@
         <ul class="nav flex-column">
           <li class="nav-item">
             <div class="collapse" [ngClass]="{'show': isSubmenuOpen('inventory')}">
-              <ul class="nav flex-column wlt-c-furg-sub-menu">              
+              <ul class="nav flex-column wlt-c-furg-sub-menu">
                 <li class="nav-item" routerLink="/inventory/item-master"><a class="nav-link">Item Master </a></li>
                 <li class="nav-item" routerLink="/inventory/asset-master"><a class="nav-link">Asset Master</a></li>
-                <li class="nav-item" routerLink="/inventory/recepient-master"><a class="nav-link">Recepient Master</a></li>
+                <li class="nav-item" routerLink="/inventory/recepient-master"><a class="nav-link">Recepient Master</a>
+                </li>
                 <li class="nav-item" routerLink="/inventory/purchase-bills"><a class="nav-link">Purchase Bills</a></li>
                 <li class="nav-item" routerLink="/inventory/material-issue"><a class="nav-link">Material Issue</a></li>
               </ul>
@@ -143,8 +149,10 @@
                 <!--          <li class="nav-item" routerLink="/finance/receipts"> <a class="nav-link">Receipts</a></li>-->
                 <li class="nav-item" routerLink="/finance/cheque-status"><a class="nav-link">Cheque Status</a></li>
                 <li class="nav-item" routerLink="/finance/cheque-master"><a class="nav-link">Cheque Master</a></li>
-                <li class="nav-item" routerLink="/inventory/category-master"><a class="nav-link">Category Master</a></li>
-                <li class="nav-item" routerLink="/inventory/supplier-master"><a class="nav-link">Supplier Master</a></li>
+                <li class="nav-item" routerLink="/inventory/category-master"><a class="nav-link">Category Master</a>
+                </li>
+                <li class="nav-item" routerLink="/inventory/supplier-master"><a class="nav-link">Supplier Master</a>
+                </li>
                 <li class="nav-item" routerLink="/inventory/utility-bills"><a class="nav-link">Expenses</a></li>
                 <li class="nav-item" routerLink="/finance/legal-demand-action"><a class="nav-link">Legal/Demand
                     Action</a>
@@ -192,6 +200,8 @@
               <ul class="nav flex-column wlt-c-furg-sub-menu">
                 <li class="nav-item"><a class="nav-link" routerLink="/report/finance/invoice-report">Invoice Report</a>
                 </li>
+                <li class="nav-item"><a class="nav-link" routerLink="/report/finance/print-indian-invoice">Indian
+                    Invoice</a></li>
                 <li class="nav-item"><a class="nav-link"
                     routerLink="/report/finance/invoice-collection-status-report">Invoice Collection Status</a></li>
                 <li class="nav-item"><a class="nav-link" routerLink="/report/finance/monthly-invoice-status">Monthly
@@ -238,12 +248,14 @@
                 <li class="nav-item" routerLink="/payroll/new-employee-uniform-loan"><a class="nav-link">Employee
                     Uniform Loan</a></li>
                 <li class="nav-item" routerLink="/payroll/new-attendance"><a class="nav-link">Attendance</a></li>
-                <li class="nav-item" routerLink="/payroll/attendance-display"><a class="nav-link">Attendance Display</a></li>
+                <li class="nav-item" routerLink="/payroll/attendance-display"><a class="nav-link">Attendance Display</a>
+                </li>
                 <li class="nav-item" routerLink="/payroll/misc-transactions"><a class="nav-link">Misc Transactions </a>
                 </li>
                 <li class="nav-item" routerLink="/payroll/salary-processing"><a class="nav-link">Salary Processing</a>
                 </li>
-                <li class="nav-item" routerLink="/payroll/rbi-bank-salary-process"><a class="nav-link">RBI Bank Salary Process</a>
+                <li class="nav-item" routerLink="/payroll/rbi-bank-salary-process"><a class="nav-link">RBI Bank Salary
+                    Process</a>
                 </li>
               </ul>
             </div>
@@ -258,13 +270,17 @@
             </span>
             <div class="collapse" [ngClass]="{'show': isSubmenuOpen('payroll')}">
               <ul class="nav flex-column wlt-c-furg-sub-menu">
-                <li class="nav-item" [routerLink]="['report/compliance/client-compliance-report']"><a class="nav-link">Client Compliance Report</a>
+                <li class="nav-item" [routerLink]="['report/compliance/client-compliance-report']"><a
+                    class="nav-link">Client Compliance Report</a>
                 </li>
-                <li class="nav-item" [routerLink]="['report/payroll/pf-statement-report']"><a class="nav-link">PF Statement Report</a>
+                <li class="nav-item" [routerLink]="['report/payroll/pf-statement-report']"><a class="nav-link">PF
+                    Statement Report</a>
                 </li>
-                <li class="nav-item" [routerLink]="['report/payroll/esi-statement-report']"><a class="nav-link">ESI Statement Report</a>
+                <li class="nav-item" [routerLink]="['report/payroll/esi-statement-report']"><a class="nav-link">ESI
+                    Statement Report</a>
                 </li>
-                <li class="nav-item" [routerLink]="['report/payroll/professional-tax-statement-report']"><a class="nav-link">Professional Tax Statement Report</a>
+                <li class="nav-item" [routerLink]="['report/payroll/professional-tax-statement-report']"><a
+                    class="nav-link">Professional Tax Statement Report</a>
                 </li>
                 <li class="nav-item" [routerLink]="['report/payroll/payslip-report']"><a class="nav-link">Pay Slip &
                     Time Sheet</a>
@@ -366,7 +382,8 @@
             <div class="collapse" [ngClass]="{'show': isSubmenuOpen('accounting')}">
               <ul class="nav flex-column wlt-c-furg-sub-menu">
                 <li class="nav-item" hidden><a class="nav-link">Category Master</a></li>
-                <li class="nav-item" routerLink="/accounting/acc-gl-data-list"><a class="nav-link">General Ledger Data List </a></li>
+                <li class="nav-item" routerLink="/accounting/acc-gl-data-list"><a class="nav-link">General Ledger Data
+                    List </a></li>
                 <li class="nav-item" hidden><a class="nav-link">Trade Master </a></li>
                 <li class="nav-item" hidden><a class="nav-link">Income/Expenses Master</a></li>
                 <li class="nav-item" hidden><a class="nav-link">Trail Balance Process</a></li>
@@ -374,8 +391,8 @@
             </div>
           </li>
 
-           <!-- third Submenu -->
-           <li class="nav-item">
+          <!-- third Submenu -->
+          <li class="nav-item">
             <span class="reportHeader">
               <a class="nav-link collapsed reportHeader" data-toggle="collapse" data-parent="#accordion"
                 data-target="#accounting" aria-expanded="false" aria-controls="accounting">
@@ -384,26 +401,26 @@
             </span>
             <div class="collapse" [ngClass]="{'show': isSubmenuOpen('accounting')}">
               <ul class="nav flex-column wlt-c-furg-sub-menu">
-                <li class="nav-item" [routerLink]="['report/accounting/balance-sheet']"><a
-                  class="nav-link">Balance Sheet                  
-                </a>
+                <li class="nav-item" [routerLink]="['report/accounting/balance-sheet']"><a class="nav-link">Balance
+                    Sheet
+                  </a>
                 </li>
-                <li class="nav-item" [routerLink]="['report/accounting/trail-balance']"><a
-                  class="nav-link">Trail Balance                   
-                </a>
+                <li class="nav-item" [routerLink]="['report/accounting/trail-balance']"><a class="nav-link">Trail
+                    Balance
+                  </a>
                 </li>
                 <li class="nav-item" [routerLink]="['report/accounting/accounting-profit-and-loss']"><a
-                    class="nav-link">Profit And Loss                    
+                    class="nav-link">Profit And Loss
                   </a>
-                  </li>
-                  <li class="nav-item" [routerLink]="['report/accounting/bank-reconciliation']"><a
-                    class="nav-link">Bank Reconciliation                    
+                </li>
+                <li class="nav-item" [routerLink]="['report/accounting/bank-reconciliation']"><a class="nav-link">Bank
+                    Reconciliation
                   </a>
-                  </li>
-                  <li class="nav-item" [routerLink]="['report/accounting/general-ledger']"><a
-                    class="nav-link">General Ledger                    
+                </li>
+                <li class="nav-item" [routerLink]="['report/accounting/general-ledger']"><a class="nav-link">General
+                    Ledger
                   </a>
-                  </li>
+                </li>
               </ul>
             </div>
           </li>

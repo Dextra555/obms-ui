@@ -23,7 +23,8 @@
             box-sizing: border-box;
         }
 
-        html, body {
+        html,
+        body {
             width: 210mm;
             height: 297mm;
             margin: 0 auto;
@@ -40,7 +41,9 @@
         }
 
         @media print {
-            html, body {
+
+            html,
+            body {
                 width: 210mm;
                 height: 297mm;
                 margin: 0;
@@ -79,7 +82,8 @@
         /* Wrapper to simulate A4 on screen */
         .invoice-wrapper {
             width: 210mm;
-            height: calc(297mm - 16mm); /* 297mm minus 2x 8mm padding */
+            height: calc(297mm - 16mm);
+            /* 297mm minus 2x 8mm padding */
             margin: 0 auto;
             padding: 8mm;
             background: #fff;
@@ -465,7 +469,7 @@
             margin-bottom: 1.2mm;
         }
 
-        .footer-two-col > div {
+        .footer-two-col>div {
             flex: 1;
         }
 
@@ -597,9 +601,17 @@
         }
 
         /* ── HELPERS ── */
-        .text-right  { text-align: right; }
-        .text-center { text-align: center; }
-        .bold        { font-weight: 700; }
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .bold {
+            font-weight: 700;
+        }
     </style>
 </head>
 
@@ -610,8 +622,7 @@
             <!-- ══ HEADER ══ -->
             <div class="header-top">
                 <div class="logo-section">
-                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
-                        alt="Logo" class="company-logo" id="company-logo">
+                    <img src="./assets/img/logo-white.png" alt="Logo" class="company-logo" id="company-logo">
                     <div class="tagline">Securing Global Trade</div>
                 </div>
                 <div class="address-section">
@@ -625,9 +636,9 @@
                 </div>
                 <div class="cert-section">
                     <div class="cert-icons-row">
-                        <img src="assets/img/iaf.jfif" alt="IAF" class="cert-thumb">
-                        <img src="assets/img/uaf.jfif" alt="UAF" class="cert-thumb">
-                        <img src="assets/img/bmg.jfif" alt="BMG" class="cert-thumb">
+                        <img src="./assets/img/iaf.jfif" alt="IAF" class="cert-thumb">
+                        <img src="./assets/img/uaf.jfif" alt="UAF" class="cert-thumb">
+                        <img src="./assets/img/bmg.jfif" alt="BMG" class="cert-thumb">
                     </div>
                     <div class="iso-box">CERTIFIED ISO 9001 : 2015</div>
                 </div>
@@ -682,74 +693,74 @@
 
             <!-- ══ INVOICE TABLE ══ -->
             <div class="table-flex-section">
-            <table class="invoice-table" style="height: 100%;">
-                <thead>
-                    <tr class="gst-meta-row">
-                        <td colspan="7">
-                            <span>GST No.: {{BillingGSTIN}}</span>
-                            &nbsp;&nbsp;|&nbsp;&nbsp;
-                            <span>State : {{BillingState}}</span>
-                            &nbsp;&nbsp;|&nbsp;&nbsp;
-                            <span>SAC Code : {{SACCode}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th style="width: 28px;">S.No</th>
-                        <th>Particulars</th>
-                        <th style="width: 60px;">HSN Code</th>
-                        <th style="width: 45px;">Duties</th>
-                        <th style="width: 30px;">Qty</th>
-                        <th style="width: 80px;">Rate (₹)</th>
-                        <th style="width: 80px;">Amount (₹)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{DataRows}}
+                <table class="invoice-table" style="height: 100%;">
+                    <thead>
+                        <tr class="gst-meta-row">
+                            <td colspan="7">
+                                <span>GST No.: {{BillingGSTIN}}</span>
+                                &nbsp;&nbsp;|&nbsp;&nbsp;
+                                <span>State : {{BillingState}}</span>
+                                &nbsp;&nbsp;|&nbsp;&nbsp;
+                                <span>SAC Code : {{SACCode}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th style="width: 28px;">S.No</th>
+                            <th>Particulars</th>
+                            <th style="width: 60px;">HSN Code</th>
+                            <th style="width: 45px;">Duties</th>
+                            <th style="width: 30px;">Qty</th>
+                            <th style="width: 80px;">Rate (₹)</th>
+                            <th style="width: 80px;">Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{DataRows}}
 
-                    <!-- Filler Row to stretch vertical borders down -->
-                    <tr class="filler-row">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
+                        <!-- Filler Row to stretch vertical borders down -->
+                        <tr class="filler-row">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
 
-                    <!-- SUMMARY -->
-                    <tr>
-                        <td colspan="5"></td>
-                        <td class="summary-total-label">TOTAL</td>
-                        <td class="summary-total-value">{{Subtotal}}</td>
-                    </tr>
-                    <tr class="cgst-row">
-                        <td colspan="5"></td>
-                        <td class="summary-total-label">CGST - {{CGSTPct}}%</td>
-                        <td class="summary-total-value">{{CGSTAmount}}</td>
-                    </tr>
-                    <tr class="sgst-row">
-                        <td colspan="5"></td>
-                        <td class="summary-total-label">SGST - {{SGSTPct}}%</td>
-                        <td class="summary-total-value">{{SGSTAmount}}</td>
-                    </tr>
-                    <tr class="igst-row">
-                        <td colspan="5"></td>
-                        <td class="summary-total-label">IGST - {{IGSTPct}}%</td>
-                        <td class="summary-total-value">{{IGSTAmount}}</td>
-                    </tr>
-                    <tr class="grand-total-row">
-                        <td colspan="5"></td>
-                        <td class="summary-total-label">Grand Total</td>
-                        <td class="summary-total-value">{{GrandTotal}}</td>
-                    </tr>
-                    <tr class="amount-words-row">
-                        <td colspan="7">
-                            <span class="bold">Rupees:</span> {{AmountInWords}}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                        <!-- SUMMARY -->
+                        <tr>
+                            <td colspan="5"></td>
+                            <td class="summary-total-label">TOTAL</td>
+                            <td class="summary-total-value">{{Subtotal}}</td>
+                        </tr>
+                        <tr class="cgst-row">
+                            <td colspan="5"></td>
+                            <td class="summary-total-label">CGST - {{CGSTPct}}%</td>
+                            <td class="summary-total-value">{{CGSTAmount}}</td>
+                        </tr>
+                        <tr class="sgst-row">
+                            <td colspan="5"></td>
+                            <td class="summary-total-label">SGST - {{SGSTPct}}%</td>
+                            <td class="summary-total-value">{{SGSTAmount}}</td>
+                        </tr>
+                        <tr class="igst-row">
+                            <td colspan="5"></td>
+                            <td class="summary-total-label">IGST - {{IGSTPct}}%</td>
+                            <td class="summary-total-value">{{IGSTAmount}}</td>
+                        </tr>
+                        <tr class="grand-total-row">
+                            <td colspan="5"></td>
+                            <td class="summary-total-label">Grand Total</td>
+                            <td class="summary-total-value">{{GrandTotal}}</td>
+                        </tr>
+                        <tr class="amount-words-row">
+                            <td colspan="7">
+                                <span class="bold">Rupees:</span> {{AmountInWords}}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div><!-- /.table-flex-section -->
 
             <!-- ══ FOOTER CONTENT ══ -->
@@ -788,16 +799,21 @@
                 <div class="footer-section">
                     <div class="footer-section-title">Declaration</div>
                     <ol class="declaration-ol">
-                        <li>We declare that this invoice shows the Actual value of the services described and that all particulars are true and correct.</li>
-                        <li>If any discrepancy in this invoice, please contact us immediately. This invoice is subject to provisions of MSMED Act, 2006.</li>
+                        <li>We declare that this invoice shows the Actual value of the services described and that all
+                            particulars are true and correct.</li>
+                        <li>If any discrepancy in this invoice, please contact us immediately. This invoice is subject
+                            to provisions of MSMED Act, 2006.</li>
                     </ol>
                 </div>
 
                 <!-- Terms & Conditions -->
                 <div class="terms-box">
                     <div class="terms-head">Terms &amp; Conditions</div>
-                    <p>Please remit the payment in our current account through NEFT / Account Payee Cheque in favour of "<span class="info-label">{{CompanyName}}</span>"</p>
-                    <p>Arrears in payments are subject to interest @12% p.a. Any discrepancy in this invoice must be notified to us in writing within five days of receipt, otherwise it will be treated as accepted. For any queries please contact: {{CompanyPhone}}</p>
+                    <p>Please remit the payment in our current account through NEFT / Account Payee Cheque in favour of
+                        "<span class="info-label">{{CompanyName}}</span>"</p>
+                    <p>Arrears in payments are subject to interest @12% p.a. Any discrepancy in this invoice must be
+                        notified to us in writing within five days of receipt, otherwise it will be treated as accepted.
+                        For any queries please contact: {{CompanyPhone}}</p>
                 </div>
             </div>
 

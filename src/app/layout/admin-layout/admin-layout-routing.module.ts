@@ -121,6 +121,7 @@ import { SupplierStatementComponent } from "../../modules/report/finance/supplie
 import { InvoiceAgeingComponent } from "../../modules/report/finance/invoice-ageing/invoice-ageing.component";
 import { ProfitAndLossComponent } from 'src/app/modules/report/finance/profit-and-loss/profit-and-loss.component';
 import { InvoiceReportComponent } from 'src/app/modules/report/finance/invoice-report/invoice-report.component';
+import { PrintIndianInvoiceComponent } from 'src/app/modules/report/finance/print-indian-invoice/print-indian-invoice.component';
 import { SearchReceiptsComponent } from 'src/app/modules/finance/receipts/search-receipts/search-receipts.component';
 import { SearchPaymentsComponent } from 'src/app/modules/finance/payments/search-payments/search-payments.component';
 import { UniformLoanReportComponent } from 'src/app/modules/payroll/employee-uniform-loan/uniform-loan-report/uniform-loan-report.component';
@@ -147,6 +148,8 @@ import { EsiSlabComponent } from '../../modules/master/esi-slab/esi-slab.compone
 import { TdsSlabComponent } from '../../modules/master/tds-slab/tds-slab.component';
 import { GstSlabComponent } from "../../modules/master/gst-slab/gst-slab.component";
 import { ServiceTypeComponent } from "../../modules/master/service-type/service-type.component";
+import { NewServiceTypeComponent } from "../../modules/master/service-type/new-service-type/new-service-type.component";
+import { ViewServiceTypeComponent } from "../../modules/master/service-type/view-service-type/view-service-type.component";
 import { ProfessionalTaxSlabComponent } from "../../modules/master/professional-tax-slab/professional-tax-slab.component";
 import { DepartmentMasterComponent } from 'src/app/modules/master/department-master/department-master.component';
 import { DesignationMasterComponent } from 'src/app/modules/master/designation-master/designation-master.component';
@@ -155,9 +158,9 @@ const routes: Routes = [
   // { path: '', component: AdminLayoutComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
 
-   //Master module
+  //Master module
   { path: 'master/branch-master', component: BranchMasterComponent, canActivate: [AuthGuard] },
-  { path: 'master/branch-master/new-branch', component: NewBranchComponent, canActivate: [AuthGuard] }, 
+  { path: 'master/branch-master/new-branch', component: NewBranchComponent, canActivate: [AuthGuard] },
   { path: 'master/client-master', component: ClientMasterComponent, canActivate: [AuthGuard] },
   { path: 'master/client-master/new-client', component: NewClientMasterComponent, canActivate: [AuthGuard] },
   { path: 'master/employee-master', component: EmployeeMasterComponent, canActivate: [AuthGuard] },
@@ -179,7 +182,7 @@ const routes: Routes = [
   { path: 'master/income-tax-slab', component: IncomeTaxSlabComponent, canActivate: [AuthGuard] },
   { path: 'master/income-tax-slab/new-income-tax-slab', component: NewIncomeTaxSlabComponent, canActivate: [AuthGuard] },
   { path: 'master/employee-history', component: EmployeeHistoryComponent, canActivate: [AuthGuard] },
-  
+
   // Indian Statutory Compliance
   { path: 'master/pf-slab', component: PfSlabComponent, canActivate: [AuthGuard] },
   { path: 'master/esi-slab', component: EsiSlabComponent, canActivate: [AuthGuard] },
@@ -187,6 +190,9 @@ const routes: Routes = [
   { path: 'master/gst-slab', component: GstSlabComponent, canActivate: [AuthGuard] },
   { path: 'master/professional-tax-slab', component: ProfessionalTaxSlabComponent, canActivate: [AuthGuard] },
   { path: 'master/service-type', component: ServiceTypeComponent, canActivate: [AuthGuard] },
+  { path: 'master/service-type/new', component: NewServiceTypeComponent, canActivate: [AuthGuard] },
+  { path: 'master/service-type/edit/:id', component: NewServiceTypeComponent, canActivate: [AuthGuard] },
+  { path: 'master/service-type/details/:id', component: ViewServiceTypeComponent, canActivate: [AuthGuard] },
   { path: 'master/department-master', component: DepartmentMasterComponent, canActivate: [AuthGuard] },
   { path: 'master/designation-master', component: DesignationMasterComponent, canActivate: [AuthGuard] },
 
@@ -313,6 +319,7 @@ const routes: Routes = [
 
   //finance report module
   { path: 'report/finance/invoice-report', component: InvoiceReportComponent, canActivate: [AuthGuard] },
+  { path: 'report/finance/print-indian-invoice', component: PrintIndianInvoiceComponent, canActivate: [AuthGuard] },
   { path: 'report/finance/payment-voucher-summary-report', component: PaymentVoucherSummaryComponent, canActivate: [AuthGuard] },
   { path: 'report/finance/receipt-voucher-summary-report', component: ReceiptVoucherSummaryComponent, canActivate: [AuthGuard] },
   { path: 'report/finance/branch-transactions-report', component: BranchTransactionsComponent, canActivate: [AuthGuard] },
@@ -327,6 +334,7 @@ const routes: Routes = [
   { path: 'report/finance/supplier-statement', component: SupplierStatementComponent, canActivate: [AuthGuard] },
   { path: 'report/finance/invoice-ageing', component: InvoiceAgeingComponent, canActivate: [AuthGuard] },
   { path: 'report/finance/print-invoice-computer-generated', component: PrintInvoiceComputerGeneratedComponent, canActivate: [AuthGuard] },
+  { path: 'report/finance/print-indian-invoice', component: PrintIndianInvoiceComponent, canActivate: [AuthGuard] },
   { path: 'report/finance/print-voucher-report', component: PrintVoucherReportComponent, canActivate: [AuthGuard] },
   { path: 'report/finance/receipt-voucher-report', component: ReceiptVoucherReportComponent, canActivate: [AuthGuard] },
 
@@ -341,7 +349,7 @@ const routes: Routes = [
   //Compliance report module
   { path: 'report/compliance/client-compliance-report', component: ClientComplianceReportComponent, canActivate: [AuthGuard] },
 
-  
+
   { path: '**', redirectTo: 'login' }
 ];
 

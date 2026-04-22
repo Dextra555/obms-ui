@@ -10,7 +10,7 @@ import { ServiceType } from '../model/service-type.model';
 export class ServiceTypeService {
   private apiUrl = environment.baseUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getAllServiceTypes(): Observable<ServiceType[]> {
     return this.http.get<ServiceType[]>(`${this.apiUrl}servicetype`).pipe(
@@ -24,14 +24,14 @@ export class ServiceTypeService {
     );
   }
 
-  createServiceType(serviceType: ServiceType): Observable<ServiceType> {
-    return this.http.post<ServiceType>(`${this.apiUrl}servicetype`, serviceType).pipe(
+  createServiceType(serviceType: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}servicetype`, serviceType).pipe(
       catchError(this.handleError)
     );
   }
 
-  updateServiceType(id: number, serviceType: ServiceType): Observable<ServiceType> {
-    return this.http.put<ServiceType>(`${this.apiUrl}servicetype/${id}`, serviceType).pipe(
+  updateServiceType(id: number, serviceType: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}servicetype/${id}`, serviceType).pipe(
       catchError(this.handleError)
     );
   }
@@ -53,7 +53,7 @@ export class ServiceTypeService {
     } else if (error.status === 500) {
       errorMessage = 'Server error occurred';
     }
-    
+
     return throwError(() => errorMessage);
   }
 }

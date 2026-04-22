@@ -61,6 +61,7 @@ import { GstSlabComponent } from './master/gst-slab/gst-slab.component';
 import { SalarySlabComponent } from './master/salary-slab/salary-slab.component';
 import { ServiceTypeComponent } from './master/service-type/service-type.component';
 import { NewServiceTypeComponent } from './master/service-type/new-service-type/new-service-type.component';
+import { ViewServiceTypeComponent } from './master/service-type/view-service-type/view-service-type.component';
 import { IndianComplianceService } from '../service/indian-compliance.service';
 import { IndianPayrollService } from '../service/indian-payroll.service';
 // import { IndianPayrollDashboardComponent } from './payroll/indian-payroll-dashboard/indian-payroll-dashboard.component';
@@ -189,6 +190,7 @@ import { SupplierStatementComponent } from './report/finance/supplier-statement/
 import { InvoiceAgeingComponent } from './report/finance/invoice-ageing/invoice-ageing.component';
 import { ProfitAndLossComponent } from './report/finance/profit-and-loss/profit-and-loss.component';
 import { InvoiceReportComponent } from './report/finance/invoice-report/invoice-report.component';
+import { PrintIndianInvoiceComponent } from './report/finance/print-indian-invoice/print-indian-invoice.component';
 import { UniformLoanReportComponent } from './payroll/employee-uniform-loan/uniform-loan-report/uniform-loan-report.component';
 import { DailyAdvanceVoucherReportComponent } from './payroll/new-employee-daily-advance/daily-advance-voucher-report/daily-advance-voucher-report.component';
 import { LoanVoucherReportComponent } from './payroll/employee-loan/loan-voucher-report/loan-voucher-report.component';
@@ -341,6 +343,7 @@ import { DesignationMasterComponent } from './master/designation-master/designat
     InvoiceAgeingComponent,
     ProfitAndLossComponent,
     InvoiceReportComponent,
+    PrintIndianInvoiceComponent,
     UniformLoanReportComponent,
     DailyAdvanceVoucherReportComponent,
     LoanVoucherReportComponent,
@@ -360,6 +363,7 @@ import { DesignationMasterComponent } from './master/designation-master/designat
     GstSlabComponent,
     ServiceTypeComponent,
     NewServiceTypeComponent,
+    ViewServiceTypeComponent,
     CommercialBreakdownDialogComponent,
     CommercialBreakdownEnhancedDialogComponent,
     EmployeeImportDialogComponent,
