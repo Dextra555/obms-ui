@@ -232,25 +232,38 @@ export class AgreementsComponent implements OnInit, AfterViewInit {
   }
 
   deleteAgreement(agreementId: number, clientName: string) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: `Do you want to delete the agreement for ${clientName}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.showLoadingSpinner = true;
-        this.service.DeleteAgreementById(agreementId).subscribe({
-          next: (response) => {
-            Swal.fire('Deleted!', 'Agreement has been deleted successfully.', 'success');
-            this.getAgreements(this.currentUser, "0", false);
-          },
-          error: (error) => {
-            this.handleErrors(error);
-            Swal.fire('Error!', 'Failed to delete agreement.', 'error');
+    // First check if invoices are posted for this agreement
+    this.service.getFinalInvoiceDate(agreementId).subscribe((finalInvoiceDate: any) => {
+      if (Array.isArray(finalInvoiceDate) && finalInvoiceDate.length > 0) {
+        Swal.fire({
+          title: 'Cannot Delete',
+          text: 'This agreement has posted invoices. Cannot delete agreements with posted invoices.',
+          icon: 'error',
+          confirmButtonColor: '#3085d6',
+          confirmButtonText: 'OK'
+        });
+      } else {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: `Do you want to delete the agreement for ${clientName}?`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.showLoadingSpinner = true;
+            this.service.DeleteAgreementById(agreementId).subscribe({
+              next: (response) => {
+                Swal.fire('Deleted!', 'Agreement has been deleted successfully.', 'success');
+                this.getAgreements(this.currentUser, "0", false);
+              },
+              error: (error) => {
+                this.handleErrors(error);
+                Swal.fire('Error!', 'Failed to delete agreement.', 'error');
+              }
+            });
           }
         });
       }
