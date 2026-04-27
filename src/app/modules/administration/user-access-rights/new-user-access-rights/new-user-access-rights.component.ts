@@ -67,9 +67,9 @@ export class NewUserAccessRightsComponent implements OnInit {
       this._dataService.getUsername().subscribe((username) => {
         this.currentUser = username;
       });
-    } 
+    }
     this.getUserAccessRights(this.currentUser, 'User Access Rights');
-    this.createForm();   
+    this.createForm();
     this._activatedRoute.queryParams.subscribe((params) => {
       if (params['name'] != undefined) {
         this.userAccessTitle = 'edit';
@@ -86,6 +86,9 @@ export class NewUserAccessRightsComponent implements OnInit {
           this.isDeleteEditable = true;
         }
         this.getScreensByCategoryandUsername('Master',params['name']);
+      } else {
+        // Load screens for default category when in new mode
+        this.getScreensByCategory(this.selectedCategory);
       }
     });
   }
@@ -155,8 +158,13 @@ export class NewUserAccessRightsComponent implements OnInit {
           }   
         } 
   }
-  onCategoryChange() {      
-    this.getScreensByCategoryandUsername(this.selectedCategory,this.userName);
+  onCategoryChange() {
+    // If editing (userName exists), get permissions with screens. Otherwise, just get screens by category.
+    if (this.userName) {
+      this.getScreensByCategoryandUsername(this.selectedCategory, this.userName);
+    } else {
+      this.getScreensByCategory(this.selectedCategory);
+    }
   }
 
   getScreensByCategory(categoryName: string): void {   

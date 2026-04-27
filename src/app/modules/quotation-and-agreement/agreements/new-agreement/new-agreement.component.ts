@@ -939,11 +939,11 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
             const agreementStartDate = new Date(agreement.AgreementDate);
             const agreementMonth = agreementStartDate.getMonth();
             const agreementYear = agreementStartDate.getFullYear();
-            
-            // Check if any invoice is in the same month or after the agreement start date
+
+            // Check if any invoice is posted for the exact same month as the agreement start date
             let hasConflictingInvoice = false;
             let conflictingMonth = '';
-            
+
             for (let invoice of finalInvoiceDate) {
               let invoiceDate = null;
               if (invoice.InvoiceDate) {
@@ -955,25 +955,25 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
               } else if (invoice.Date) {
                 invoiceDate = new Date(invoice.Date);
               }
-              
+
               if (invoiceDate) {
                 const invoiceMonth = invoiceDate.getMonth();
                 const invoiceYear = invoiceDate.getFullYear();
-                
-                // Check if invoice is in the same month or after the agreement start date
-                if (invoiceYear > agreementYear || (invoiceYear === agreementYear && invoiceMonth >= agreementMonth)) {
+
+                // Check if invoice is in the exact same month as the agreement start date
+                if (invoiceYear === agreementYear && invoiceMonth === agreementMonth) {
                   hasConflictingInvoice = true;
                   conflictingMonth = invoiceDate.toISOString().substring(0, 7);
-                  console.log('Found conflicting invoice:', invoiceDate, 'Agreement:', agreementStartDate);
+                  console.log('Found conflicting invoice for same month:', invoiceDate, 'Agreement:', agreementStartDate);
                   break;
                 }
               }
             }
-            
+
             if (hasConflictingInvoice) {
               Swal.fire({
                 title: 'Warning Message',
-                text: `New Agreement Period can not be less than ${conflictingMonth} already posted invoice documents`,
+                text: `Invoice already posted for period ${conflictingMonth}`,
                 icon: 'warning',
                 confirmButtonColor: '#3085d6',
                 confirmButtonText: 'OK'
