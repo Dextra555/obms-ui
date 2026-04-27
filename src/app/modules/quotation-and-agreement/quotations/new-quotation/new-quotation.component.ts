@@ -312,7 +312,7 @@ export class NewQuotationComponent {
 
         quotationDetails.forEach((d: any) => {
 
-          d['YearTotal'] = (parseFloat(d['MonthTotal']) * 12);
+          d['YearTotal'] = Math.round(d['MonthTotal'] * 12);
 
 
 
@@ -1394,6 +1394,16 @@ export class NewQuotationComponent {
 
   }
 
+  set8Hours() {
+    this.frm.get('details.NoOfHours')?.setValue(8);
+    this.DetailRowChange();
+  }
+
+  set12Hours() {
+    this.frm.get('details.NoOfHours')?.setValue(12);
+    this.DetailRowChange();
+  }
+
 
 
   chkDogService(type: string) {
@@ -1722,11 +1732,10 @@ export class NewQuotationComponent {
 
     }
 
+    // Round vMonthTotal to avoid floating-point precision errors before calculating Year Total
+    vMonthTotal = Math.round(vMonthTotal);
 
-
-    this.frm.get('details.YearTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal * 12)));
-
-
+    this.frm.get('details.YearTotal')?.setValue(Math.round(vMonthTotal * 12));
 
     let vDiscount = parseFloat(this.frm.get('details.DiscountAmount')?.value || '0');
 

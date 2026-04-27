@@ -100,7 +100,7 @@
                         <tr>
                             <td style="border: 1px solid #000; border-bottom: 0; border-top: 0;"></td>
                             <td class="text-right" style="border: none; text-align: center; font-weight: bold;"> Service Charges</td>
-                            <td class="text-right" style="border: 1px solid #000; border-top: 0; border-bottom: 0;"> {{invoice['ServiceCharges']}}</td>
+                            <td class="text-right" style="border: 1px solid #000; border-top: 0; border-bottom: 0;"> {{invoice['ServiceCharges'] | number:'1.2-2'}}</td>
                         </tr>
                         <tr>
                             <td style="border: 1px solid #000; border-bottom: 0; border-top: 0;"></td>
@@ -110,12 +110,12 @@
                         <tr>
                             <td style="border: 1px solid #000; border-bottom: 0; border-top: 0;"></td>
                             <td class="text-right" style="border: none; text-align: center; font-weight: bold;"> 18% GST</td>
-                            <td class="text-right" style="border: 1px solid #000; border-top: 0; border-bottom: 0;">  {{invoice['TaxAmount']}}</td>
+                            <td class="text-right" style="border: 1px solid #000; border-top: 0; border-bottom: 0;">  {{invoice['TaxAmount'] | number:'1.2-2'}}</td>
                         </tr>
                         <tr>
                             <td style="border: 1px solid #000; border-bottom: 0; border-top: 0;"></td>
                             <td class="text-right" style="border: none; text-align: center; font-weight: bold;"> TOTAL :</td>
-                            <td class="text-right" style="border: 1px solid #000; border-bottom: 0; font-weight: bold;">  {{invoice['ServiceCharges']+invoice['TaxAmount']}}</td>
+                            <td class="text-right" style="border: 1px solid #000; border-bottom: 0; font-weight: bold;">  {{(invoice['ServiceCharges'] + invoice['TaxAmount']) | number:'1.2-2'}}</td>
                         </tr>
                     </table>
                 </td>

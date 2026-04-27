@@ -400,7 +400,11 @@ export class BatchInvoiceComponent implements AfterViewInit {
 
     });
 
+    this.ServiceCharges = Math.round(this.ServiceCharges * 100) / 100;
+    this.DiscountAmount = Math.round(this.DiscountAmount * 100) / 100;
+    this.TaxAmount = Math.round(this.TaxAmount * 100) / 100;
     this.Total = this.ServiceCharges - this.DiscountAmount + this.TaxAmount;
+    this.Total = Math.round(this.Total * 100) / 100;
   }
 
   hideLoadingSpinner() {

@@ -194,7 +194,10 @@ export class NewEmployeeComponent implements OnInit {
       DesignationId: [null],
 
       // Salary Structure Flag (for migration from salary slab to commercial breakdown)
-      NewSalaryStructure: ['N']
+      NewSalaryStructure: ['N'],
+
+      // OT (Overtime) Field
+      OT: ['No']
     });
 
     this.checklistItems.forEach((item) => {
@@ -252,6 +255,7 @@ export class NewEmployeeComponent implements OnInit {
         this.frm.get('SOCSODETECT')?.setValue(salaryDetail?.SOCSODETECT == true ? "Yes" : "No");
         this.frm.get('EPFDETECT')?.setValue(salaryDetail?.EPFDETECT == true ? "Yes" : "No");
         this.frm.get('DETECTBYND55')?.setValue(salaryDetail?.DETECTBYND55 == true ? "Yes" : "No");
+        this.frm.get('OT')?.setValue(salaryDetail?.OT || 'No');
 
         this.frm.get('AttendanceAllowanceFollowCalendar')?.setValue(employment['AttendanceAllowanceFollowCalendar'] == "Y");
 
@@ -485,6 +489,11 @@ export class NewEmployeeComponent implements OnInit {
     if (selectedDesignation) {
       this.frm.get('EMPPAY_CATEGORY')?.setValue(selectedDesignation.DesignationName);
     }
+  }
+
+  otChange(value: any): void {
+    // OT change handler - Salary Details visibility is controlled by *ngIf in HTML
+    // This method can be used for additional logic if needed in the future
   }
 
   calculateCommercialBreakdownTotal(): void {

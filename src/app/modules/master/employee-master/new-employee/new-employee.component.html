@@ -367,6 +367,14 @@
             <mat-datepicker #picker3></mat-datepicker>
           </mat-form-field>
         </div>
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-label class="mr-3"><strong>OT (Overtime)</strong></mat-label>
+          <br />
+          <mat-radio-group aria-label="Select OT" formControlName="OT" (change)="otChange($event.value)">
+            <mat-radio-button value="Yes">Yes</mat-radio-button>
+            <mat-radio-button value="No">No</mat-radio-button>
+          </mat-radio-group>
+        </div>
       </div>
       <div class="row" *ngIf="warningMessage ==''">
         <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
