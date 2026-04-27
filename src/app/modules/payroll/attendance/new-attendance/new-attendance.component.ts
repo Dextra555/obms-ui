@@ -131,7 +131,7 @@ export class NewAttendanceComponent implements OnInit {
       ID: [0],
       EmployeeID: [''],
       AdvanceDate: [new Date, [Validators.required]],
-      ClientName: [''],
+      ClientName: ['', [Validators.required]],
       BranchCode: ['', [Validators.required]],
       EmployeeNo: ['', [Validators.required]],
       EmployeeType: ['Guard'],
@@ -714,10 +714,11 @@ export class NewAttendanceComponent implements OnInit {
   clientNameChange(event: any) {
     this.ClientName = event.value == '' ? '0' : event.value;
   }
-  Shif2ClientChange(event: any) {
+  Shift2ClientChange(event: any) {
     this.Shift2Client = event.value == '' ? '0' : event.value;
   }
-  getClients(advanceDate: string, branchCode: string): void {
+
+    getClients(advanceDate: string, branchCode: string): void {
     this._payrollService.getClients(advanceDate, branchCode).subscribe(
       (data) => {
         // Prepend an empty option to the list
@@ -1640,6 +1641,39 @@ export class NewAttendanceComponent implements OnInit {
     if (!allowProceed) {
       return; // stop if user cancels the confirm dialog
     }
+
+    // Validate client selection for Guard employees
+    if (this.employeeSelectedType === 'Guard') {
+      const clientName = this.attendanceForm.get('ClientName')?.value;
+      const shift2Client = this.attendanceForm.get('Shif2Client')?.value;
+      
+      // Shift 1 Client is always mandatory
+      if (!clientName || clientName.trim() === '') {
+        this.showMessage('Please select a Default Client for Shift 1. This is mandatory.', 'warning', 'Warning Message');
+        return;
+      }
+      
+      // Check if Shift 2 has any hours in the dynamic form
+      let hasShift2Hours = false;
+      const formArray = this.dynamicForm.get('formArray') as FormArray;
+      for (let i = 0; i < formArray.length; i++) {
+        const group = formArray.at(i);
+        const shift2Hours = group.get('Shift2Hours')?.value;
+        if (shift2Hours && parseFloat(shift2Hours) > 0) {
+          hasShift2Hours = true;
+          break;
+        }
+      }
+      
+      // Shift 2 Client is required only if Shift 2 has hours
+      if (hasShift2Hours) {
+        if (!shift2Client || shift2Client.trim() === '') {
+          this.showMessage('Please select a Shift II Default Client. Shift 2 hours are present.', 'warning', 'Warning Message');
+          return;
+        }
+      }
+    }
+
     // Get allowed leave values from form
     const annualAllowed = this.attendanceForm.get('Annual')?.value;
     const medicalAllowed = this.attendanceForm.get('Medical')?.value;

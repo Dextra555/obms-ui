@@ -43,7 +43,7 @@
                         <mat-datepicker #picker></mat-datepicker>
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-3">
                     <mat-form-field appearance="outline">
                         <mat-label>Branch Code</mat-label>
                         <mat-select formControlName="BranchCode" (selectionChange)="onBranchSelectionChange($event)"
@@ -54,45 +54,38 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-            </div>
-            <br />
-            <div class="class">
-                <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                    <div class="row">
-                        <div class="col-12 col-sm-12 col-md-4 col-lg-3">
-                            <mat-label class="mr-3"><strong>Type</strong></mat-label>
-                            <br />
-                            <mat-radio-group aria-label="Select a Type" formControlName="EmployeeType"
-                                (change)="radioButtonTypeSelectionChange($event)">
-                                <mat-radio-button value="Guard">Guard</mat-radio-button>
-                                <mat-radio-button value="Staff">Staff</mat-radio-button>
-                            </mat-radio-group>
-                        </div>
-                        <div class="col-12 col-sm-12 col-md-12 col-lg-4">
-                            <mat-form-field appearance="outline">
-                                <mat-label>Employee</mat-label>
-                                <mat-select formControlName="EmployeeNo" (selectionChange)="onEmployeeChange()"
-                                    [panelClass]="'custom-dropdown-panel'">
-                                    <mat-option *ngFor="let employee of employeeListModel" [ngStyle]="{
-                                        'background-color': isEmployeeInNameList(employee.EMP_CODE) 
-                                          ? 'yellow' 
-                                          : isEmployeeProcessList(employee.EMP_CODE) 
-                                          ? 'red' 
-                                          : 'white',
-                                        'padding': '8px 16px',
-                                        'margin-bottom': '4px'
-                                      }" [value]="employee.EMP_CODE">
-                                        {{ employee.EMP_NAME }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                    </div>
+                <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                    <mat-label class="mr-3"><strong>Type</strong></mat-label>
+                    <br />
+                    <mat-radio-group aria-label="Select a Type" formControlName="EmployeeType"
+                        (change)="radioButtonTypeSelectionChange($event)">
+                        <mat-radio-button value="Guard">Guard</mat-radio-button>
+                        <mat-radio-button value="Staff">Staff</mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div class="col-12 col-sm-12 col-md-12 col-lg-3">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Employee</mat-label>
+                        <mat-select formControlName="EmployeeNo" (selectionChange)="onEmployeeChange()"
+                            [panelClass]="'custom-dropdown-panel'">
+                            <mat-option *ngFor="let employee of employeeListModel" [ngStyle]="{
+                                'background-color': isEmployeeInNameList(employee.EMP_CODE) 
+                                  ? 'yellow' 
+                                  : isEmployeeProcessList(employee.EMP_CODE) 
+                                  ? 'red' 
+                                  : 'white',
+                                'padding': '8px 16px',
+                                'margin-bottom': '4px'
+                              }" [value]="employee.EMP_CODE">
+                                {{ employee.EMP_NAME }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
             </div>
             <br />
             <!-- employee list details section -->
-            <div class="row">
+            <div class="row mb-4">
                 <div class="col-12 col-sm-12 col-md-4 col-lg-2">
                     <mat-form-field appearance="outline">
                         <mat-label>Aadhaar/PAN</mat-label>
@@ -100,7 +93,7 @@
                             readonly="true">
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-1">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
                     <mat-form-field appearance="outline">
                         <mat-label>Age</mat-label>
                         <input type="text" formControlName="Age" matInput placeholder="" autocomplete="off"
@@ -114,28 +107,14 @@
                             readonly="true">
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
                         <mat-label>Resigned Date</mat-label>
                         <input type="text" formControlName="ResignedDate" matInput placeholder="" autocomplete="off"
                             readonly="true">
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
-                    <mat-form-field appearance="outline">
-                        <mat-label>Income Tax</mat-label>
-                        <input type="text" formControlName="IncomeTax" matInput placeholder="" autocomplete="off"
-                            readonly="true">
-                    </mat-form-field>
-                </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-1">
-                    <mat-form-field appearance="outline">
-                        <mat-label>PF</mat-label>
-                        <input type="text" formControlName="PF" matInput placeholder="" autocomplete="off"
-                            readonly="true">
-                    </mat-form-field>
-                </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
                         <mat-label>PF Account No</mat-label>
                         <input type="text" formControlName="PFAccountNo" matInput placeholder="" autocomplete="off"
@@ -143,9 +122,15 @@
                     </mat-form-field>
                 </div>
             </div>
-            <br />
-            <div class="row">
-                <div class="col-12 col-sm-12 col-md-4 col-lg-1">
+            <div class="row mb-4">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                    <mat-form-field appearance="outline">
+                        <mat-label>PF</mat-label>
+                        <input type="text" formControlName="PF" matInput placeholder="" autocomplete="off"
+                            readonly="true">
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
                     <mat-form-field appearance="outline">
                         <mat-label>ESI</mat-label>
                         <input type="text" formControlName="ESI" matInput placeholder="" autocomplete="off"
@@ -159,35 +144,14 @@
                             readonly="true">
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
-                        <mat-label>Payment Mode</mat-label>
-                        <input type="text" formControlName="PaymentMode" matInput placeholder="" autocomplete="off"
-                            readonly="true">
-                    </mat-form-field>
-                </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
-                    <mat-form-field appearance="outline">
-                        <mat-label>New Salary Structure</mat-label>
-                        <input type="text" formControlName="SalaryStructure" matInput placeholder="" autocomplete="off"
-                            readonly="true">
-                    </mat-form-field>
-                </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
-                    <mat-form-field appearance="outline">
-                        <mat-label>Basic Pay</mat-label>
+                        <mat-label>Employee Fixed Salary</mat-label>
                         <input type="text" formControlName="BasicPay" matInput placeholder="" autocomplete="off"
                             readonly="true">
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-1">
-                    <mat-form-field appearance="outline">
-                        <mat-label>Allowance</mat-label>
-                        <input type="text" formControlName="Allowance" matInput placeholder="" autocomplete="off"
-                            readonly="true">
-                    </mat-form-field>
-                </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
                         <mat-label>Special Allowance</mat-label>
                         <input type="text" formControlName="SpecialAllowance" matInput placeholder="" autocomplete="off"
@@ -224,14 +188,14 @@
                             readonly="true">
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
                         <mat-label>Paternity</mat-label>
                         <input type="text" formControlName="Paternity" matInput placeholder="" autocomplete="off"
                             readonly="true">
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
                         <mat-label>Hospitalization</mat-label>
                         <input type="text" formControlName="Hospitalization" matInput placeholder="" autocomplete="off"
@@ -247,11 +211,15 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                     <mat-form-field appearance="outline">
                         <mat-label>Bonus Amount</mat-label>
                         <input type="text" formControlName="BonusAmount" matInput placeholder="" autocomplete="off">
                     </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                 </div>
             </div>
             <br />
@@ -262,25 +230,28 @@
                 </div>
             </div>
             <!-- defulat client details sections -->
-            <div class="row" *ngIf="employeeSelectedType == 'Guard'">
+            <div class="row mb-5" *ngIf="employeeSelectedType == 'Guard'">
                 <div class="col-12 col-sm-12 col-md-12 col-lg-12 wlt-c-furg-profile">
                     <h2><span>Attendance</span></h2>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
-                        <mat-label>Default Client</mat-label>
+                        <mat-label>Default Client <span style="color: red;">*</span></mat-label>
                         <mat-select formControlName="ClientName" [panelClass]="'custom-dropdown-panel'"
                             (selectionChange)="clientNameChange($event)">
                             <mat-option *ngFor="let employee of employeeModel" [value]="employee.Name">
                                 {{ employee.Name }}
                             </mat-option>
                         </mat-select>
+                        <mat-error *ngIf="attendanceForm.get('ClientName')?.hasError('required') && attendanceForm.get('ClientName')?.touched">
+                            Default Client is required
+                        </mat-error>
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-2" style="margin-top: 10px;">
                     <mat-label>Normal Timings</mat-label>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-1">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
                     <mat-form-field appearance="fill" class="custom-width">
                         <mat-select formControlName="StartTime" (selectionChange)="normalValues1Change($event)"
                             [panelClass]="'custom-dropdown-panel'">
@@ -290,7 +261,7 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-1">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
                     <mat-form-field appearance="fill" class="custom-width">
                         <mat-select formControlName="EndTime" (selectionChange)="normalValues2Change($event)"
                             [panelClass]="'custom-dropdown-panel'">
@@ -300,24 +271,28 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3">
+                </div>
             </div>
-            <br />
-            <div class="row" *ngIf="employeeSelectedType == 'Guard'">
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+            <div class="row mb-3" *ngIf="employeeSelectedType == 'Guard'">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
-                        <mat-label>Shift II Default Client</mat-label>
+                        <mat-label>Shift II Default Client <span style="color: red;">*</span></mat-label>
                         <mat-select formControlName="Shif2Client" [panelClass]="'custom-dropdown-panel'"
-                            (selectionChange)="Shif2ClientChange($event)">
+                            (selectionChange)="Shift2ClientChange($event)">
                             <mat-option *ngFor="let employee of employeeModel" [value]="employee.Name">
                                 {{ employee.Name }}
                             </mat-option>
                         </mat-select>
+                        <mat-error *ngIf="attendanceForm.get('Shif2Client')?.hasError('required') && attendanceForm.get('Shif2Client')?.touched">
+                            Shift II Default Client is required
+                        </mat-error>
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-2" style="margin-top: 10px;">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
                     <mat-label>Shift II Timings</mat-label>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-1">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
                     <mat-form-field appearance="fill" class="custom-width">
                         <mat-select formControlName="Shift2StartTime" (selectionChange)="shift2Values1Change($event)"
                             [panelClass]="'custom-dropdown-panel'">
@@ -327,7 +302,7 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-1">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-2">
                     <mat-form-field appearance="fill" class="custom-width">
                         <mat-select formControlName="Shift2EndTime" (selectionChange)="shift2Values2Change($event)"
                             [panelClass]="'custom-dropdown-panel'">
@@ -337,7 +312,7 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-4 col-lg-1" *ngIf="dynamicEditable !== 'edit'">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-3" *ngIf="dynamicEditable !== 'edit'">
                     <button class="btn wlt-c-furg-btn-primary" (click)="setButtonClick()"> Set</button>
                 </div>
             </div>
@@ -526,17 +501,6 @@
                         </mat-radio-group>
                     </div>
                 </div>
-                <!-- <div class=" col-12 col-sm-12 col-md-6 col-lg-6">
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-4" style="margin-top: 10px;">
-                        <mat-label>Shift II</mat-label>
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-6 col-lg-8">
-                        <mat-radio-group aria-label="Select a Shift2Type" formControlName="Shift2Type">
-                            <mat-radio-button value="2">Hourly Basis</mat-radio-button>
-                            <mat-radio-button value="3">None</mat-radio-button>
-                        </mat-radio-group>
-                    </div>
-                </div> -->
             </div>
             <br />
             <div class="row">
@@ -561,6 +525,10 @@
                             <input type="text" formControlName="SpecialAllowanceDeduction" matInput autocomplete="off">
                         </mat-form-field>
                     </div>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-3">
+                    </div>
                 </ng-container>
 
                 <!-- Staff section -->
@@ -577,6 +545,10 @@
                             <input type="text" formControlName="SpecialAllowanceDeductionStaff" matInput
                                 autocomplete="off">
                         </mat-form-field>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     </div>
                 </ng-container>
             </div>
