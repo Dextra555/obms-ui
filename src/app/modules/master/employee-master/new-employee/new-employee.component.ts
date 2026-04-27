@@ -197,7 +197,7 @@ export class NewEmployeeComponent implements OnInit {
       NewSalaryStructure: ['N'],
 
       // OT (Overtime) Field
-      OT: ['No']
+      OT: ['None']
     });
 
     this.checklistItems.forEach((item) => {

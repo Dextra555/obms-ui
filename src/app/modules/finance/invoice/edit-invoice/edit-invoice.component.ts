@@ -637,15 +637,8 @@ export class EditInvoiceComponent implements AfterViewInit {
 
 
 
-      if (d.NoOfGuards != 0 && d.Rate != 0 && d.NoOfHours != 0 && d.NoOfDays != 0) {
-
-        this.ServiceCharges += d.NoOfDays * d.NoOfGuards * d.NoOfHours * d.Rate;
-
-      } else {
-
-        this.ServiceCharges += d.MonthTotal;
-
-      }
+      // Use MonthTotal from agreement to match agreement calculation exactly
+      this.ServiceCharges += d.MonthTotal;
 
 
 

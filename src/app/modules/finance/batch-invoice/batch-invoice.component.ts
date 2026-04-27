@@ -382,11 +382,8 @@ export class BatchInvoiceComponent implements AfterViewInit {
         }
       }
 
-      if (d.NoOfGuards != 0 && d.Rate != 0 && d.NoOfHours != 0 && d.NoOfDays != 0) {
-        this.ServiceCharges += d.NoOfDays * d.NoOfGuards * d.NoOfHours * d.Rate;
-      } else {
-        this.ServiceCharges += d.MonthTotal;
-      }
+      // Use MonthTotal from agreement to match agreement calculation exactly
+      this.ServiceCharges += d.MonthTotal;
 
       this.NoOfHours += d.NoOfHours * d.NoOfGuards * d.NoOfDays;
       if (d.HasDiscount) {
@@ -400,7 +397,7 @@ export class BatchInvoiceComponent implements AfterViewInit {
 
     });
 
-    this.ServiceCharges = Math.round(this.ServiceCharges * 100) / 100;
+    this.ServiceCharges = Math.round(this.ServiceCharges);
     this.DiscountAmount = Math.round(this.DiscountAmount * 100) / 100;
     this.TaxAmount = Math.round(this.TaxAmount * 100) / 100;
     this.Total = this.ServiceCharges - this.DiscountAmount + this.TaxAmount;
