@@ -112,10 +112,6 @@
 
           <button type="button" class="btn wlt-c-furg-btn-secondary mr-3" (click)="chkLumpSum('L')"> Lump sum</button>
 
-          <button type="button" class="btn wlt-c-furg-btn-secondary mr-3" (click)="set8Hours()"> 8 hours</button>
-
-          <button type="button" class="btn wlt-c-furg-btn-secondary mr-3" (click)="set12Hours()"> 12 Hours</button>
-
         </div>
 
       </div>
@@ -136,9 +132,9 @@
 
               <th class="mat-header-cell">Guards</th>
 
-              <th class="mat-header-cell">Per Hours Rate</th>
+              <th class="mat-header-cell" style="display: none;">Per Hours Rate</th>
 
-              <th class="mat-header-cell">Per Day</th>
+              <th class="mat-header-cell" style="display: none;">Per Day</th>
 
               <th class="mat-header-cell">Working<br/> Hours</th>
 
@@ -214,7 +210,7 @@
 
               </td>
 
-              <td class="mat-cell">
+              <td class="mat-cell" style="display: none;">
 
                 <mat-form-field appearance="outline" style="width: 80px !important;">
 
@@ -226,7 +222,7 @@
 
               </td>
 
-              <td class="mat-cell">
+              <td class="mat-cell" style="display: none;">
 
                 <mat-form-field appearance="outline" style="width: 80px !important;">
 
@@ -496,7 +492,7 @@
 
               </ng-container>
 
-              <ng-container matColumnDef="PerDay">
+              <ng-container matColumnDef="PerDay" style="display: none;">
 
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Per Day</th>
 
@@ -504,7 +500,7 @@
 
               </ng-container>
 
-              <ng-container matColumnDef="Rate">
+              <ng-container matColumnDef="Rate" style="display: none;">
 
                 <th mat-header-cell *matHeaderCellDef mat-sort-header> Per Hours Rate</th>
 
