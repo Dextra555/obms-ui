@@ -289,10 +289,16 @@ export class FinanceService {
       errorMessage = `An error occurred Cleint side: ${error.error}`;
     } else {
       // The backend returned an unsuccessful response code.
-      //errorMessage = `An error occurred Server side: ${error.status}, body was: ${error.error}`;
+      // Check if backend sent a specific error message
+      if (error.error && error.error.error) {
+        errorMessage = error.error.error;
+      } else if (error.error && error.error.message) {
+        errorMessage = error.error.message;
+      } else {
+        errorMessage = `An error occurred Server side: ${error.status}`;
+      }
     }
     // Return an observable with a user-facing error message.
-    errorMessage += '\n This is the problem with service. We are notified & working on it. Please try again later..';
     return throwError(errorMessage);
   }
 }

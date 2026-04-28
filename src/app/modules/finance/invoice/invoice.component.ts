@@ -1,36 +1,36 @@
-import {Component, AfterViewInit, ViewChild} from '@angular/core';
+import { Component, AfterViewInit, ViewChild } from '@angular/core';
 
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import {MatDialog} from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
-import {MatPaginator} from '@angular/material/paginator';
+import { MatPaginator } from '@angular/material/paginator';
 
-import {MatTableDataSource} from '@angular/material/table';
+import { MatTableDataSource } from '@angular/material/table';
 
-import {MatSort, Sort} from '@angular/material/sort';
+import { MatSort, Sort } from '@angular/material/sort';
 
-import {LiveAnnouncer} from '@angular/cdk/a11y';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 
-import {EditInvoiceComponent} from './edit-invoice/edit-invoice.component';
+import { EditInvoiceComponent } from './edit-invoice/edit-invoice.component';
 
-import {FinanceService} from "../../../service/finance.service";
+import { FinanceService } from "../../../service/finance.service";
 
-import {from} from "rxjs";
+import { from } from "rxjs";
 
 // import {environment, TAX} from "src/environments/environment";
 
 import Swal from "sweetalert2";
 
-import {Router} from "@angular/router";
+import { Router } from "@angular/router";
 
-import {TAX} from 'src/app/model/TAXModel';
+import { TAX } from 'src/app/model/TAXModel';
 
-import {DatasharingService} from "../../../service/datasharing.service";
+import { DatasharingService } from "../../../service/datasharing.service";
 
-import {UserAccessModel} from 'src/app/model/userAccesModel';
+import { UserAccessModel } from 'src/app/model/userAccesModel';
 
-import {MastermoduleService} from 'src/app/service/mastermodule.service';
+import { MastermoduleService } from 'src/app/service/mastermodule.service';
 
 
 
@@ -56,7 +56,7 @@ export interface PeriodicElement {
 
 export class InvoiceComponent implements AfterViewInit {
 
-  displayedColumns: string[] = ['actions','Name',];
+  displayedColumns: string[] = ['actions', 'Name',];
 
   dataSource = new MatTableDataSource<PeriodicElement>();
 
@@ -198,7 +198,7 @@ export class InvoiceComponent implements AfterViewInit {
 
                       Thank you`;
 
-                      this.hideLoadingSpinner()
+            this.hideLoadingSpinner()
 
           }
 
@@ -428,6 +428,13 @@ export class InvoiceComponent implements AfterViewInit {
 
       this.calculation();
 
+    }, (error: any) => {
+      Swal.fire({
+        title: 'Error',
+        text: error,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     })
 
   }
@@ -614,7 +621,7 @@ export class InvoiceComponent implements AfterViewInit {
 
 
 
-    const monthString = new Intl.DateTimeFormat('en-US', {month: 'long'}).format(new Date(year, month - 1, 1));
+    const monthString = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date(year, month - 1, 1));
 
     return `${monthString} ${year}`;
 
@@ -820,7 +827,7 @@ export class InvoiceComponent implements AfterViewInit {
 
   printView(invoiceId: number) {
 
-    this.route.navigate(['/report/finance/print-invoice-computer-generated'], {queryParams: {invoiceId: invoiceId}, queryParamsHandling: 'merge'});
+    this.route.navigate(['/report/finance/print-invoice-computer-generated'], { queryParams: { invoiceId: invoiceId }, queryParamsHandling: 'merge' });
 
   }
 
@@ -882,7 +889,7 @@ export class InvoiceComponent implements AfterViewInit {
 
   }
 
-  hideLoadingSpinner(){
+  hideLoadingSpinner() {
 
     this.showLoadingSpinner = false
 

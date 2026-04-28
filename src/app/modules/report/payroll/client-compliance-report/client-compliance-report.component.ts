@@ -719,7 +719,7 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.pt || 0}</td>
           <td>${row.advance || 0}</td>
           <td>${row.lwf || 0}</td>
-          <td>${(row.pf || 0) + (row.esi || 0) + (row.pt || 0) + (row.advance || 0) + (row.lwf || 0)}</td>
+          <td>${row.totalDeductions || row.TotalDed || 0}</td>
           <td>${row.mobile || 0}</td>
           <td>${row.arrear || 0}</td>
           <td>${row.net || 0}</td>
