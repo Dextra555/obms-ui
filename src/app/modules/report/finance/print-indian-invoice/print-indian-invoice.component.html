@@ -79,7 +79,18 @@
             <mat-label style="color:red" [innerHTML]="errorMessage"></mat-label>
         </div>
         <br />
-        <iframe *ngIf="warningMessage ===''" width="1200px" height="1200px" #myFrame [src]="urlSafe"></iframe>
+
+        <!-- Invoice Display with DomSanitized HTML -->
+        <div *ngIf="invoiceHtml && errorMessage === ''" class="invoice-container mt-4">
+            <div class="row mb-3">
+                <div class="col-12 text-right">
+                    <button class="btn wlt-c-furg-btn-primary m-1" (click)="printInvoice()">
+                        <i class="fas fa-print"></i> Print Invoice
+                    </button>
+                </div>
+            </div>
+            <div [innerHTML]="invoiceHtml" class="invoice-display"></div>
+        </div>
     </mat-card-content>
 </mat-card>
 
@@ -91,3 +102,46 @@
     </div>
 </div>
 <!-- model pop up for logic ended -->
+
+<style>
+    .invoice-container {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .invoice-display {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .alert {
+        border-radius: 8px;
+        border-left: 4px solid #17a2b8;
+    }
+
+    @media print {
+
+        .wlt-c-furg-content-header,
+        .container-fluid.mb-3,
+        .row.mb-3,
+        .no-print {
+            display: none !important;
+        }
+
+        .invoice-container {
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+        }
+
+        .invoice-display {
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    }
+</style>

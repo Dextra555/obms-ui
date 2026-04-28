@@ -5,12 +5,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeHtml } from '@angular/platform-browser';
 import { NavigationEnd, Router } from '@angular/router';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { FinanceService } from 'src/app/service/finance.service';
 import { DatasharingService } from 'src/app/service/datasharing.service';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
+import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
 
@@ -39,6 +40,9 @@ export class PrintIndianInvoiceComponent implements AfterViewInit {
   selectedBatchInvoiceIds: string[] = [];
   url: string = environment.baseReportUrl;
   urlSafe: SafeResourceUrl | undefined;
+  invoiceHtml: SafeHtml | null = null;
+  invoiceHtmlRaw: string = '';
+  invoiceTemplate: string = '';
   client: any;
   InvoiceDate: any;
   Subject: any;
@@ -46,7 +50,7 @@ export class PrintIndianInvoiceComponent implements AfterViewInit {
 
   constructor(public sanitizer: DomSanitizer, private fb: FormBuilder, public dialog: MatDialog,
     private _liveAnnouncer: LiveAnnouncer, private service: FinanceService, private router: Router,
-    private _dataService: DatasharingService, private _masterService: MastermoduleService) {
+    private _dataService: DatasharingService, private _masterService: MastermoduleService, private http: HttpClient) {
     this.userAccessModel = {
       readAccess: false,
       updateAccess: false,
@@ -234,138 +238,282 @@ export class PrintIndianInvoiceComponent implements AfterViewInit {
   }
 
   printIndianInvoiceClick() {
-    // Load the HTML template and populate with invoice data
-    this.loadIndianInvoiceTemplate();
+    if (this.selectedBatchInvoiceIds.length === 0) {
+      this.errorMessage = 'Please select at least one invoice to print.';
+      return;
+    }
+
+    // Load the HTML template and populate with invoice data from API
+    this.loadInvoiceTemplate();
+    this.generateInvoiceHtml(this.selectedBatchInvoiceIds[0]);
   }
 
-  loadIndianInvoiceTemplate() {
-    // Fetch the HTML template
-    fetch('assets/invoice-templates/invoice.html')
-      .then(response => response.text())
-      .then(htmlContent => {
-        // Populate template with invoice data
-        const populatedHtml = this.populateInvoiceTemplate(htmlContent);
+  loadInvoiceTemplate() {
+    const templatePath = 'assets/invoice-templates/invoice.html';
+    this.http.get(templatePath, { responseType: 'text' }).subscribe(
+      (htmlTemplate: string) => {
+        // Load logo and convert to base64
+        this.loadLogoBase64().then(logoBase64 => {
+          this.invoiceTemplate = htmlTemplate.replace(
+            'src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="',
+            `src="${logoBase64}"`
+          );
+        }).catch(error => {
+          console.warn('Could not load logo, using placeholder');
+          this.invoiceTemplate = htmlTemplate;
+        });
+      },
+      (error) => {
+        console.error('Could not load invoice template', error);
+        this.errorMessage = 'Could not load invoice template. Please try again.';
+      }
+    );
+  }
 
-        // Create a blob URL for the populated HTML
-        const blob = new Blob([populatedHtml], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-
-        // Set the iframe source to the populated HTML
-        this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-      })
-      .catch(error => {
-        console.error('Error loading invoice template:', error);
-        // Fallback to report URL if template fails to load
-        this.url = environment.baseReportUrl;
-        this.url += 'Finance/IndianInvoiceReport.aspx?';
-        this.url += "LoginID=" + this.currentUser;
-        this.url += "&ID=" + this.selectedBatchInvoiceIds;
-        this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
+  async loadLogoBase64(): Promise<string> {
+    try {
+      const response = await fetch('assets/img/logo-white.png');
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
       });
+    } catch (error) {
+      console.error('Error loading logo:', error);
+      throw error;
+    }
   }
 
-  populateInvoiceTemplate(template: string): string {
-    // Get sample invoice data - in real implementation, this would come from API
-    const invoiceData = this.getInvoiceData();
+  generateInvoiceHtml(invoiceId: string) {
+    this.showLoadingSpinner = true;
+    this.errorMessage = '';
 
-    // Replace all template variables
-    let populatedTemplate = template;
+    this.http.get(environment.baseUrl + 'Finance/GetIndianInvoiceReportData?invoiceId=' + invoiceId).subscribe(
+      (data: any) => {
+        this.showLoadingSpinner = false;
+        if (data.error) {
+          this.errorMessage = data.error;
+          return;
+        }
 
-    // Replace each placeholder with actual data
-    populatedTemplate = populatedTemplate.replace(/\{\{InvoiceNo\}\}/g, invoiceData.invoiceNo);
-    populatedTemplate = populatedTemplate.replace(/\{\{InvoiceDate\}\}/g, invoiceData.invoiceDate);
-    populatedTemplate = populatedTemplate.replace(/\{\{BillingName\}\}/g, invoiceData.billingName);
-    populatedTemplate = populatedTemplate.replace(/\{\{BillingAddress\}\}/g, invoiceData.billingAddress);
-    populatedTemplate = populatedTemplate.replace(/\{\{BillingGSTIN\}\}/g, invoiceData.billingGSTIN);
-    populatedTemplate = populatedTemplate.replace(/\{\{BillingState\}\}/g, invoiceData.billingState);
-    populatedTemplate = populatedTemplate.replace(/\{\{ShippingName\}\}/g, invoiceData.shippingName);
-    populatedTemplate = populatedTemplate.replace(/\{\{ShippingAddress\}\}/g, invoiceData.shippingAddress);
-    populatedTemplate = populatedTemplate.replace(/\{\{ShippingGSTIN\}\}/g, invoiceData.shippingGSTIN);
-    populatedTemplate = populatedTemplate.replace(/\{\{ShippingState\}\}/g, invoiceData.shippingState);
-    populatedTemplate = populatedTemplate.replace(/\{\{WorkOrderNo\}\}/g, invoiceData.workOrderNo);
-    populatedTemplate = populatedTemplate.replace(/\{\{WorkOrderDate\}\}/g, invoiceData.workOrderDate);
-    populatedTemplate = populatedTemplate.replace(/\{\{SACCode\}\}/g, invoiceData.sacCode);
-    populatedTemplate = populatedTemplate.replace(/\{\{DataRows\}\}/g, invoiceData.dataRows);
-    populatedTemplate = populatedTemplate.replace(/\{\{Subtotal\}\}/g, invoiceData.subtotal);
-    populatedTemplate = populatedTemplate.replace(/\{\{CGSTPct\}\}/g, invoiceData.cgstPct);
-    populatedTemplate = populatedTemplate.replace(/\{\{CGSTAmount\}\}/g, invoiceData.cgstAmount);
-    populatedTemplate = populatedTemplate.replace(/\{\{SGSTPct\}\}/g, invoiceData.sgstPct);
-    populatedTemplate = populatedTemplate.replace(/\{\{SGSTAmount\}\}/g, invoiceData.sgstAmount);
-    populatedTemplate = populatedTemplate.replace(/\{\{IGSTPct\}\}/g, invoiceData.igstPct);
-    populatedTemplate = populatedTemplate.replace(/\{\{IGSTAmount\}\}/g, invoiceData.igstAmount);
-    populatedTemplate = populatedTemplate.replace(/\{\{GrandTotal\}\}/g, invoiceData.grandTotal);
-    populatedTemplate = populatedTemplate.replace(/\{\{AmountInWords\}\}/g, invoiceData.amountInWords);
-    populatedTemplate = populatedTemplate.replace(/\{\{ServicePeriod\}\}/g, invoiceData.servicePeriod);
-    populatedTemplate = populatedTemplate.replace(/\{\{ThankYouMessage\}\}/g, invoiceData.thankYouMessage);
-    populatedTemplate = populatedTemplate.replace(/\{\{BankName\}\}/g, invoiceData.bankName);
-    populatedTemplate = populatedTemplate.replace(/\{\{BankBranch\}\}/g, invoiceData.bankBranch);
-    populatedTemplate = populatedTemplate.replace(/\{\{AccountNo\}\}/g, invoiceData.accountNo);
-    populatedTemplate = populatedTemplate.replace(/\{\{IFSCCode\}\}/g, invoiceData.ifscCode);
-    populatedTemplate = populatedTemplate.replace(/\{\{PAN\}\}/g, invoiceData.pan);
-    populatedTemplate = populatedTemplate.replace(/\{\{CompanyGSTIN\}\}/g, invoiceData.companyGSTIN);
-    populatedTemplate = populatedTemplate.replace(/\{\{EPFNo\}\}/g, invoiceData.epfNo);
-    populatedTemplate = populatedTemplate.replace(/\{\{ESIC\}\}/g, invoiceData.esic);
-    populatedTemplate = populatedTemplate.replace(/\{\{CompanyName\}\}/g, invoiceData.companyName);
-    populatedTemplate = populatedTemplate.replace(/\{\{CompanyPhone\}\}/g, invoiceData.companyPhone);
-    populatedTemplate = populatedTemplate.replace(/\{\{GlobalOfficeAddress\}\}/g, invoiceData.globalOfficeAddress);
-    populatedTemplate = populatedTemplate.replace(/\{\{GlobalOfficePhone\}\}/g, invoiceData.globalOfficePhone);
-    populatedTemplate = populatedTemplate.replace(/\{\{GlobalOfficeFax\}\}/g, invoiceData.globalOfficeFax);
-
-    return populatedTemplate;
+        const html = this.renderInvoiceHtml(data);
+        this.invoiceHtmlRaw = html;
+        this.invoiceHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+      },
+      (error: any) => {
+        this.showLoadingSpinner = false;
+        this.errorMessage = 'Failed to load invoice data. Please check the server is running and try again.';
+        console.error('API error loading invoice:', error);
+      }
+    );
   }
 
-  getInvoiceData() {
-    // Sample invoice data - in real implementation, this would come from API based on selected invoices
-    return {
-      invoiceNo: 'FWG/INV/2024-25/001',
-      invoiceDate: this.returnDate(new Date()),
-      billingName: 'Sample Client Company',
-      billingAddress: '123 Business Street, Chennai, Tamil Nadu - 600001',
-      billingGSTIN: '33AAAPL1234C1ZV',
-      billingState: 'Tamil Nadu',
-      shippingName: 'Sample Client Company',
-      shippingAddress: '123 Business Street, Chennai, Tamil Nadu - 600001',
-      shippingGSTIN: '33AAAPL1234C1ZV',
-      shippingState: 'Tamil Nadu',
-      workOrderNo: 'WO-2024-001',
-      workOrderDate: this.returnDate(new Date()),
-      sacCode: '998811',
-      dataRows: `
-        <tr>
-          <td>1</td>
-          <td>Security Services - Manpower Supply</td>
-          <td>998811</td>
-          <td>18%</td>
-          <td>1</td>
-          <td>50,000.00</td>
-          <td>50,000.00</td>
-        </tr>
-      `,
-      subtotal: '50,000.00',
-      cgstPct: '9',
-      cgstAmount: '4,500.00',
-      sgstPct: '9',
-      sgstAmount: '4,500.00',
-      igstPct: '0',
-      igstAmount: '0.00',
-      grandTotal: '59,000.00',
-      amountInWords: 'Fifty Nine Thousand Only',
-      servicePeriod: 'April 2024',
-      thankYouMessage: 'Thank you for your business!',
-      bankName: 'State Bank of India',
-      bankBranch: 'Anna Salai Branch, Chennai',
-      accountNo: '123456789012345',
-      ifscCode: 'SBIN0001234',
-      pan: 'AAAPL1234C',
-      companyGSTIN: '33AAAPL1234C1ZV',
-      epfNo: 'TNMAS1234567890',
-      esic: '1234567890',
-      companyName: 'FreightWatch G Security Services India Pvt. Ltd.',
-      companyPhone: '+91 4440050684',
-      globalOfficeAddress: 'Global Office: 123 International Plaza, Singapore',
-      globalOfficePhone: '+65 1234 5678',
-      globalOfficeFax: '+65 1234 5679'
+  private renderInvoiceHtml(data: any): string {
+    if (!this.invoiceTemplate) {
+      return '<div class="error-message">Template not loaded</div>';
+    }
+
+    // Generate data rows HTML with complete formatting
+    let dataRowsHtml = '';
+    // Format currency as Indian format (₹)
+    const formatCurrency = (value: any) => {
+      const num = parseFloat(value) || 0;
+      return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
+
+    if (data.dataRows && data.dataRows.length > 0) {
+      data.dataRows.forEach((row: any, index: number) => {
+        const sno = (index + 1).toString();
+        const hsnCode = this.escapeHtml(row.hsnSacCode || row.hsn_code || '');
+        const description = this.escapeHtml(row.description || 'Security Services');
+        const duties = this.escapeHtml(row.dutiesTaxes || row.duties || '');
+        const qty = parseFloat(row.units || row.qty || 0).toFixed(0);
+
+        // Use Indian formatting for rate and amount
+        const rateFormatted = formatCurrency(row.rate || 0);
+        const amountFormatted = formatCurrency(row.amount || 0);
+
+        dataRowsHtml += `
+        <tr>
+            <td class="text-center">${sno}</td>
+            <td>${description}</td>
+            <td class="text-center">${hsnCode}</td>
+            <td class="text-center">${duties}</td>
+            <td class="text-center">${qty}</td>
+            <td class="text-right">₹ ${rateFormatted}</td>
+            <td class="text-right">₹ ${amountFormatted}</td>
+        </tr>`;
+      });
+    } else {
+      dataRowsHtml = '<tr><td colspan="7" class="text-center">No items found</td></tr>';
+    }
+
+    // Safely extract data with fallback values
+    const company = data.company || {};
+    const invoice = data.invoice || {};
+    const client = data.client || {};
+    const totals = data.totals || {};
+    const statutory = data.statutory || {};
+    const declaration = data.declaration || {};
+    const termsAndConditions = data.termsAndConditions || {};
+    const isIntraState = totals.isIntraState || false; // Check if intra-state
+
+    let html = this.invoiceTemplate
+      // Document Type
+      .replace(/{{DocumentType}}/g, this.escapeHtml(data.documentType || 'INDIAN TAX INVOICE (Original for Recipient)'))
+      // Company Information
+      .replace(/{{CompanyName}}/g, this.escapeHtml(company.name || 'Company Name'))
+      .replace(/{{CompanyTagline}}/g, this.escapeHtml(company.tagline || ''))
+      .replace(/{{CompanyAddress}}/g, this.escapeHtml(company.address || 'Address'))
+      .replace(/{{CompanyGSTIN}}/g, this.escapeHtml(company.gstin || ''))
+      .replace(/{{CompanyPAN}}/g, this.escapeHtml(company.pan || ''))
+      .replace(/{{CompanyPhone}}/g, this.escapeHtml(company.phone || ''))
+      .replace(/{{CompanyEmail}}/g, this.escapeHtml(company.email || ''))
+      .replace(/{{CompanyWebsite}}/g, this.escapeHtml(company.website || 'www.fwgindia.com'))
+      .replace(/{{CINNo}}/g, this.escapeHtml(company.cinNo || company.tan || 'U74920TN2005PTC057775'))
+      // Invoice Details
+      .replace(/{{InvoiceNo}}/g, this.escapeHtml(invoice.invoiceNoFormatted || 'N/A'))
+      .replace(/{{InvoiceDate}}/g, this.escapeHtml(invoice.invoiceDate || 'N/A'))
+      .replace(/{{ServicePeriod}}/g, this.escapeHtml(invoice.servicePeriod || ''))
+      .replace(/{{PlaceOfSupply}}/g, this.escapeHtml(invoice.placeOfSupply || client.billingState || ''))
+      // Work Order Details
+      .replace(/{{WorkOrderNo}}/g, this.escapeHtml(invoice.workOrderNoFormatted || 'N/A'))
+      .replace(/{{WorkOrderDate}}/g, this.escapeHtml(invoice.workOrderDate || 'N/A'))
+      .replace(/{{SACCode}}/g, this.escapeHtml(invoice.sacCode || ''))
+      // Statutory Details
+      .replace(/{{PAN}}/g, this.escapeHtml(statutory.pan || company.pan || 'AACCF8611P'))
+      .replace(/{{GSTIN}}/g, this.escapeHtml(statutory.gstin || company.gstin || ''))
+      .replace(/{{ESIC}}/g, this.escapeHtml(statutory.esic || '51001204250000999'))
+      .replace(/{{EPFNo}}/g, this.escapeHtml(statutory.epf || 'TNMAS1598210000'))
+      // Billing Information
+      .replace(/{{BillingName}}/g, this.escapeHtml(client.billingName || client.name || 'Billing Name'))
+      .replace(/{{BillingAddress}}/g, this.escapeHtml(client.billingAddress || client.address || 'Billing Address'))
+      .replace(/{{BillingGSTIN}}/g, this.escapeHtml(client.billingGSTIN || client.gstin || ''))
+      .replace(/{{BillingState}}/g, this.escapeHtml(client.billingState || client.state || ''))
+      // Shipping Information
+      .replace(/{{ShippingName}}/g, this.escapeHtml(client.shippingName || client.billingName || client.name || 'Shipping Name'))
+      .replace(/{{ShippingAddress}}/g, this.escapeHtml(client.shippingAddress || client.billingAddress || client.address || 'Shipping Address'))
+      .replace(/{{ShippingGSTIN}}/g, this.escapeHtml(client.shippingGSTIN || client.billingGSTIN || client.gstin || ''))
+      .replace(/{{ShippingState}}/g, this.escapeHtml(client.shippingState || client.billingState || client.state || ''))
+      // Line Items and Subtotal
+      .replace(/{{DataRows}}/g, dataRowsHtml)
+      .replace(/{{Subtotal}}/g, formatCurrency(totals.subtotal || 0));
+
+    // Handle GST based on intra-state or inter-state
+    if (isIntraState) {
+      // Intra-state: Show CGST (9%) + SGST (9%), hide IGST row
+      html = html
+        .replace(/{{CGSTPct}}/g, (totals.cgstPct || 9).toString())
+        .replace(/{{SGSTPct}}/g, (totals.sgstPct || 9).toString())
+        .replace(/{{CGSTAmount}}/g, formatCurrency(totals.cgstAmount || 0))
+        .replace(/{{SGSTAmount}}/g, formatCurrency(totals.sgstAmount || 0))
+        .replace(/{{IGSTPct}}/g, '0')
+        .replace(/{{IGSTAmount}}/g, '₹ 0.00');
+      // Hide IGST row for intra-state using class selector
+      html = html.replace(/<tr[^>]*class="igst-row"[^>]*>[\s\S]*?<\/tr>/gi, '');
+    } else {
+      // Inter-state: Show IGST (18%) only, hide CGST/SGST rows
+      html = html
+        .replace(/{{CGSTPct}}/g, '0')
+        .replace(/{{SGSTPct}}/g, '0')
+        .replace(/{{CGSTAmount}}/g, '₹ 0.00')
+        .replace(/{{SGSTAmount}}/g, '₹ 0.00')
+        .replace(/{{IGSTPct}}/g, (totals.igstPct || 18).toString())
+        .replace(/{{IGSTAmount}}/g, formatCurrency(totals.igstAmount || 0));
+      // Hide CGST and SGST rows for inter-state using class selectors
+      html = html.replace(/<tr[^>]*class="cgst-row"[^>]*>[\s\S]*?<\/tr>/gi, '');
+      html = html.replace(/<tr[^>]*class="sgst-row"[^>]*>[\s\S]*?<\/tr>/gi, '');
+    }
+
+    // Continue with remaining placeholders
+    html = html
+      .replace(/{{GrandTotal}}/g, formatCurrency(totals.grandTotal || 0))
+      .replace(/{{AmountInWords}}/g, this.escapeHtml(totals.amountInWords || 'Amount in words'))
+      // Bank Details
+      .replace(/{{BankName}}/g, this.escapeHtml(company.bankName || ''))
+      .replace(/{{AccountNo}}/g, this.escapeHtml(company.bankAccount || ''))
+      .replace(/{{IFSCCode}}/g, this.escapeHtml(company.ifscCode || ''))
+      .replace(/{{BankBranch}}/g, this.escapeHtml(company.bankBranch || ''))
+      .replace(/{{AccountType}}/g, this.escapeHtml(company.accountType || 'Current Account'))
+      // Notes & Declaration
+      .replace(/{{ThankYouMessage}}/g, this.escapeHtml(declaration.thankYou || 'Thank you for your business'))
+      .replace(/{{ServiceValueMessage}}/g, this.escapeHtml(declaration.serviceValue || 'Invoice confirms actual service value'))
+      .replace(/{{TruthStatement}}/g, this.escapeHtml(declaration.truthStatement || 'All details are true and correct'))
+      // Terms & Conditions
+      .replace(/{{PaymentMethod}}/g, this.escapeHtml(termsAndConditions.paymentMethod || 'Payment via NEFT / Account Payee Cheque'))
+      .replace(/{{PayableTo}}/g, this.escapeHtml(termsAndConditions.payableTo || 'FreightWatch G Security Services India Pvt. Ltd.'))
+      .replace(/{{InterestRate}}/g, this.escapeHtml(termsAndConditions.interestRate || 'Interest @18% p.a. on delayed payments'))
+      .replace(/{{Discrepancies}}/g, this.escapeHtml(termsAndConditions.discrepancies || 'Discrepancies must be reported within receipt'))
+      .replace(/{{Authorization}}/g, this.escapeHtml(termsAndConditions.authorization || 'Contains official stamp and authorized signature'))
+      // Global Office
+      .replace(/{{GlobalOfficeAddress}}/g, this.escapeHtml(company.globalOfficeAddress || 'No. 23 & 24, Taman Bukit Emas, Jalan Tampin, 70450 Seremban, Negeri Sembilan, Malaysia'))
+      .replace(/{{GlobalOfficePhone}}/g, this.escapeHtml(company.globalOfficePhone || '+60 6 677 2000'))
+      .replace(/{{GlobalOfficeFax}}/g, this.escapeHtml(company.globalOfficeFax || '+60 6 677 9866'));
+
+    return html;
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  printInvoice() {
+    if (!this.invoiceHtmlRaw) {
+      this.errorMessage = 'Please generate an invoice first before printing.';
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Tax Invoice</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { 
+              font-family: 'Arial', sans-serif; 
+              color: #000; 
+              background: white;
+              padding: 0;
+              margin: 0;
+            }
+            @media print {
+              body { 
+                margin: 0; 
+                padding: 0; 
+                background: white; 
+              }
+              .invoice-container {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                page-break-after: avoid;
+              }
+              .invoice-header, .invoice-title, .invoice-meta, 
+              .billing-section, .table-container, 
+              .totals-section, .amount-words, .footer-section, .signature {
+                page-break-inside: avoid;
+              }
+            }
+          </style>
+        </head>
+        <body>${this.invoiceHtmlRaw}</body>
+      </html>`);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => {
+        printWindow.print();
+      }, 250);
+    }
   }
 
   hideLoadingSpinner() {
