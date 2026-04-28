@@ -105,8 +105,7 @@ export class PdfExportService {
       const noOfHours = item.NoOfHours || 8;
       const noOfGuards = item.NoOfGuards || 0;
       const noOfDays = item.NoOfDays || 0;
-      // Use stored MonthTotal value instead of recalculating to match form calculation
-      const monthAmt = parseFloat((item.MonthTotal || 0).toString().replace(/,/g, ''));
+      const monthAmt = rate * noOfHours * noOfGuards * noOfDays;
 
       const taxAmt = parseFloat((item.TaxAmount || 0).toString().replace(/,/g, ''));
       totalMonth += monthAmt;
@@ -630,8 +629,7 @@ export class PdfExportService {
       const noOfHours = item.NoOfHours || 8;
       const noOfGuards = item.NoOfGuards || 0;
       const noOfDays = item.NoOfDays || 0;
-      // Use stored MonthTotal value instead of recalculating to match form calculation
-      const monthAmt = parseFloat((item.MonthTotal || 0).toString().replace(/,/g, ''));
+      const monthAmt = rate * noOfHours * noOfGuards * noOfDays;
 
       const taxAmt = parseFloat((item.TaxAmount || 0).toString().replace(/,/g, ''));
       totalMonth += monthAmt;
@@ -1029,8 +1027,7 @@ export class PdfExportService {
       const noOfHours = item.NoOfHours || 8;
       const noOfGuards = item.NoOfGuards || 0;
       const noOfDays = item.NoOfDays || 0;
-      // Use stored MonthTotal value instead of recalculating to match form calculation
-      const monthAmt = parseFloat((item.MonthTotal || 0).toString().replace(/,/g, ''));
+      const monthAmt = rate * noOfHours * noOfGuards * noOfDays;
 
       const taxAmt = parseFloat((item.TaxAmount || 0).toString().replace(/,/g, ''));
       totalMonth += monthAmt;
