@@ -1704,6 +1704,9 @@ export class NewQuotationComponent {
 
     }
 
+    // Ensure proper rounding to nearest integer
+    vMonthTotal = Math.round(vMonthTotal);
+
 
 
     if (!(parseInt("0" + tNoOfGuards, 10) === 0 ||
@@ -1712,7 +1715,7 @@ export class NewQuotationComponent {
 
       parseInt("0" + tNoOfDays, 10) === 0)) {
 
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(vMonthTotal));
 
     } else if (this.type == 'S') {
 
