@@ -1,16 +1,16 @@
-import {Component, AfterViewInit, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {MatDialog} from '@angular/material/dialog';
-import {MatPaginator} from '@angular/material/paginator';
-import {MatTableDataSource} from '@angular/material/table';
-import {MatSort, Sort} from '@angular/material/sort';
-import {LiveAnnouncer} from '@angular/cdk/a11y';
-import {FinanceService} from "../../../service/finance.service";
-import {Router} from "@angular/router";
-import {DatasharingService} from "../../../service/datasharing.service";
-import {UserAccessModel} from 'src/app/model/userAccesModel';
-import {MastermoduleService} from 'src/app/service/mastermodule.service';
-import {TAX} from "../../../model/TAXModel";
+import { Component, AfterViewInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, Sort } from '@angular/material/sort';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { FinanceService } from "../../../service/finance.service";
+import { Router } from "@angular/router";
+import { DatasharingService } from "../../../service/datasharing.service";
+import { UserAccessModel } from 'src/app/model/userAccesModel';
+import { MastermoduleService } from 'src/app/service/mastermodule.service';
+import { TAX } from "../../../model/TAXModel";
 import Swal from "sweetalert2";
 
 export interface PeriodicElement {
@@ -128,7 +128,7 @@ export class BatchInvoiceComponent implements AfterViewInit {
                       You do not have permissions to view this page. <br>
                       If you feel you should have access to this page, Please contact administrator. <br>
                       Thank you`;
-                      this.hideLoadingSpinner()
+            this.hideLoadingSpinner()
           }
         }
 
@@ -157,7 +157,7 @@ export class BatchInvoiceComponent implements AfterViewInit {
     const month = currentDate.getMonth() + 1;
 
 
-    const monthString = new Intl.DateTimeFormat('en-US', {month: 'long'}).format(new Date(year, month - 1, 1));
+    const monthString = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date(year, month - 1, 1));
     return `${monthString} ${year}`;
   }
 
@@ -177,14 +177,14 @@ export class BatchInvoiceComponent implements AfterViewInit {
       this.rowCheckedState = [];
       this.service.getBatchInvoiceClients(branch, this.InvoiceDate).subscribe((d: any) => {
 
-          this.batchInvoice = d['batchInvoice'];
-          this.setDatasource(this.batchInvoice);
+        this.batchInvoice = d['batchInvoice'];
+        this.setDatasource(this.batchInvoice);
 
-          for (let i = 0; i < this.batchInvoice.length; i++) {
-            this.rowCheckedState.push(false);
-          }
-        }, () => {
-        },
+        for (let i = 0; i < this.batchInvoice.length; i++) {
+          this.rowCheckedState.push(false);
+        }
+      }, () => {
+      },
         () => {
           this.toggleRowCheckboxAll();
         });
@@ -239,6 +239,12 @@ export class BatchInvoiceComponent implements AfterViewInit {
 
         this.calculation(i);
 
+        // Skip this item if calculation returned early (no data)
+        if (this.details.length === 0) {
+          console.warn(`Skipping batch invoice item at index ${i} - no data available`);
+          continue;
+        }
+
         if (!data[ij]) {
           data[ij] = {};
         }
@@ -258,7 +264,7 @@ export class BatchInvoiceComponent implements AfterViewInit {
       }
     }
 
-    this.service.saveBatchInvoice({data: data}).subscribe((d: any) => {
+    this.service.saveBatchInvoice({ data: data }).subscribe((d: any) => {
       Swal.fire({
         toast: true,
         position: 'top',
@@ -337,6 +343,13 @@ export class BatchInvoiceComponent implements AfterViewInit {
 
     this.client = this.batchInvoice[i];
     this.details = [];
+
+    // Check if data exists before accessing it
+    if (!this.batchInvoice[i]['data']) {
+      console.error('No data found for batch invoice item at index', i);
+      return;
+    }
+
     if (this.client.ID == 0) {
       this.agreementDetails = this.batchInvoice[i]['data']['agreementDetails'];
       this.agreement = this.batchInvoice[i]['data']['agreement'];
@@ -347,7 +360,7 @@ export class BatchInvoiceComponent implements AfterViewInit {
     } else {
       this.agreementDetails = this.batchInvoice[i]['data']['details'];
       this.agreement = this.batchInvoice[i]['data']['invoice'];
-      this.invoice_no = this.agreement?.InvoiceNo;
+      this.invoice_no = this.agreement.InvoiceNo;
       this.agreementDetails.forEach((d: any) => {
         this.setAgreementDetailFromSavedInvoice(d);
       });

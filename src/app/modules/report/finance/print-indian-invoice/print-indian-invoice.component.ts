@@ -47,6 +47,8 @@ export class PrintIndianInvoiceComponent implements AfterViewInit {
   InvoiceDate: any;
   Subject: any;
   Note: any;
+  currentInvoiceIndex: number = 0;
+  totalInvoices: number = 0;
 
   constructor(public sanitizer: DomSanitizer, private fb: FormBuilder, public dialog: MatDialog,
     private _liveAnnouncer: LiveAnnouncer, private service: FinanceService, private router: Router,
@@ -152,11 +154,14 @@ export class PrintIndianInvoiceComponent implements AfterViewInit {
     this.getClients();
   }
   getClients() {
-    if (this.frm.get("branch")?.value != "" && this.frm.get("invoice_period")?.value != "") {
-      let branch = this.frm.get("branch")?.value;
-      this.InvoiceDate = this.returnDate(this.frm.get("invoice_period")?.value);
+    const branchValue = this.frm.get("branch")?.value;
+    const invoicePeriodValue = this.frm.get("invoice_period")?.value;
 
-      let dateStr = this.returnMonthAndYear(this.frm.get("invoice_period")?.value)
+    if (branchValue && branchValue !== "" && invoicePeriodValue) {
+      let branch = branchValue;
+      this.InvoiceDate = this.returnDate(invoicePeriodValue);
+
+      let dateStr = this.returnMonthAndYear(invoicePeriodValue);
       this.Subject = "Being Charges for Security Services for the month of " + dateStr;
       this.Note = "Being Charges for Security Services for the month of " + dateStr;
 
@@ -165,11 +170,6 @@ export class PrintIndianInvoiceComponent implements AfterViewInit {
 
         this.batchInvoice = d['batchInvoice'];
         this.setDatasource(this.batchInvoice);
-        if (this.batchInvoice.length == 0) {
-          this.frm.patchValue({
-            branch: '0'
-          });
-        }
 
         for (let i = 0; i < this.batchInvoice.length; i++) {
           this.rowCheckedState.push(false);
@@ -242,6 +242,10 @@ export class PrintIndianInvoiceComponent implements AfterViewInit {
       this.errorMessage = 'Please select at least one invoice to print.';
       return;
     }
+
+    // Initialize pagination
+    this.currentInvoiceIndex = 0;
+    this.totalInvoices = this.selectedBatchInvoiceIds.length;
 
     // Load the HTML template and populate with invoice data from API
     this.loadInvoiceTemplate();
@@ -518,5 +522,38 @@ export class PrintIndianInvoiceComponent implements AfterViewInit {
 
   hideLoadingSpinner() {
     this.showLoadingSpinner = false
+  }
+
+  previousInvoice() {
+    if (this.currentInvoiceIndex > 0) {
+      this.currentInvoiceIndex--;
+      this.generateInvoiceHtml(this.selectedBatchInvoiceIds[this.currentInvoiceIndex]);
+    }
+  }
+
+  nextInvoice() {
+    if (this.currentInvoiceIndex < this.totalInvoices - 1) {
+      this.currentInvoiceIndex++;
+      this.generateInvoiceHtml(this.selectedBatchInvoiceIds[this.currentInvoiceIndex]);
+    }
+  }
+
+  goToInvoice(index: number) {
+    if (index >= 0 && index < this.totalInvoices) {
+      this.currentInvoiceIndex = index;
+      this.generateInvoiceHtml(this.selectedBatchInvoiceIds[index]);
+    }
+  }
+
+  get canGoPrevious(): boolean {
+    return this.currentInvoiceIndex > 0;
+  }
+
+  get canGoNext(): boolean {
+    return this.currentInvoiceIndex < this.totalInvoices - 1;
+  }
+
+  get currentPageNumber(): number {
+    return this.currentInvoiceIndex + 1;
   }
 }

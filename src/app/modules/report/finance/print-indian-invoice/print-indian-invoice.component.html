@@ -31,8 +31,8 @@
                     <mat-form-field appearance="outline">
                         <mat-label>Branch</mat-label>
                         <mat-select formControlName="branch" (selectionChange)="getClients()">
-                            <mat-option [value]="0"></mat-option>
-                            <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Name}}</mat-option>
+                            <mat-option [value]="''">Select Branch</mat-option>
+                            <mat-option *ngFor="let d of branchList" [value]="d.Code">{{d.Name}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </div>
@@ -89,6 +89,24 @@
                     </button>
                 </div>
             </div>
+
+            <!-- Pagination Controls -->
+            <div class="row mb-3" *ngIf="totalInvoices > 1">
+                <div class="col-12">
+                    <div class="pagination-controls d-flex justify-content-between align-items-center">
+                        <button class="btn btn-secondary" (click)="previousInvoice()" [disabled]="!canGoPrevious">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </button>
+                        <span class="page-indicator">
+                            Invoice {{ currentPageNumber }} of {{ totalInvoices }}
+                        </span>
+                        <button class="btn btn-secondary" (click)="nextInvoice()" [disabled]="!canGoNext">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div [innerHTML]="invoiceHtml" class="invoice-display"></div>
         </div>
     </mat-card-content>
@@ -117,6 +135,19 @@
         overflow: hidden;
     }
 
+    .pagination-controls {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    .page-indicator {
+        font-weight: 600;
+        color: #495057;
+        font-size: 16px;
+    }
+
     .alert {
         border-radius: 8px;
         border-left: 4px solid #17a2b8;
@@ -127,7 +158,8 @@
         .wlt-c-furg-content-header,
         .container-fluid.mb-3,
         .row.mb-3,
-        .no-print {
+        .no-print,
+        .pagination-controls {
             display: none !important;
         }
 
