@@ -140,7 +140,7 @@ export interface IAgreement {
 
 export class NewAgreementComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['ServiceType', 'Description', 'NoOfGuards', 'PerMonth', 'PerDay', 'Rate', 'NoOfHours', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
+  displayedColumns: string[] = ['ServiceType', 'Description', 'NoOfGuards', 'PerMonth', 'PerDay', 'Rate', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
 
   dataSource!: MatTableDataSource<IItemDetails>;
 
