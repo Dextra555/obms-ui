@@ -140,7 +140,7 @@ export interface IAgreement {
 
 export class NewAgreementComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['ServiceType', 'Description', 'NoOfGuards', 'PerMonth', 'PerDay', 'Rate', 'NoOfHours', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
+  displayedColumns: string[] = ['ServiceType', 'Description', 'NoOfGuards', 'PerMonth', 'PerDay', 'Rate', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
 
   dataSource!: MatTableDataSource<IItemDetails>;
 
@@ -1986,9 +1986,6 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     }
 
-    // Ensure proper rounding to nearest integer
-    vMonthTotal = Math.round(vMonthTotal);
-
 
 
     if (!(parseInt("0" + tNoOfGuards, 10) === 0 ||
@@ -1997,7 +1994,7 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
       parseInt("0" + tNoOfDays, 10) === 0)) {
 
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(vMonthTotal));
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
 
     } else if (this.type == 'S') {
 

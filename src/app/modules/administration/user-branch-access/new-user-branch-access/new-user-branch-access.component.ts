@@ -83,10 +83,10 @@ export class NewUserBranchAccessComponent implements OnInit {
 
   checkboxChanged(index: number, controlName: string) {
     const formArray = this.dynamicForm.get('formArray') as FormArray;
-    const control = formArray.at(index) as FormGroup   
-    if (controlName === 'IsAllowed') {     
+    const control = formArray.at(index) as FormGroup
+    if (controlName === 'IsAllowed') {
       control.get('Name')?.patchValue(this.userName, { emitEvent: false });
-    } 
+    }
   }
   getUserAccessRights(userName: string, screenName: string) {
     this.showLoadingSpinner = true;
@@ -108,22 +108,22 @@ export class NewUserBranchAccessComponent implements OnInit {
   updateFormFields(data: any, permissions: any): void {
     const formArray = this.dynamicForm.get('formArray') as FormArray;
     formArray.clear();
-    
+
     // Loop through existing data and set formArray fields
     for (let i = 0; i < data.length; i++) {
       const branchCode = data[i].Code;
-      
+
       // Find the corresponding permission for this branch
       const permission = permissions.find((p: any) => p.BranchCode === branchCode);
-  
+
       // Set the form group with data and update IsAllowed from permissions
       formArray.push(this.fb.group({
         ID: [data[i].ID ? data[i].ID : 0],
-        Name: [data[i].Name],
+        Name: [this.userName], // Always set the Name from the current user being edited
         BranchCode: [branchCode],
         IsAllowed: [permission ? permission.IsAllowed : false], // Use the IsAllowed from permission if found, else false
-        LastUpdatedDate: this.formatDate(this.formatDate(new Date())),
-        LastUpdatedBy: [data[i].LastUpdatedBy],
+        LastUpdatedDate: this.formatDate(new Date()),
+        LastUpdatedBy: [this.currentUser], // Use current user instead of old value
       }));
     }
   }
@@ -153,6 +153,9 @@ export class NewUserBranchAccessComponent implements OnInit {
   savebuttonClick(): void {
     this.showLoadingSpinner = true;
     const formArray = this.dynamicForm.get('formArray') as FormArray;
+
+    console.log('Form array before save:', formArray.value);
+
     // Loop through the formArray backwards to avoid index issues while removing items
     for (let i = formArray.length - 1; i >= 0; i--) {
       const formGroup = formArray.at(i) as FormGroup;
@@ -160,10 +163,16 @@ export class NewUserBranchAccessComponent implements OnInit {
         formArray.removeAt(i);
       }
     }
+
     this.obmsBranches = formArray.value;
+    console.log('Data to save:', this.obmsBranches);
+
     this._commonService.SaveAndUpdateObmsBranches(this.obmsBranches)
       .subscribe(response => {
-        if (response.Success == 'Success') {
+        console.log('Save response:', response);
+        this.showLoadingSpinner = false;
+
+        if (response && response.Success == 'Success') {
           this._router.navigate(['/administration/user-branch-access']);
           Swal.fire({
             toast: true,
@@ -175,10 +184,19 @@ export class NewUserBranchAccessComponent implements OnInit {
             showCloseButton: false,
             timer: 3000,
           });
+        } else {
+          Swal.fire({
+            title: 'Error',
+            text: response?.Message || 'Failed to save user branch access',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
         }
-        this.showLoadingSpinner = false;
       },
-        (error) => this.handleErrors(error)
+        (error) => {
+          console.error('Save error:', error);
+          this.handleErrors(error);
+        }
       );
   }
 
