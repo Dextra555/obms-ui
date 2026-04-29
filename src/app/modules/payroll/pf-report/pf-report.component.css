@@ -1,0 +1,29 @@
+.mat-icon-large {
+  font-size: 64px;
+  height: 64px;
+  width: 64px;
+}
+
+.table th {
+  white-space: nowrap;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-success {
+  color: #28a745;
+}
+
+.text-muted {
+  color: #6c757d;
+}

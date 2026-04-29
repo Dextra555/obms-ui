@@ -23,22 +23,23 @@ export class PfStatementReportComponent implements OnInit {
   warningMessage: string = '';
   errorMessage: string = '';
   successMessage: string = '';
-  
+
   branchModel!: BranchModel[];
   clientModel!: ClientModel[];
   currentUser: string = '';
   userAccessModel!: UserAccessModel;
   selectedReportType: string = 'monthly';
+  years: number[] = [];
 
   currentReportHtml: SafeHtml | null = null;
   currentReportHtmlRaw: string = '';
   reportTemplate: string = '';
 
   constructor(
-    public sanitizer: DomSanitizer, 
-    private fb: FormBuilder, 
+    public sanitizer: DomSanitizer,
+    private fb: FormBuilder,
     private http: HttpClient,
-    private _dataService: DatasharingService, 
+    private _dataService: DatasharingService,
     private _masterService: MastermoduleService,
     private _payrollService: PayrollModuleService,
     private router: Router
@@ -62,11 +63,12 @@ export class PfStatementReportComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) this._dataService.scrollToTop();
     });
-    
+
     this.currentUser = sessionStorage.getItem('username')!;
     if (!this.currentUser) {
       this._dataService.getUsername().subscribe((username) => { this.currentUser = username; });
     }
+    this.generateYearOptions();
     this.loadTemplate();
     this.getUserAccessRights(this.currentUser, 'PF Statement Report');
   }
@@ -130,7 +132,7 @@ export class PfStatementReportComponent implements OnInit {
     const branchName = this.branchModel?.find(b => b.Code === formValues.BranchCode)?.Name || '';
     const clientName = this.clientModel?.find(c => c.Code === formValues.ClientCode)?.Name || '';
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    
+
     const metaData = {
       ReportTitle: 'PROVIDENT FUND STATEMENT - ' + months[formValues.Month - 1].toUpperCase() + ' ' + formValues.Year,
       Branch: branchName,
@@ -239,4 +241,12 @@ export class PfStatementReportComponent implements OnInit {
   clearMessages() { this.errorMessage = ''; this.warningMessage = ''; this.successMessage = ''; }
   showSpinner() { this.showLoadingSpinner = true; }
   hideSpinner() { this.showLoadingSpinner = false; }
+
+  generateYearOptions() {
+    const currentYear = new Date().getFullYear();
+    this.years = [];
+    for (let i = currentYear - 2; i <= currentYear + 5; i++) {
+      this.years.push(i);
+    }
+  }
 }

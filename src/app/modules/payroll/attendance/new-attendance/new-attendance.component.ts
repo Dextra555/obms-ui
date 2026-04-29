@@ -718,7 +718,7 @@ export class NewAttendanceComponent implements OnInit {
     this.Shift2Client = event.value == '' ? '0' : event.value;
   }
 
-    getClients(advanceDate: string, branchCode: string): void {
+  getClients(advanceDate: string, branchCode: string): void {
     this._payrollService.getClients(advanceDate, branchCode).subscribe(
       (data) => {
         // Prepend an empty option to the list
@@ -1646,13 +1646,13 @@ export class NewAttendanceComponent implements OnInit {
     if (this.employeeSelectedType === 'Guard') {
       const clientName = this.attendanceForm.get('ClientName')?.value;
       const shift2Client = this.attendanceForm.get('Shif2Client')?.value;
-      
+
       // Shift 1 Client is always mandatory
       if (!clientName || clientName.trim() === '') {
         this.showMessage('Please select a Default Client for Shift 1. This is mandatory.', 'warning', 'Warning Message');
         return;
       }
-      
+
       // Check if Shift 2 has any hours in the dynamic form
       let hasShift2Hours = false;
       const formArray = this.dynamicForm.get('formArray') as FormArray;
@@ -1664,7 +1664,7 @@ export class NewAttendanceComponent implements OnInit {
           break;
         }
       }
-      
+
       // Shift 2 Client is required only if Shift 2 has hours
       if (hasShift2Hours) {
         if (!shift2Client || shift2Client.trim() === '') {

@@ -282,6 +282,26 @@ export class FinanceService {
     return this.httpClient.get<any>(`${this.apiUrl}Finance/GetLegalDemandByID/${id}`);
   }
 
+  getPFStatement(request: any): Observable<any> {
+    return this.httpClient.post(`${this.apiUrl}PFReport/GetPFStatement`, request);
+  }
+
+  getESIWageReport(request: any): Observable<any> {
+    return this.httpClient.post(`${this.apiUrl}ESIWageReport/GetESIWageReport`, request);
+  }
+
+  getESIReasonCodes(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}ESIWageReport/GetESIReasonCodes`);
+  }
+
+  getBranches(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}Master/GetBranchList`);
+  }
+
+  getEmployeeTypes(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}Master/GetEmployeeTypeList`);
+  }
+
   private errorHandle(error: HttpErrorResponse) {
     let errorMessage: string = '';
     if (error.error instanceof ErrorEvent) {

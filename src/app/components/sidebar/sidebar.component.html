@@ -39,7 +39,6 @@
                 <li class="nav-item" routerLink="/master/employee-master"><a class="nav-link">Employee Master</a></li>
                 <li class="nav-item" routerLink="/master/employee-transfer"><a class="nav-link">Employee Transfer</a>
                 </li>
-               
                 <!--<li class="nav-item" [routerLink]="['/master/report/user-report']"> <a class="nav-link">User Report</a></li>-->
               </ul>
             </div>
@@ -59,7 +58,7 @@
                     Report</a></li>
                 <li class="nav-item" [routerLink]="['master/report/employee-list']"><a class="nav-link">Employee
                     List</a></li>
-                 <li class="nav-item" routerLink="/master/employee-history"><a class="nav-link">Employee Transfer
+                <li class="nav-item" routerLink="/master/employee-history"><a class="nav-link">Employee Transfer
                     History</a></li>
               </ul>
             </div>
@@ -149,14 +148,6 @@
                 <!--          <li class="nav-item" routerLink="/finance/receipts"> <a class="nav-link">Receipts</a></li>-->
                 <li class="nav-item" routerLink="/finance/cheque-status"><a class="nav-link">Cheque Status</a></li>
                 <li class="nav-item" routerLink="/finance/cheque-master"><a class="nav-link">Cheque Master</a></li>
-                <li class="nav-item" routerLink="/inventory/category-master"><a class="nav-link">Category Master</a>
-                </li>
-                <li class="nav-item" routerLink="/inventory/supplier-master"><a class="nav-link">Supplier Master</a>
-                </li>
-                <li class="nav-item" routerLink="/inventory/utility-bills"><a class="nav-link">Expenses</a></li>
-                <li class="nav-item" routerLink="/finance/legal-demand-action"><a class="nav-link">Legal/Demand
-                    Action</a>
-                </li>
               </ul>
             </div>
           </li>
@@ -198,7 +189,8 @@
             </span>
             <div class="collapse" [ngClass]="{'show': isSubmenuOpen('finance')}">
               <ul class="nav flex-column wlt-c-furg-sub-menu">
-                <li class="nav-item"><a class="nav-link" routerLink="/report/finance/print-indian-invoice">Invoice Report</a></li>
+                <li class="nav-item"><a class="nav-link" routerLink="/report/finance/print-indian-invoice">Invoice
+                    Report</a></li>
                 <li class="nav-item"><a class="nav-link"
                     routerLink="/report/finance/invoice-collection-status-report">Invoice Collection Status</a></li>
                 <li class="nav-item"><a class="nav-link" routerLink="/report/finance/monthly-invoice-status">Monthly
@@ -253,6 +245,10 @@
                 </li>
                 <li class="nav-item" routerLink="/payroll/rbi-bank-salary-process"><a class="nav-link">RBI Bank Salary
                     Process</a>
+                </li>
+                <li class="nav-item" routerLink="/payroll/pf-report"><a class="nav-link">PF Report (For Portal)</a>
+                </li>
+                <li class="nav-item" routerLink="/payroll/esi-wage-report"><a class="nav-link">ESI Wage Report (For Portal)</a>
                 </li>
               </ul>
             </div>
