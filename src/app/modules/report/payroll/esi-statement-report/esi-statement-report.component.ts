@@ -166,12 +166,9 @@ export class EsiStatementReportComponent implements OnInit {
     if (apiData?.totals) {
       const t = apiData.totals;
       // Remap API totals keys to template placeholder keys
-      // Backend: TotalGross, TotalEmpESI, TotalErESI, TotalESI
-      // Template: {{TotalWages}}, {{TotalEmpShare}}, {{TotalEmployerShare}}, {{TotalAmount}}
-      allData['TotalWages'] = fmt(t['TotalGross'] ?? t['totalWages'] ?? 0);
-      allData['TotalEmpShare'] = fmt(t['TotalEmpESI'] ?? t['totalEmpShare'] ?? 0);
-      allData['TotalEmployerShare'] = fmt(t['TotalErESI'] ?? t['totalEmployerShare'] ?? 0);
-      allData['TotalAmount'] = fmt(t['TotalESI'] ?? t['totalAmount'] ?? 0);
+      // Backend: TotalMonthlyWages, TotalDaysWorked
+      // Template: {{TotalMonthlyWages}}
+      allData['TotalMonthlyWages'] = fmt(t['TotalMonthlyWages'] ?? 0);
     }
 
     // Replace {{Key}} and {{Key || 'default'}} placeholders
@@ -183,7 +180,7 @@ export class EsiStatementReportComponent implements OnInit {
       });
 
     // Build data rows
-    let rowHtml = '<tr><td colspan="9" style="text-align:center;color:#888;">No records found for the selected period.</td></tr>';
+    let rowHtml = '<tr><td colspan="7" style="text-align:center;color:#888;">No records found for the selected period.</td></tr>';
     if (apiData?.rows && apiData.rows.length > 0) {
       rowHtml = apiData.rows.map((r: any, i: number) => this.buildRow(r, i)).join('');
     }
@@ -195,18 +192,16 @@ export class EsiStatementReportComponent implements OnInit {
   }
 
   private buildRow(row: any, index: number): string {
-    // Backend returns: empCode, empName, esiNo, gross, empESI, erESI, totalESI
+    // Backend returns: ipNumber, ipName, noOfDaysForWhichWagesPaid, totalMonthlyWages, reasonCodeForZeroWorkingDays, lastWorkingDay
     const fmt = (v: any) => (v != null ? Number(v).toLocaleString('en-IN') : '0');
     return `<tr>
       <td class="text-center">${row.sno ?? index + 1}</td>
-      <td>${row.empCode ?? row.employeeCode ?? ''}</td>
-      <td>${row.empName ?? row.employeeName ?? ''}</td>
-      <td>${row.esiNo ?? ''}</td>
-      <td class="text-center">${row.days ?? row.daysWorked ?? 26}</td>
-      <td class="text-right">${fmt(row.gross ?? row.totalWages)}</td>
-      <td class="text-right">${fmt(row.empESI ?? row.empShare)}</td>
-      <td class="text-right">${fmt(row.erESI ?? row.employerShare)}</td>
-      <td class="text-right">${fmt(row.totalESI ?? row.totalAmount)}</td>
+      <td>${row.ipNumber ?? row.esiNo ?? ''}</td>
+      <td>${row.ipName ?? row.empName ?? ''}</td>
+      <td class="text-center">${row.noOfDaysForWhichWagesPaid ?? row.daysWorked ?? 0}</td>
+      <td class="text-right">${fmt(row.totalMonthlyWages ?? row.gross)}</td>
+      <td>${row.reasonCodeForZeroWorkingDays ?? ''}</td>
+      <td>${row.lastWorkingDay ?? ''}</td>
     </tr>`;
   }
 
