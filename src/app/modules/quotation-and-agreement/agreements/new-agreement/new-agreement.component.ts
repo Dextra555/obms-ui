@@ -1854,8 +1854,6 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     const noOfHours = parseFloat(this.frm.get('details.NoOfHours')?.value || 8);
 
-    const noOfGuards = parseFloat(this.frm.get('details.NoOfGuards')?.value || 0);
-
 
 
     if (perMonth > 0) {
@@ -1896,33 +1894,8 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
-      // Set MonthTotal directly from PerMonth to avoid rounding errors from PerDay roundtrip
-      const monthTotal = noOfGuards > 0 ? perMonth * noOfGuards : perMonth;
-
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(monthTotal)));
-
-      this.frm.get('details.YearTotal')?.setValue(Math.round(monthTotal * 12));
-
-
-
-      // Call DetailRowChange for discount/tax/total calculations
+      // DetailRowChange now uses PerMonth × NoOfGuards for MonthTotal
       this.DetailRowChange();
-
-
-
-      // Override MonthTotal back to the exact PerMonth-based value after DetailRowChange
-      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(monthTotal)));
-
-      this.frm.get('details.YearTotal')?.setValue(Math.round(monthTotal * 12));
-
-
-
-      // Recalculate total with the correct MonthTotal
-      let vDiscount = parseFloat(this.frm.get('details.DiscountAmount')?.value || '0');
-
-      let tTaxAmount = parseFloat(this.frm.get('details.TaxAmount')?.value || '0');
-
-      this.frm.get('details.total')?.setValue(this.formatCurrency(monthTotal - vDiscount + tTaxAmount));
 
     }
 
@@ -2013,6 +1986,8 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     const tNoOfGuards = this.frm.get('details.NoOfGuards')?.value;
 
+    const tPerMonth = this.frm.get('details.PerMonth')?.value;
+
     const tPerDay = this.frm.get('details.PerDay')?.value;
 
     const tNoOfHours = this.frm.get('details.NoOfHours')?.value;
@@ -2039,29 +2014,17 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     if (parseInt("0" + tNoOfGuards, 10) === 0) {
 
-      vMonthTotal = parseFloat(tPerDay) * parseFloat(tNoOfDays);
+      vMonthTotal = parseFloat(tPerMonth) || 0;
 
     } else {
 
-      vMonthTotal = (
-
-        parseFloat(tNoOfGuards) *
-
-        parseFloat(tPerDay) *
-
-        parseFloat(tNoOfDays)
-
-      );
+      vMonthTotal = parseFloat(tNoOfGuards) * parseFloat(tPerMonth);
 
     }
 
 
 
-    if (!(parseInt("0" + tNoOfGuards, 10) === 0 ||
-
-      parseInt("0" + tPerDay, 10) === 0 ||
-
-      parseInt("0" + tNoOfDays, 10) === 0)) {
+    if (parseFloat(tPerMonth) > 0) {
 
       this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
 
@@ -2100,16 +2063,18 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
     const tDiscountHour = parseFloat(this.frm.get('details.DiscountHour')?.value || '0');
 
     if (this.frm.get('details.HasDiscount')?.value && tDiscountHour > 0) {
+      // Calculate per-day rate from PerMonth for discount calculation
+      const perDayRate = parseFloat(tPerMonth) / parseFloat(tNoOfDays);
       // Validate that discount days cannot exceed (NoOfGuards * Working Days)
       const maxDiscountDays = tNoOfGuards * tNoOfDays;
       if (tDiscountHour > maxDiscountDays) {
         // Reset discount days to maximum allowed if it exceeds
         this.frm.get('details.DiscountHour')?.setValue(maxDiscountDays);
-        const calculatedDiscount = tPerDay * maxDiscountDays;
+        const calculatedDiscount = perDayRate * maxDiscountDays;
         this.frm.get('details.DiscountAmount')?.setValue(this.formatCurrency(Math.round(calculatedDiscount)));
       } else {
-        // Calculate discount as monetary amount: (PerDay * Discount Days)
-        const calculatedDiscount = tPerDay * tDiscountHour;
+        // Calculate discount as monetary amount: (PerMonth/NoOfDays * Discount Days)
+        const calculatedDiscount = perDayRate * tDiscountHour;
         this.frm.get('details.DiscountAmount')?.setValue(this.formatCurrency(Math.round(calculatedDiscount)));
       }
     } else {
