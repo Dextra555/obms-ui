@@ -323,7 +323,7 @@ export class NewAttendanceComponent implements OnInit {
             ESI: employeeDetails.ESIDETECT ? 'YES' : 'NO',
             UAN: employeeDetails.UANNumber,
             PaymentMode: employeeDetails.PAYMODE,
-            BasicPay: employeeDetails.EMPPAY_BASIC_RATE,
+            BasicPay: employeeDetails.CB_SubTotal || employeeDetails.EMPPAY_BASIC_RATE,
             Allowance: employeeDetails.ATTENDANCEALLOWANCE,
             SpecialAllowance: employeeDetails.SpecialAllowance,
             SalaryStructure: employeeDetails.SalaryStructure === 'Y' ? 'YES' : 'NO',
