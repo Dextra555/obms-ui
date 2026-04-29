@@ -304,7 +304,7 @@
 
               <td class="mat-cell">
 
-                <mat-checkbox formControlName="HasDiscount" (input)="DetailRowChange()"></mat-checkbox>
+                <mat-checkbox formControlName="HasDiscount" (change)="onDiscountCheckboxChange($event)"></mat-checkbox>
 
               </td>
 
@@ -314,7 +314,7 @@
 
                   <input type="text" formControlName="DiscountAmount" matInput placeholder=""
 
-                         autocomplete="off" (input)="DetailRowChange()">
+                         autocomplete="off" (input)="DetailRowChange()" [disabled]="!hasDiscount">
 
                 </mat-form-field>
 
@@ -326,7 +326,7 @@
 
                   <input type="text" formControlName="DiscountHour" matInput placeholder=""
 
-                         autocomplete="off" (input)="DetailRowChange()">
+                         autocomplete="off" (input)="onDiscountHourChange()" [disabled]="!hasDiscount">
 
                 </mat-form-field>
 

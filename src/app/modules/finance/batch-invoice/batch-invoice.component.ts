@@ -266,46 +266,35 @@ export class BatchInvoiceComponent implements AfterViewInit {
       }
     }
 
-    this.service.saveBatchInvoice({ data: data }).subscribe({
-      next: (d: any) => {
-        Swal.fire({
-          toast: true,
-          position: 'top',
-          showConfirmButton: false,
-          title: 'Success',
-          text: "Batch Invoice Saved successfully",
-          icon: 'success',
-          showCloseButton: false,
-          timer: 3000,
-        });
-        this.route.navigate(['/finance/batch-invoice']);
-        this.frm.reset();
-        this.details = [];
-        this.setDatasource([]);
-      },
-      error: (err: any) => {
-        console.error('Batch invoice save error:', err);
-        let errorMsg = 'Failed to save batch invoice. Please try again.';
-        if (err?.error?.error) {
-          errorMsg = err.error.error;
-        } else if (err?.error?.message) {
-          errorMsg = err.error.message;
-        } else if (err?.status === 400) {
-          errorMsg = 'Invalid invoice data. Please check the invoice details and try again.';
-        } else if (err?.status === 0) {
-          errorMsg = 'Unable to connect to server. Please check your connection.';
-        }
-        Swal.fire({
-          toast: true,
-          position: 'top',
-          showConfirmButton: false,
-          title: 'Error',
-          text: errorMsg,
-          icon: 'error',
-          showCloseButton: false,
-          timer: 5000,
-        });
-      }
+    if (data.length === 0) {
+      Swal.fire({
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        title: 'Error',
+        text: "No valid invoice data to save. Please check if agreements exist for the selected period.",
+        icon: 'error',
+        showCloseButton: false,
+        timer: 3000,
+      });
+      return;
+    }
+
+    this.service.saveBatchInvoice({data: data}).subscribe((d: any) => {
+      Swal.fire({
+        toast: true,
+        position: 'top',
+        showConfirmButton: false,
+        title: 'Success',
+        text: "Batch Invoice Saved successfully",
+        icon: 'success',
+        showCloseButton: false,
+        timer: 3000,
+      });
+      this.route.navigate(['/finance/batch-invoice']);
+      this.frm.reset();
+      this.details = [];
+      this.setDatasource([]);
     })
     // data['InvoiceNo'] = (this.frm.get("invoice_no")?.value).toString();
     // data['InvoiceDate'] = this.returnDate(this.frm.get("invoice_period")?.value);
