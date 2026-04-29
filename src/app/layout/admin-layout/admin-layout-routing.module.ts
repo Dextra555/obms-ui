@@ -137,6 +137,8 @@ import { EsiStatementReportComponent } from 'src/app/modules/report/payroll/esi-
 import { ProfessionalTaxStatementReportComponent } from 'src/app/modules/report/payroll/professional-tax-statement-report/professional-tax-statement-report.component';
 import { NonComplianceReportComponent } from 'src/app/modules/report/payroll/non-compliance-report/non-compliance-report.component';
 import { PfStatementReportComponent } from 'src/app/modules/report/payroll/pf-statement-report/pf-statement-report.component';
+import { PfReportComponent } from '../../modules/payroll/pf-report/pf-report.component';
+import { EsiWageReportComponent } from '../../modules/payroll/esi-wage-report/esi-wage-report.component';
 
 import { AccGlDataListComponent } from 'src/app/modules/Accounting/acc-gl-data-list/acc-gl-data-list.component';
 import { PrintInvoiceComputerGeneratedComponent } from 'src/app/modules/finance/invoice/print-invoice-computer-generated/print-invoice-computer-generated.component';
@@ -275,6 +277,8 @@ const routes: Routes = [
   { path: 'finance/legal-demand-action/new-legal-demand-action', component: NewLegalDemandActionComponent, canActivate: [AuthGuard] },
   { path: 'finance/legal-demand-action/new-legal-demand-action/:ID', component: NewLegalDemandActionComponent, canActivate: [AuthGuard] },
   { path: 'finance/invoice/print-invoice', component: PrintInvoiceComponent, canActivate: [AuthGuard] },
+  { path: 'payroll/pf-report', component: PfReportComponent, canActivate: [AuthGuard] },
+  { path: 'payroll/esi-wage-report', component: EsiWageReportComponent, canActivate: [AuthGuard] },
 
 
   //Master Report

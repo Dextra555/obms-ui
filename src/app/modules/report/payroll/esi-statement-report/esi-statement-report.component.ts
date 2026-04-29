@@ -23,22 +23,23 @@ export class EsiStatementReportComponent implements OnInit {
   warningMessage: string = '';
   errorMessage: string = '';
   successMessage: string = '';
-  
+
   branchModel!: BranchModel[];
   clientModel!: ClientModel[];
   currentUser: string = '';
   userAccessModel!: UserAccessModel;
   reportType: number = 0;
+  years: number[] = [];
 
   currentReportHtml: SafeHtml | null = null;
   currentReportHtmlRaw: string = '';
   reportTemplate: string = '';
 
   constructor(
-    public sanitizer: DomSanitizer, 
-    private fb: FormBuilder, 
+    public sanitizer: DomSanitizer,
+    private fb: FormBuilder,
     private http: HttpClient,
-    private _dataService: DatasharingService, 
+    private _dataService: DatasharingService,
     private _masterService: MastermoduleService,
     private _payrollService: PayrollModuleService,
     private router: Router
@@ -61,11 +62,12 @@ export class EsiStatementReportComponent implements OnInit {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) this._dataService.scrollToTop();
     });
-    
+
     this.currentUser = sessionStorage.getItem('username')!;
     if (!this.currentUser) {
       this._dataService.getUsername().subscribe((username) => { this.currentUser = username; });
     }
+    this.generateYearOptions();
     this.loadTemplate();
     this.getUserAccessRights(this.currentUser, 'ESI Statement Report');
   }
@@ -166,10 +168,10 @@ export class EsiStatementReportComponent implements OnInit {
       // Remap API totals keys to template placeholder keys
       // Backend: TotalGross, TotalEmpESI, TotalErESI, TotalESI
       // Template: {{TotalWages}}, {{TotalEmpShare}}, {{TotalEmployerShare}}, {{TotalAmount}}
-      allData['TotalWages']         = fmt(t['TotalGross']   ?? t['totalWages']         ?? 0);
-      allData['TotalEmpShare']      = fmt(t['TotalEmpESI']  ?? t['totalEmpShare']      ?? 0);
-      allData['TotalEmployerShare'] = fmt(t['TotalErESI']   ?? t['totalEmployerShare'] ?? 0);
-      allData['TotalAmount']        = fmt(t['TotalESI']     ?? t['totalAmount']        ?? 0);
+      allData['TotalWages'] = fmt(t['TotalGross'] ?? t['totalWages'] ?? 0);
+      allData['TotalEmpShare'] = fmt(t['TotalEmpESI'] ?? t['totalEmpShare'] ?? 0);
+      allData['TotalEmployerShare'] = fmt(t['TotalErESI'] ?? t['totalEmployerShare'] ?? 0);
+      allData['TotalAmount'] = fmt(t['TotalESI'] ?? t['totalAmount'] ?? 0);
     }
 
     // Replace {{Key}} and {{Key || 'default'}} placeholders
@@ -244,4 +246,12 @@ export class EsiStatementReportComponent implements OnInit {
   clearMessages() { this.errorMessage = ''; this.warningMessage = ''; this.successMessage = ''; }
   showSpinner() { this.showLoadingSpinner = true; }
   hideSpinner() { this.showLoadingSpinner = false; }
+
+  generateYearOptions() {
+    const currentYear = new Date().getFullYear();
+    this.years = [];
+    for (let i = currentYear - 2; i <= currentYear + 5; i++) {
+      this.years.push(i);
+    }
+  }
 }

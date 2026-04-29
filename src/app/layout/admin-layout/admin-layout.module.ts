@@ -15,6 +15,8 @@ import { EsiStatementReportModule } from 'src/app/modules/report/payroll/esi-sta
 import { ProfessionalTaxStatementReportModule } from 'src/app/modules/report/payroll/professional-tax-statement-report/professional-tax-statement-report.module';
 import { NonComplianceReportModule } from 'src/app/modules/report/payroll/non-compliance-report/non-compliance-report.module';
 import { PfStatementReportModule } from 'src/app/modules/report/payroll/pf-statement-report/pf-statement-report.module';
+import { PfReportModule } from 'src/app/modules/payroll/pf-report/pf-report.module';
+import { EsiWageReportModule } from 'src/app/modules/payroll/esi-wage-report/esi-wage-report.module';
 import { ProfessionalTaxSlabModule } from 'src/app/modules/master/professional-tax-slab/professional-tax-slab.module';
 import { RbiBankSalaryProcessModule } from 'src/app/modules/payroll/rbi-bank-salary-process/rbi-bank-salary-process.module';
 
@@ -36,9 +38,11 @@ import { RbiBankSalaryProcessModule } from 'src/app/modules/payroll/rbi-bank-sal
     ProfessionalTaxStatementReportModule,
     NonComplianceReportModule,
     PfStatementReportModule,
+    PfReportModule,
+    EsiWageReportModule,
     ProfessionalTaxSlabModule,
     RbiBankSalaryProcessModule
-  ], 
-  providers: [CommonService,MastermoduleService],
+  ],
+  providers: [CommonService, MastermoduleService],
 })
 export class AdminLayoutModule { }

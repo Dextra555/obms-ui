@@ -475,8 +475,8 @@ export class PayrollModuleService {
 
   getAttendanceByDate(date: string, branch: string): Observable<any[]> {
     return this.httpClient.get<any[]>(this.apiUrl + 'payroll/GetAttendanceByDate', {
-      params: { 
-        attendanceDate: date, 
+      params: {
+        attendanceDate: date,
         branch: branch || 'ALL'
       }
     }).pipe(catchError(this.errorHandle));
@@ -490,9 +490,9 @@ export class PayrollModuleService {
 
     return this.httpClient.get<any[]>(this.apiUrl + 'payroll/GetEmployeeAttendanceList', {
 
-      params: { 
+      params: {
 
-        period: period, 
+        period: period,
 
         branch: branch || 'MAIN'
 
@@ -678,9 +678,9 @@ export class PayrollModuleService {
       .set('branch', encodeURIComponent(branch))
       .set('employeeType', encodeURIComponent(employeeType));
 
-    return this.httpClient.get(`${this.apiUrl}payroll/GetRbiBankSalaryExportCsv`, { 
-      params, 
-      responseType: 'blob' 
+    return this.httpClient.get(`${this.apiUrl}payroll/GetRbiBankSalaryExportCsv`, {
+      params,
+      responseType: 'blob'
     }).pipe(catchError(this.errorHandle));
   }
 
@@ -1303,9 +1303,9 @@ export class PayrollModuleService {
       .set('period', period)
       .set('reportType', reportType)
       .set('format', format);
-    return this.httpClient.get(`${this.apiUrl}payroll/GenerateComplianceReport`, { 
-      params, 
-      responseType: 'blob' 
+    return this.httpClient.get(`${this.apiUrl}payroll/GenerateComplianceReport`, {
+      params,
+      responseType: 'blob'
     }).pipe(catchError(this.errorHandle));
   }
 
