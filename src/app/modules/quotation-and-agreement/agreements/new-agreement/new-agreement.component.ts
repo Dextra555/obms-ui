@@ -1850,28 +1850,79 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     const perMonth = parseFloat(this.frm.get('details.PerMonth')?.value || 0);
 
-    const noOfDays = parseFloat(this.frm.get('details.NoOfDays')?.value || 30);
+    let noOfDays = parseFloat(this.frm.get('details.NoOfDays')?.value || 0);
 
     const noOfHours = parseFloat(this.frm.get('details.NoOfHours')?.value || 8);
 
-
-
-    if (perMonth > 0 && noOfDays > 0) {
-
-      const perDay = perMonth / noOfDays;
-
-      this.frm.get('details.PerDay')?.setValue(this.formatCurrency(perDay));
+    const noOfGuards = parseFloat(this.frm.get('details.NoOfGuards')?.value || 0);
 
 
 
-      // Calculate per hour rate
-      const perHour = perDay / noOfHours;
+    if (perMonth > 0) {
 
-      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHour));
+      // Auto-set NoOfDays from agreement date calendar if not already set
+      if (noOfDays === 0) {
+
+        let dt = this.frm.get('AgreementDate')?.value;
+
+        const currentDate = new Date(dt);
+
+        const currentYear = currentDate.getFullYear();
+
+        const currentMonth = currentDate.getMonth();
+
+        noOfDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        this.frm.get('details.NoOfDays')?.setValue(noOfDays);
+
+        this.frm.get('details.FollowCalender')?.setValue(true);
+
+      }
 
 
 
+      // Calculate PerDay and Rate from PerMonth
+      if (noOfDays > 0) {
+
+        const perDay = perMonth / noOfDays;
+
+        this.frm.get('details.PerDay')?.setValue(this.formatCurrency(perDay));
+
+        const perHour = perDay / noOfHours;
+
+        this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHour));
+
+      }
+
+
+
+      // Set MonthTotal directly from PerMonth to avoid rounding errors from PerDay roundtrip
+      const monthTotal = noOfGuards > 0 ? perMonth * noOfGuards : perMonth;
+
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(monthTotal)));
+
+      this.frm.get('details.YearTotal')?.setValue(Math.round(monthTotal * 12));
+
+
+
+      // Call DetailRowChange for discount/tax/total calculations
       this.DetailRowChange();
+
+
+
+      // Override MonthTotal back to the exact PerMonth-based value after DetailRowChange
+      this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(monthTotal)));
+
+      this.frm.get('details.YearTotal')?.setValue(Math.round(monthTotal * 12));
+
+
+
+      // Recalculate total with the correct MonthTotal
+      let vDiscount = parseFloat(this.frm.get('details.DiscountAmount')?.value || '0');
+
+      let tTaxAmount = parseFloat(this.frm.get('details.TaxAmount')?.value || '0');
+
+      this.frm.get('details.total')?.setValue(this.formatCurrency(monthTotal - vDiscount + tTaxAmount));
 
     }
 
