@@ -1902,6 +1902,24 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
   }
 
+  onDiscountHourChange(): void {
+    // Trigger DetailRowChange to recalculate discount based on Working Days - Discount Days
+    this.DetailRowChange();
+  }
+
+  onDiscountCheckboxChange(event: any): void {
+    if (!event.checked) {
+      // Clear discount values when checkbox is unchecked
+      this.frm.get('details.DiscountAmount')?.setValue(0);
+      this.frm.get('details.DiscountHour')?.setValue(0);
+    }
+    this.DetailRowChange();
+  }
+
+  get hasDiscount(): boolean {
+    return this.frm.get('details.HasDiscount')?.value || false;
+  }
+
 
 
   DetailRowChange(): void {
@@ -2027,13 +2045,27 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
-    let vDiscount = parseFloat(this.frm.get('details.DiscountAmount')?.value || '0');
+    // Calculate DiscountAmount based on days deduction
+    const tDiscountHour = parseFloat(this.frm.get('details.DiscountHour')?.value || '0');
 
-    if (!this.frm.get('details.HasDiscount')?.value) {
-
-      vDiscount = 0;
-
+    if (this.frm.get('details.HasDiscount')?.value && tDiscountHour > 0) {
+      // Validate that discount days cannot exceed (NoOfGuards * Working Days)
+      const maxDiscountDays = tNoOfGuards * tNoOfDays;
+      if (tDiscountHour > maxDiscountDays) {
+        // Reset discount days to maximum allowed if it exceeds
+        this.frm.get('details.DiscountHour')?.setValue(maxDiscountDays);
+        const calculatedDiscount = tPerDay * maxDiscountDays;
+        this.frm.get('details.DiscountAmount')?.setValue(this.formatCurrency(Math.round(calculatedDiscount)));
+      } else {
+        // Calculate discount as monetary amount: (PerDay * Discount Days)
+        const calculatedDiscount = tPerDay * tDiscountHour;
+        this.frm.get('details.DiscountAmount')?.setValue(this.formatCurrency(Math.round(calculatedDiscount)));
+      }
+    } else {
+      this.frm.get('details.DiscountAmount')?.setValue(0);
     }
+
+    let vDiscount = parseFloat(this.frm.get('details.DiscountAmount')?.value || '0');
 
 
 
