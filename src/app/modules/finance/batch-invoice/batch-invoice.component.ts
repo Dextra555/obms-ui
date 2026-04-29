@@ -237,7 +237,9 @@ export class BatchInvoiceComponent implements AfterViewInit {
     for (let i = 0; i < this.batchInvoice.length; i++) {
       if (this.rowCheckedState[i]) {
 
-        this.calculation(i);
+        if (!this.calculation(i)) {
+          continue;
+        }
 
         if (!data[ij]) {
           data[ij] = {};
@@ -258,21 +260,60 @@ export class BatchInvoiceComponent implements AfterViewInit {
       }
     }
 
-    this.service.saveBatchInvoice({data: data}).subscribe((d: any) => {
+    if (data.length === 0) {
       Swal.fire({
         toast: true,
         position: 'top',
         showConfirmButton: false,
-        title: 'Success',
-        text: "Batch Invoice Saved successfully",
-        icon: 'success',
+        title: 'Error',
+        text: "No valid invoice data to save. Please check if agreements exist for the selected period.",
+        icon: 'error',
         showCloseButton: false,
         timer: 3000,
       });
-      this.route.navigate(['/finance/batch-invoice']);
-      this.frm.reset();
-      this.details = [];
-      this.setDatasource([]);
+      return;
+    }
+
+    this.service.saveBatchInvoice({data: data}).subscribe({
+      next: (d: any) => {
+        Swal.fire({
+          toast: true,
+          position: 'top',
+          showConfirmButton: false,
+          title: 'Success',
+          text: "Batch Invoice Saved successfully",
+          icon: 'success',
+          showCloseButton: false,
+          timer: 3000,
+        });
+        this.route.navigate(['/finance/batch-invoice']);
+        this.frm.reset();
+        this.details = [];
+        this.setDatasource([]);
+      },
+      error: (err: any) => {
+        console.error('Batch invoice save error:', err);
+        let errorMsg = 'Failed to save batch invoice. Please try again.';
+        if (err?.error?.error) {
+          errorMsg = err.error.error;
+        } else if (err?.error?.message) {
+          errorMsg = err.error.message;
+        } else if (err?.status === 400) {
+          errorMsg = 'Invalid invoice data. Please check the invoice details and try again.';
+        } else if (err?.status === 0) {
+          errorMsg = 'Unable to connect to server. Please check your connection.';
+        }
+        Swal.fire({
+          toast: true,
+          position: 'top',
+          showConfirmButton: false,
+          title: 'Error',
+          text: errorMsg,
+          icon: 'error',
+          showCloseButton: false,
+          timer: 5000,
+        });
+      }
     })
     // data['InvoiceNo'] = (this.frm.get("invoice_no")?.value).toString();
     // data['InvoiceDate'] = this.returnDate(this.frm.get("invoice_period")?.value);
@@ -332,21 +373,26 @@ export class BatchInvoiceComponent implements AfterViewInit {
     this.details.push(obj);
   }
 
-  calculation(i: any) {
+  calculation(i: any): boolean {
 
 
     this.client = this.batchInvoice[i];
     this.details = [];
+    const invoiceData = this.batchInvoice[i]['data'];
+    if (!invoiceData) {
+      console.error('No invoice data found for batch invoice index', i);
+      return false;
+    }
     if (this.client.ID == 0) {
-      this.agreementDetails = this.batchInvoice[i]['data']['agreementDetails'];
-      this.agreement = this.batchInvoice[i]['data']['agreement'];
-      this.invoice_no = this.batchInvoice[i]['data']['invoiceNo'];
+      this.agreementDetails = invoiceData['agreementDetails'];
+      this.agreement = invoiceData['agreement'];
+      this.invoice_no = invoiceData['invoiceNo'];
       this.agreementDetails.forEach((d: any) => {
         this.setAgreementDetail(d);
       });
     } else {
-      this.agreementDetails = this.batchInvoice[i]['data']['details'];
-      this.agreement = this.batchInvoice[i]['data']['invoice'];
+      this.agreementDetails = invoiceData['details'];
+      this.agreement = invoiceData['invoice'];
       this.invoice_no = this.agreement?.InvoiceNo;
       this.agreementDetails.forEach((d: any) => {
         this.setAgreementDetailFromSavedInvoice(d);
@@ -402,6 +448,7 @@ export class BatchInvoiceComponent implements AfterViewInit {
     this.TaxAmount = Math.round(this.TaxAmount * 100) / 100;
     this.Total = this.ServiceCharges - this.DiscountAmount + this.TaxAmount;
     this.Total = Math.round(this.Total * 100) / 100;
+    return true;
   }
 
   hideLoadingSpinner() {
