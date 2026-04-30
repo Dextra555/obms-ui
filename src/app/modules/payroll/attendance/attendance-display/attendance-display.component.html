@@ -67,7 +67,7 @@
           <mat-select formControlName="clientCode" (selectionChange)="applyFilters()">
             <mat-option value="">All Clients</mat-option>
             <mat-option *ngFor="let client of clients" [value]="client.Code">
-              {{ client.Code }} - {{ client.Name }}
+              {{ client.Code }} - {{ client.Shortname }}
             </mat-option>
           </mat-select>
         </mat-form-field>

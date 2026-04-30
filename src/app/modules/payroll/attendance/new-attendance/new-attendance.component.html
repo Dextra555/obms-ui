@@ -240,7 +240,7 @@
                         <mat-select formControlName="ClientName" [panelClass]="'custom-dropdown-panel'"
                             (selectionChange)="clientNameChange($event)">
                             <mat-option *ngFor="let employee of employeeModel" [value]="employee.Name">
-                                {{ employee.Name }}
+                                {{ employee.Shortname }}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -278,7 +278,7 @@
                         <mat-select formControlName="Shif2Client" [panelClass]="'custom-dropdown-panel'"
                             (selectionChange)="Shift2ClientChange($event)">
                             <mat-option *ngFor="let employee of employeeModel" [value]="employee.Name">
-                                {{ employee.Name }}
+                                {{ employee.Shortname }}
                             </mat-option>
                         </mat-select>
                         <mat-error
@@ -387,8 +387,8 @@
                                         </td>
                                         <td *ngIf="dynamicEditable == 'set' && employeeSelectedType == 'Guard'">
                                             <mat-form-field appearance="outline">
-                                                <input matInput formControlName="Client"
-                                                    readonly="{{dynamicEditable == 'set'}}">
+                                                <input matInput [value]="getClientShortname(control.get('Client')?.value)"
+                                                    readonly="true">
                                             </mat-form-field>
                                         </td>
                                         <td *ngIf="dynamicEditable == 'edit' && employeeSelectedType == 'Guard'">
@@ -397,7 +397,7 @@
                                                     [panelClass]="'custom-dropdown-panel'">
                                                     <mat-option *ngFor="let employee of employeeModel"
                                                         [value]="employee.Name">
-                                                        {{ employee.Name }}
+                                                        {{ employee.Shortname }}
                                                     </mat-option>
                                                 </mat-select>
                                             </mat-form-field>
@@ -430,8 +430,8 @@
                                         </td>
                                         <td *ngIf="dynamicEditable == 'set' && employeeSelectedType == 'Guard'">
                                             <mat-form-field appearance="outline">
-                                                <input matInput formControlName="OTClient"
-                                                    readonly="{{dynamicEditable == 'set'}}">
+                                                <input matInput [value]="getClientShortname(control.get('OTClient')?.value)"
+                                                    readonly="true">
                                             </mat-form-field>
                                         </td>
                                         <td *ngIf="dynamicEditable == 'edit' && employeeSelectedType == 'Guard'">
@@ -440,7 +440,7 @@
                                                     [panelClass]="'custom-dropdown-panel'">
                                                     <mat-option *ngFor="let employee of employeeModel"
                                                         [value]="employee.Name">
-                                                        {{ employee.Name }}
+                                                        {{ employee.Shortname }}
                                                     </mat-option>
                                                 </mat-select>
                                             </mat-form-field>
