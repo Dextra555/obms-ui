@@ -137,7 +137,7 @@ export class NewAttendanceComponent implements OnInit {
       ID: [0],
       EmployeeID: [''],
       AdvanceDate: [new Date, [Validators.required]],
-      ClientName: ['', [Validators.required]],
+      ClientName: [''],
       BranchCode: ['', [Validators.required]],
       EmployeeNo: ['', [Validators.required]],
       EmployeeType: ['Guard'],
