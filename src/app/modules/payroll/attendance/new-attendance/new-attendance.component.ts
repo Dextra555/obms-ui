@@ -103,6 +103,12 @@ export class NewAttendanceComponent implements OnInit {
     return [year, month, day].join('-');
   }
 
+  getClientShortname(clientName: string): string {
+    if (!clientName) return '';
+    const client = this.employeeModel.find(c => c.Name === clientName);
+    return client ? client.Shortname : clientName;
+  }
+
   workTypeList: any[] = [
     { id: 1, name: 'General Working' },
     { id: 2, name: 'Off Day' },
