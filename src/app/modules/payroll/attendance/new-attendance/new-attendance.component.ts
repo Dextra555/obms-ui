@@ -171,6 +171,14 @@ export class NewAttendanceComponent implements OnInit {
       SpecialAllowanceDeductionStaff: 0.00,
       LastUpdate: [this.formatDate(new Date)],
       LastUpdatedBy: [''],
+      // Working Days and Allowance Configuration
+      AttendanceAllowanceFollowCalendar: '',
+      AttendanceAllowanceWorkingDays: '',
+      WorkingDays: '',
+      WorkingDaysAllowed: '',
+      DaysWorked: '',
+      CalculatedAllowance: '',
+      ExtraDays: 0,
     });
     this.userAccessModel = {
       readAccess: false,
@@ -323,11 +331,16 @@ export class NewAttendanceComponent implements OnInit {
             ESI: employeeDetails.ESIDETECT ? 'YES' : 'NO',
             UAN: employeeDetails.UANNumber,
             PaymentMode: employeeDetails.PAYMODE,
-            BasicPay: employeeDetails.CB_SubTotal || employeeDetails.EMPPAY_BASIC_RATE,
+            BankName: employeeDetails.BankName,
+            AccountNo: employeeDetails.AccountNumber,
+            BasicPay: employeeDetails.EMPPAY_BASIC_RATE,
             Allowance: employeeDetails.ATTENDANCEALLOWANCE,
             SpecialAllowance: employeeDetails.SpecialAllowance,
-            SalaryStructure: employeeDetails.SalaryStructure === 'Y' ? 'YES' : 'NO',
-            SalarySlab: employeeDetails.Name,
+            // Working Days Configuration
+            AttendanceAllowanceFollowCalendar: employeeDetails.AttendanceAllowanceFollowCalendar,
+            AttendanceAllowanceWorkingDays: employeeDetails.AttendanceAllowanceWorkingDays,
+            WorkingDays: employeeDetails.WorkingDays,
+            WorkingDaysAllowed: this.calculateWorkingDaysAllowed(employeeDetails.AttendanceAllowanceFollowCalendar, employeeDetails.AttendanceAllowanceWorkingDays, employeeDetails.WorkingDays),
             Age: this.calculateAge(employeeDetails.EMP_DATE_OF_BIRTH),
           });
 
@@ -349,6 +362,9 @@ export class NewAttendanceComponent implements OnInit {
                 Paternity: paternityLeave.LeaveAvailable,
                 Hospitalization: hospitalizationLeave.LeaveAvailable,
               });
+
+              // Calculate working days allowance dynamically
+              this.calculateDynamicAllowance();
 
               let iNoOfDays = 0;
               let iStartDay = 1;
@@ -1642,35 +1658,97 @@ export class NewAttendanceComponent implements OnInit {
       return; // stop if user cancels the confirm dialog
     }
 
+    // Recalculate dynamic allowance before checking underworked/extra days
+    this.calculateDynamicAllowance();
+
+    // Check if allowed working days is greater than actual days worked
+    const workingDaysAllowed = parseFloat(this.attendanceForm.value.WorkingDaysAllowed) || 26;
+    const daysWorked = parseFloat(this.attendanceForm.value.DaysWorked) || 0;
+
+    if (workingDaysAllowed > daysWorked) {
+      const deficitDays = workingDaysAllowed - daysWorked;
+      const result = await Swal.fire({
+        title: 'Underworked Days Detected',
+        html: `Employee has worked <b>${daysWorked} day(s)</b> out of <b>${workingDaysAllowed} allowed day(s)</b>.<br>
+               Deficit: <b>${deficitDays} day(s)</b><br><br>
+               Would you like to set Sundays as Off Day leave?`,
+        icon: 'warning',
+        confirmButtonText: 'Set Leave',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#28a745',
+        cancelButtonColor: '#6c757d'
+      });
+
+      if (result.isConfirmed) {
+        // User chose to set Sundays as Off Day leave
+        await this.autoSetSundayAsOffDayLeave(deficitDays);
+        // Continue with submission after setting leave
+      } else {
+        // User cancelled - stop submission
+        return;
+      }
+    }
+
+    // Check for extra days and show warning
+    const extraDays = this.attendanceForm.value.ExtraDays || 0;
+    if (extraDays > 0) {
+      const result = await Swal.fire({
+        title: 'Extra Days Detected',
+        html: `Employee has worked <b>${extraDays} extra day(s)</b> beyond the allowed working days.<br><br>
+               Please fix the attendance before submitting.`,
+        icon: 'warning',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6'
+      });
+
+      // Always stop submission - user must fix attendance first
+      return;
+    }
+
     // Validate client selection for Guard employees
     if (this.employeeSelectedType === 'Guard') {
-      const clientName = this.attendanceForm.get('ClientName')?.value;
-      const shift2Client = this.attendanceForm.get('Shif2Client')?.value;
+      const formArray = this.dynamicForm.get('formArray') as FormArray;
+      let hasShift1Client = false;
+      let hasShift2Client = false;
+      let hasShift2Hours = false;
 
-      // Shift 1 Client is always mandatory
-      if (!clientName || clientName.trim() === '') {
-        this.showMessage('Please select a Default Client for Shift 1. This is mandatory.', 'warning', 'Warning Message');
+      // Check dynamic form for client selections and shift 2 hours
+      for (let i = 0; i < formArray.length; i++) {
+        const group = formArray.at(i);
+        const type = group.get('Type')?.value;
+        const hours = parseFloat(group.get('Hours')?.value) || 0;
+        const shift2Hours = parseFloat(group.get('Shift2Hours')?.value) || 0;
+        const client = group.get('Client')?.value;
+        const shift2Client = group.get('OTClient')?.value;
+
+        // Check if it's a working day with hours
+        if (hours > 0 && (type === 'General Working' || type === '1' ||
+          type === 'Off Day Working' || type === '3' ||
+          type === 'Holiday Working' || type === '5')) {
+          if (client && client.trim() !== '') {
+            hasShift1Client = true;
+          }
+        }
+
+        // Check for shift 2 hours and client
+        if (shift2Hours > 0) {
+          hasShift2Hours = true;
+          if (shift2Client && shift2Client.trim() !== '') {
+            hasShift2Client = true;
+          }
+        }
+      }
+
+      // At least one Shift 1 client must be selected for working days
+      if (!hasShift1Client) {
+        this.showMessage('Please select at least one client.', 'warning', 'Warning Message');
         return;
       }
 
-      // Check if Shift 2 has any hours in the dynamic form
-      let hasShift2Hours = false;
-      const formArray = this.dynamicForm.get('formArray') as FormArray;
-      for (let i = 0; i < formArray.length; i++) {
-        const group = formArray.at(i);
-        const shift2Hours = group.get('Shift2Hours')?.value;
-        if (shift2Hours && parseFloat(shift2Hours) > 0) {
-          hasShift2Hours = true;
-          break;
-        }
-      }
-
       // Shift 2 Client is required only if Shift 2 has hours
-      if (hasShift2Hours) {
-        if (!shift2Client || shift2Client.trim() === '') {
-          this.showMessage('Please select a Shift II Default Client. Shift 2 hours are present.', 'warning', 'Warning Message');
-          return;
-        }
+      if (hasShift2Hours && !hasShift2Client) {
+        this.showMessage('Please select a Shift II Client. Shift 2 hours are present.', 'warning', 'Warning Message');
+        return;
       }
     }
 
@@ -2014,6 +2092,164 @@ export class NewAttendanceComponent implements OnInit {
   }
   public lastOfMonth(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  }
+
+  // Dynamic Allowance Calculation based on Working Days
+  calculateDynamicAllowance() {
+    const workingDaysAllowed = parseFloat(this.attendanceForm.value.WorkingDaysAllowed) || 26;
+    const allowance = parseFloat(this.attendanceForm.value.Allowance) || 0;
+    const followCalendar = this.attendanceForm.value.AttendanceAllowanceFollowCalendar;
+
+    // Calculate days worked from attendance details
+    const daysWorked = this.calculateDaysWorked();
+
+    // Calculate total days accounted for (worked + leave + holidays + off days)
+    const totalAccountedDays = this.calculateTotalAccountedDays();
+
+    let calculatedAllowance = allowance;
+    let extraDays = 0;
+
+    if (followCalendar === 'true' || followCalendar === 'Y') {
+      // When following calendar, check if total accounted days exceed calendar days
+      const daysInMonth = this.getDaysInMonth(this.attendanceForm.value.AdvanceDate);
+      if (totalAccountedDays > daysInMonth) {
+        extraDays = totalAccountedDays - daysInMonth;
+      }
+    } else {
+      // When not following calendar, use original logic
+      if (daysWorked > workingDaysAllowed) {
+        extraDays = daysWorked - workingDaysAllowed;
+      }
+    }
+
+    if (daysWorked < workingDaysAllowed && extraDays === 0) {
+      // Prorate allowance based on actual days worked (only if no extra days)
+      calculatedAllowance = (daysWorked / workingDaysAllowed) * allowance;
+    }
+
+    this.attendanceForm.patchValue({
+      DaysWorked: daysWorked,
+      CalculatedAllowance: calculatedAllowance.toFixed(2),
+      ExtraDays: extraDays
+    });
+  }
+
+  // Calculate total days worked from dynamic form array
+  calculateDaysWorked(): number {
+    let totalDays = 0;
+    const formArray = this.dynamicForm.get('formArray') as FormArray;
+
+    if (formArray && formArray.length > 0) {
+      for (let i = 0; i < formArray.length; i++) {
+        const group = formArray.at(i);
+        const type = group.get('Type')?.value;
+        const hours = parseFloat(group.get('Hours')?.value) || 0;
+        const shift2Hours = parseFloat(group.get('Shift2Hours')?.value) || 0;
+
+        // Count as a worked day if it's a working type with hours > 0
+        // General Working (1), Off Day Working (3), Holiday Working (5)
+        if (hours > 0 || shift2Hours > 0) {
+          if (type === 'General Working' || type === '1' ||
+            type === 'Off Day Working' || type === '3' ||
+            type === 'Holiday Working' || type === '5') {
+            totalDays += 1;
+          }
+        }
+      }
+    }
+    return totalDays;
+  }
+
+  // Calculate total days accounted for (worked + leave + holidays + off days)
+  calculateTotalAccountedDays(): number {
+    let totalDays = 0;
+    const formArray = this.dynamicForm.get('formArray') as FormArray;
+
+    if (formArray && formArray.length > 0) {
+      for (let i = 0; i < formArray.length; i++) {
+        const group = formArray.at(i);
+        const type = group.get('Type')?.value;
+        const hours = parseFloat(group.get('Hours')?.value) || 0;
+        const shift2Hours = parseFloat(group.get('Shift2Hours')?.value) || 0;
+
+        // Count all days that have any activity (work, leave, holiday, off day)
+        // Working types with hours
+        if ((hours > 0 || shift2Hours > 0) &&
+          (type === 'General Working' || type === '1' ||
+            type === 'Off Day Working' || type === '3' ||
+            type === 'Holiday Working' || type === '5')) {
+          totalDays += 1;
+        }
+        // Leave types (6-13)
+        else if (type === 'Annual Leave' || type === '6' ||
+          type === 'Medical Leave' || type === '7' ||
+          type === 'Maternity Leave' || type === '8' ||
+          type === 'Paternity Leave' || type === '9' ||
+          type === 'Hospitalization Leave' || type === '10' ||
+          type === 'Unpaid Leave' || type === '11' ||
+          type === 'Abscond' || type === '12' ||
+          type === 'Suspended' || type === '13') {
+          totalDays += 1;
+        }
+        // Off Day (2) and Holiday (4) without work
+        else if (type === 'Off Day' || type === '2' ||
+          type === 'Holiday' || type === '4') {
+          totalDays += 1;
+        }
+      }
+    }
+    return totalDays;
+  }
+
+  // Calculate Working Days Allowed based on Follow Calendar flag
+  calculateWorkingDaysAllowed(followCalendar: string | null | undefined, attendanceAllowanceWorkingDays: number | null | undefined, workingDays: number | null | undefined): number {
+    // If Follow Calendar is true, use actual calendar days in the month
+    if (followCalendar === 'true' || followCalendar === 'Y') {
+      // Calculate days in the attendance period month
+      const attendanceDateStr = this.attendanceForm.value.AdvanceDate;
+      const daysInMonth = this.getDaysInMonth(attendanceDateStr);
+      return daysInMonth;
+    }
+    // Otherwise use the configured AttendanceAllowanceWorkingDays, fallback to SalaryStructure WorkingDays, default to 26
+    return attendanceAllowanceWorkingDays || workingDays || 26;
+  }
+
+  // Auto-set Sundays as Off Day leave in the attendance form
+  async autoSetSundayAsOffDayLeave(deficitDays: number): Promise<void> {
+    const formArray = this.dynamicForm.get('formArray') as FormArray;
+    let sundaysSet = 0;
+
+    for (let i = 0; i < formArray.length; i++) {
+      if (sundaysSet >= deficitDays) break;
+
+      const group = formArray.at(i);
+      const dayField = group.get('dayField')?.value;
+
+      // Check if it's a Sunday (day of week 0)
+      const date = new Date(dayField);
+      if (date.getDay() === 0) {
+        // Check if current type is not already a leave type
+        const currentType = group.get('Type')?.value;
+        if (currentType !== 'Annual Leave' && currentType !== 'Unpaid Leave' &&
+          currentType !== 'Medical Leave' && currentType !== 'Absent' &&
+          currentType !== 'Off Day') {
+          // Set as Off Day
+          group.patchValue({
+            Type: 'Off Day',
+            Hours: 0
+          });
+          sundaysSet++;
+        }
+      }
+    }
+
+    if (sundaysSet > 0) {
+      // Recalculate dynamic allowance after setting leaves
+      this.calculateDynamicAllowance();
+      this.showMessage(`${sundaysSet} Sunday(s) have been set as Off Day leave.`, 'success', 'Success Message');
+    } else {
+      this.showMessage('No available Sundays found to set as leave.', 'warning', 'Warning Message');
+    }
   }
   // Cache to store ongoing requests for de-duplication
   private inProgressRequests: Map<string, Observable<boolean>> = new Map();
