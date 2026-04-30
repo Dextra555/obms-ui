@@ -404,7 +404,8 @@ export class PrintIndianInvoiceComponent implements AfterViewInit {
       // Line Items and Subtotal
       .replace(/{{DataRows}}/g, dataRowsHtml)
       .replace(/{{Subtotal}}/g, formatCurrency(totals.subtotal || 0))
-      .replace(/{{Discount}}/g, formatCurrency(totals.discount || 0))
+      .replace(/{{DiscountDuties}}/g, (totals.discountDuties || 0).toString())
+      .replace(/{{DiscountAmount}}/g, formatCurrency(totals.discountAmount || 0))
       .replace(/{{TaxableValue}}/g, formatCurrency(totals.taxableValue || 0));
 
     // Handle GST based on intra-state or inter-state
