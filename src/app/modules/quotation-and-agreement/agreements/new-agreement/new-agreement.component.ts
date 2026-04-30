@@ -1850,27 +1850,51 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     const perMonth = parseFloat(this.frm.get('details.PerMonth')?.value || 0);
 
-    const noOfDays = parseFloat(this.frm.get('details.NoOfDays')?.value || 30);
+    let noOfDays = parseFloat(this.frm.get('details.NoOfDays')?.value || 0);
 
     const noOfHours = parseFloat(this.frm.get('details.NoOfHours')?.value || 8);
 
 
 
-    if (perMonth > 0 && noOfDays > 0) {
+    if (perMonth > 0) {
 
-      const perDay = perMonth / noOfDays;
+      // Auto-set NoOfDays from agreement date calendar if not already set
+      if (noOfDays === 0) {
 
-      this.frm.get('details.PerDay')?.setValue(this.formatCurrency(perDay));
+        let dt = this.frm.get('AgreementDate')?.value;
+
+        const currentDate = new Date(dt);
+
+        const currentYear = currentDate.getFullYear();
+
+        const currentMonth = currentDate.getMonth();
+
+        noOfDays = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+        this.frm.get('details.NoOfDays')?.setValue(noOfDays);
+
+        this.frm.get('details.FollowCalender')?.setValue(true);
+
+      }
 
 
 
-      // Calculate per hour rate
-      const perHour = perDay / noOfHours;
+      // Calculate PerDay and Rate from PerMonth
+      if (noOfDays > 0) {
 
-      this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHour));
+        const perDay = perMonth / noOfDays;
+
+        this.frm.get('details.PerDay')?.setValue(this.formatCurrency(perDay));
+
+        const perHour = perDay / noOfHours;
+
+        this.frm.get('details.Rate')?.setValue(this.formatCurrency(perHour));
+
+      }
 
 
 
+      // DetailRowChange now uses PerMonth × NoOfGuards for MonthTotal
       this.DetailRowChange();
 
     }
@@ -1962,6 +1986,8 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     const tNoOfGuards = this.frm.get('details.NoOfGuards')?.value;
 
+    const tPerMonth = this.frm.get('details.PerMonth')?.value;
+
     const tPerDay = this.frm.get('details.PerDay')?.value;
 
     const tNoOfHours = this.frm.get('details.NoOfHours')?.value;
@@ -1988,29 +2014,17 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     if (parseInt("0" + tNoOfGuards, 10) === 0) {
 
-      vMonthTotal = parseFloat(tPerDay) * parseFloat(tNoOfDays);
+      vMonthTotal = parseFloat(tPerMonth) || 0;
 
     } else {
 
-      vMonthTotal = (
-
-        parseFloat(tNoOfGuards) *
-
-        parseFloat(tPerDay) *
-
-        parseFloat(tNoOfDays)
-
-      );
+      vMonthTotal = parseFloat(tNoOfGuards) * parseFloat(tPerMonth);
 
     }
 
 
 
-    if (!(parseInt("0" + tNoOfGuards, 10) === 0 ||
-
-      parseInt("0" + tPerDay, 10) === 0 ||
-
-      parseInt("0" + tNoOfDays, 10) === 0)) {
+    if (parseFloat(tPerMonth) > 0) {
 
       this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
 
@@ -2049,16 +2063,18 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
     const tDiscountHour = parseFloat(this.frm.get('details.DiscountHour')?.value || '0');
 
     if (this.frm.get('details.HasDiscount')?.value && tDiscountHour > 0) {
+      // Calculate per-day rate from PerMonth for discount calculation
+      const perDayRate = parseFloat(tPerMonth) / parseFloat(tNoOfDays);
       // Validate that discount days cannot exceed (NoOfGuards * Working Days)
       const maxDiscountDays = tNoOfGuards * tNoOfDays;
       if (tDiscountHour > maxDiscountDays) {
         // Reset discount days to maximum allowed if it exceeds
         this.frm.get('details.DiscountHour')?.setValue(maxDiscountDays);
-        const calculatedDiscount = tPerDay * maxDiscountDays;
+        const calculatedDiscount = perDayRate * maxDiscountDays;
         this.frm.get('details.DiscountAmount')?.setValue(this.formatCurrency(Math.round(calculatedDiscount)));
       } else {
-        // Calculate discount as monetary amount: (PerDay * Discount Days)
-        const calculatedDiscount = tPerDay * tDiscountHour;
+        // Calculate discount as monetary amount: (PerMonth/NoOfDays * Discount Days)
+        const calculatedDiscount = perDayRate * tDiscountHour;
         this.frm.get('details.DiscountAmount')?.setValue(this.formatCurrency(Math.round(calculatedDiscount)));
       }
     } else {
