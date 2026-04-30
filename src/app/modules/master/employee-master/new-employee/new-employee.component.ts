@@ -483,8 +483,6 @@ export class NewEmployeeComponent implements OnInit {
 
         this.frm.get('CB_SubTotal')?.setValue(salaryDetail?.CB_SubTotal || 0);
 
-
-
         // Update salary field to show CB_Basic value instead of slab data when using Commercial Breakdown
 
         if (employment?.NewSalaryStructure == 'N' || salaryDetail?.CB_Basic > 0) {
@@ -517,14 +515,29 @@ export class NewEmployeeComponent implements OnInit {
         this.onESIDeductionChange(this.frm.get('SOCSODETECT')?.value);
 
 
-
         this.frm.get('AttendanceAllowanceFollowCalendar')?.setValue(employment['AttendanceAllowanceFollowCalendar'] == "Y");
-
 
 
         this.calendarChangeEvent(employment['AttendanceAllowanceFollowCalendar'] == "Y");
 
+        // Load Attendance Allowance Working Days from salaryDetail AFTER calendarChangeEvent
+        console.log('=== COMPREHENSIVE DEBUG ===');
+        console.log('1. salaryDetail.AttendanceAllowanceWorkingDays:', salaryDetail?.AttendanceAllowanceWorkingDays);
+        console.log('2. Form control before setValue:', this.frm.get('AttendanceAllowanceWorkingDays'));
+        console.log('3. Is disabled before setValue:', this.frm.get('AttendanceAllowanceWorkingDays')?.disabled);
 
+        this.frm.get('AttendanceAllowanceWorkingDays')?.setValue(salaryDetail?.AttendanceAllowanceWorkingDays);
+
+        console.log('4. Form control after setValue:', this.frm.get('AttendanceAllowanceWorkingDays'));
+        console.log('5. Form value after setValue:', this.frm.get('AttendanceAllowanceWorkingDays')?.value);
+        console.log('6. Is disabled after setValue:', this.frm.get('AttendanceAllowanceWorkingDays')?.disabled);
+
+        // Enable the field to ensure the value displays properly
+        this.frm.get('AttendanceAllowanceWorkingDays')?.enable({ onlySelf: true });
+
+        console.log('7. Is disabled after enable:', this.frm.get('AttendanceAllowanceWorkingDays')?.disabled);
+        console.log('8. Final form value:', this.frm.get('AttendanceAllowanceWorkingDays')?.value);
+        console.log('==========================');
 
         // Reverse mapping: Set DepartmentId based on EMPPAY_JOB_TITLE
 
@@ -591,8 +604,6 @@ export class NewEmployeeComponent implements OnInit {
     this.frm.get("EMP_NO_CHILD")?.disable({ onlySelf: true });
 
     this.frm.get("EMPPAY_BASIC_RATE")?.disable({ onlySelf: true });
-
-    this.frm.get("AttendanceAllowanceWorkingDays")?.disable({ onlySelf: true });
 
     // Initialize deduction-related fields to disabled state (will be enabled based on selections)
     this.frm.get("PANNumber")?.disable({ onlySelf: true });

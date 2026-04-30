@@ -202,7 +202,10 @@ export class PrintIndianInvoiceComponent implements OnInit {
       .replace(/{{ShippingPAN}}/g, this.escapeHtml(client.shippingPAN || client.billingPAN || ''))
       // Line Items and Subtotal
       .replace(/{{DataRows}}/g, dataRowsHtml)
-      .replace(/{{Subtotal}}/g, formatCurrency(totals.subtotal || 0));
+      .replace(/{{Subtotal}}/g, formatCurrency(totals.subtotal || 0))
+      .replace(/{{DiscountDuties}}/g, (totals.discountDuties || 0).toString())
+      .replace(/{{DiscountAmount}}/g, formatCurrency(totals.discountAmount || 0))
+      .replace(/{{TaxableValue}}/g, formatCurrency(totals.taxableValue || 0));
 
     // Handle GST based on intra-state or inter-state
     if (isIntraState) {

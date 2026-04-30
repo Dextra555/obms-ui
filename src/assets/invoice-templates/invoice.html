@@ -81,7 +81,6 @@
 
         /* Wrapper to simulate A4 on screen */
         .invoice-wrapper {
-            width: 210mm;
             height: calc(297mm - 16mm);
             /* 297mm minus 2x 8mm padding */
             margin: 0 auto;
@@ -732,17 +731,7 @@
                         <tr>
                             <td colspan="5"></td>
                             <td class="summary-total-label">TOTAL</td>
-                            <td class="summary-total-value">{{Subtotal}}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="5"></td>
-                            <td class="summary-total-label">Discount</td>
-                            <td class="summary-total-value">- ₹ {{Discount}}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="5"></td>
-                            <td class="summary-total-label">Taxable Value</td>
-                            <td class="summary-total-value">₹ {{TaxableValue}}</td>
+                            <td class="summary-total-value">{{TaxableValue}}</td>
                         </tr>
                         <tr class="cgst-row">
                             <td colspan="5"></td>

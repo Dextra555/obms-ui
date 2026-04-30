@@ -37,6 +37,21 @@ button:focus {
   outline: none;
 }
 
+/* Hide number input spinner buttons globally */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  appearance: none;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 a {
   color: var(--secondary-color);
   text-decoration: none;
@@ -1407,13 +1422,17 @@ ul.wlt-c-furg-notifcation-content li {
 */
 
 .wlt-c-furg-mainpanel {
-  position: fixed; /* Keeps the panel in place */
-  top: 60px; /* Adjust to leave space for any fixed header */
+  position: fixed;
+  /* Keeps the panel in place */
+  top: 60px;
+  /* Adjust to leave space for any fixed header */
   left: 0;
   right: 0;
-  bottom: 0; /* Allow scrolling within the viewport height */
+  bottom: 0;
+  /* Allow scrolling within the viewport height */
   width: calc(100% - 266px);
-  overflow-y: auto; /* Enables vertical scrolling */
+  overflow-y: auto;
+  /* Enables vertical scrolling */
   display: flex;
   flex-direction: column;
   transition: width 0.25s ease, margin 0.25s ease;
@@ -2718,24 +2737,33 @@ td.mat-cell {
     visibility: hidden;
   }
 }
+
 /* for all dropdown height css */
 .custom-dropdown-panel {
-  max-height: 500px !important; /* Fixed max height for dropdown */
-  height: auto !important; /* Adjust based on content */
-  overflow-y: auto !important; /* Enable scroll for overflow */
+  max-height: 500px !important;
+  /* Fixed max height for dropdown */
+  height: auto !important;
+  /* Adjust based on content */
+  overflow-y: auto !important;
+  /* Enable scroll for overflow */
 }
 
 ::ng-deep .mat-select-panel {
-  max-height: 500px !important; /* Matches the custom panel */
+  max-height: 500px !important;
+  /* Matches the custom panel */
   overflow-y: auto !important;
 }
 
 ::ng-deep .cdk-overlay-pane {
-  max-height: 500px !important; /* Matches dropdown */
-  overflow-y: auto !important; /* Restrict scroll within bounds */
+  max-height: 500px !important;
+  /* Matches dropdown */
+  overflow-y: auto !important;
+  /* Restrict scroll within bounds */
 }
 
 ::ng-deep .cdk-overlay-connected-position-bounding-box {
-  max-height: 500px !important; /* Ensure alignment */
-  overflow-y: hidden !important; /* Prevent unintended scrolling */
+  max-height: 500px !important;
+  /* Ensure alignment */
+  overflow-y: hidden !important;
+  /* Prevent unintended scrolling */
 }
