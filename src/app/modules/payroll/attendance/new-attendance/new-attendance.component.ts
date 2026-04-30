@@ -1667,33 +1667,7 @@ export class NewAttendanceComponent implements OnInit {
     // Recalculate dynamic allowance before checking underworked/extra days
     this.calculateDynamicAllowance();
 
-    // Check if allowed working days is greater than actual days worked
-    const workingDaysAllowed = parseFloat(this.attendanceForm.value.WorkingDaysAllowed) || 26;
-    const daysWorked = parseFloat(this.attendanceForm.value.DaysWorked) || 0;
-
-    if (workingDaysAllowed > daysWorked) {
-      const deficitDays = workingDaysAllowed - daysWorked;
-      const result = await Swal.fire({
-        title: 'Underworked Days Detected',
-        html: `Employee has worked <b>${daysWorked} day(s)</b> out of <b>${workingDaysAllowed} allowed day(s)</b>.<br>
-               Deficit: <b>${deficitDays} day(s)</b><br><br>
-               Would you like to set Sundays as Off Day leave?`,
-        icon: 'warning',
-        confirmButtonText: 'Set Leave',
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: '#28a745',
-        cancelButtonColor: '#6c757d'
-      });
-
-      if (result.isConfirmed) {
-        // User chose to set Sundays as Off Day leave
-        await this.autoSetSundayAsOffDayLeave(deficitDays);
-        // Continue with submission after setting leave
-      } else {
-        // User cancelled - stop submission
-        return;
-      }
-    }
+    // Underworked days check removed - functionality disabled
 
     // Check for extra days and show warning
     const extraDays = this.attendanceForm.value.ExtraDays || 0;
@@ -2220,43 +2194,7 @@ export class NewAttendanceComponent implements OnInit {
     return attendanceAllowanceWorkingDays || workingDays || 26;
   }
 
-  // Auto-set Sundays as Off Day leave in the attendance form
-  async autoSetSundayAsOffDayLeave(deficitDays: number): Promise<void> {
-    const formArray = this.dynamicForm.get('formArray') as FormArray;
-    let sundaysSet = 0;
-
-    for (let i = 0; i < formArray.length; i++) {
-      if (sundaysSet >= deficitDays) break;
-
-      const group = formArray.at(i);
-      const dayField = group.get('dayField')?.value;
-
-      // Check if it's a Sunday (day of week 0)
-      const date = new Date(dayField);
-      if (date.getDay() === 0) {
-        // Check if current type is not already a leave type
-        const currentType = group.get('Type')?.value;
-        if (currentType !== 'Annual Leave' && currentType !== 'Unpaid Leave' &&
-          currentType !== 'Medical Leave' && currentType !== 'Absent' &&
-          currentType !== 'Off Day') {
-          // Set as Off Day
-          group.patchValue({
-            Type: 'Off Day',
-            Hours: 0
-          });
-          sundaysSet++;
-        }
-      }
-    }
-
-    if (sundaysSet > 0) {
-      // Recalculate dynamic allowance after setting leaves
-      this.calculateDynamicAllowance();
-      this.showMessage(`${sundaysSet} Sunday(s) have been set as Off Day leave.`, 'success', 'Success Message');
-    } else {
-      this.showMessage('No available Sundays found to set as leave.', 'warning', 'Warning Message');
-    }
-  }
+  // Auto-set Sundays as Off Day leave functionality removed
   // Cache to store ongoing requests for de-duplication
   private inProgressRequests: Map<string, Observable<boolean>> = new Map();
   // Helper function to get effective value (dynamic or default)
