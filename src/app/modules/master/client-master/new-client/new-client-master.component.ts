@@ -411,6 +411,19 @@ export class NewClientMasterComponent implements OnInit {
     // CIN validation logic removed - using simplified compliance
   }
 
+  onClientNameChange(event: any): void {
+    // Only auto-generate ShortName in new mode, not in edit mode
+    if (this.clientCodeStatus === 'new') {
+      const clientName = event.target.value;
+      if (clientName && clientName.length >= 3) {
+        const shortName = clientName.substring(0, 3).toUpperCase();
+        this.clientForm.patchValue({
+          ShortName: shortName
+        });
+      }
+    }
+  }
+
 
 
 
