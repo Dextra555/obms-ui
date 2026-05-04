@@ -69,7 +69,7 @@
           <div class="col-12 col-sm-12 col-md-4 col-lg-3">
             <mat-form-field appearance="outline">
               <mat-label>Bank</mat-label>
-              <mat-select formControlName="BankCode" >
+              <mat-select formControlName="BankCode">
                 <mat-option *ngFor="let d of bankList" value="{{d.BankCode}}">{{d.BankName}}</mat-option>
               </mat-select>
             </mat-form-field>
@@ -250,32 +250,32 @@
               <input type="text" formControlName="balance_amount" matInput placeholder="" autocomplete="off">
             </mat-form-field>
           </div>
-        </ng-container>       
+        </ng-container>
       </div>
       <div class="row">
-        <ng-container >          
-            <div class="col-12 col-sm-12 col-md-4 col-lg-4" *ngIf="isAdjustment">
-              <mat-label class="mr-3"><strong>Balance Status</strong></mat-label>
-              <br />
-              <mat-radio-group aria-label="Balance Status" formControlName="balance_status"
-                (change)="changeBalanceStatus()">
-                <mat-radio-button value="1">Carry Forward</mat-radio-button>
-                <mat-radio-button value="2">Credit Note</mat-radio-button>
-                <mat-radio-button value="3">Suspended</mat-radio-button>
-              </mat-radio-group>
-            </div>
-            <div class="col-12 col-sm-12 col-md-4 col-lg-3">
-              <mat-form-field appearance="outline">
-                <mat-label>Credit Note</mat-label>
-                <input type="text" formControlName="CreditNoteAmount" matInput placeholder="" autocomplete="off">
-              </mat-form-field>
-            </div>
-            <div class="col-12 col-sm-12 col-md-4 col-lg-3">
-              <mat-form-field appearance="outline">
-                <mat-label>Suspended</mat-label>
-                <input type="text" formControlName="SuspendAmount" matInput placeholder="" autocomplete="off">
-              </mat-form-field>
-            </div>          
+        <ng-container>
+          <div class="col-12 col-sm-12 col-md-4 col-lg-4" *ngIf="isAdjustment">
+            <mat-label class="mr-3"><strong>Balance Status</strong></mat-label>
+            <br />
+            <mat-radio-group aria-label="Balance Status" formControlName="balance_status"
+              (change)="changeBalanceStatus()">
+              <mat-radio-button value="1">Carry Forward</mat-radio-button>
+              <mat-radio-button value="2">Credit Note</mat-radio-button>
+              <mat-radio-button value="3">Suspended</mat-radio-button>
+            </mat-radio-group>
+          </div>
+          <div class="col-12 col-sm-12 col-md-4 col-lg-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Credit Note</mat-label>
+              <input type="text" formControlName="CreditNoteAmount" matInput placeholder="" autocomplete="off">
+            </mat-form-field>
+          </div>
+          <div class="col-12 col-sm-12 col-md-4 col-lg-3">
+            <mat-form-field appearance="outline">
+              <mat-label>Suspended</mat-label>
+              <input type="text" formControlName="SuspendAmount" matInput placeholder="" autocomplete="off">
+            </mat-form-field>
+          </div>
         </ng-container>
       </div>
       <div class="row">
@@ -308,9 +308,9 @@
                 <input type="text" formControlName="Particulars" matInput placeholder="" autocomplete="off">
               </mat-form-field>
             </div>
-           
+
           </div>
-        </div>      
+        </div>
       </div>
       <div class="row">
         <div class="col-12 col-sm-12 col-md-6 col-lg-6">
@@ -337,14 +337,15 @@
             <mat-label>Branch Collection</mat-label>
             <input type="text" formControlName="BranchCollection" matInput placeholder="" autocomplete="off" readonly>
           </mat-form-field>
-        </div>       
+        </div>
       </div>
       <div class="row">
         <div class="col-12">
           <div class="text-right">
             <button class="btn wlt-c-furg-btn-gray mr-3" (click)="cancelButtonClick()" mat-dialog-close> Cancel</button>
-            <button class="btn btn-delete mr-3" *ngIf="this.userAccessModel.deleteAccess == true || currentUser == 'superadmin'"
-            (click)="deleteClickButton()" [disabled]="receiptID== 0"> Delete</button>
+            <button class="btn btn-delete mr-3"
+              *ngIf="this.userAccessModel.deleteAccess == true || currentUser == 'superadmin'"
+              (click)="deleteClickButton()" [disabled]="receiptID== 0"> Delete</button>
             <button class="btn btn-print mr-3" [disabled]="receiptID == 0" (click)="onPrint()">Print</button>
             <button
               *ngIf="this.userAccessModel.createAccess == true || this.userAccessModel.updateAccess == true || currentUser == 'superadmin'"

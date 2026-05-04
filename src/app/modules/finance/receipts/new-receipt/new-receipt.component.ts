@@ -379,9 +379,11 @@ export class NewReceiptComponent implements OnInit {
 
   calculation() {
     let total = 0;
+    let hasSelectedInvoices = false;
     for (let i = 0; i < this.invoiceList.length; i++) {
       if (this.rowCheckedState[i]) {
         total += Number(this.invoiceList[i]['Balance']);
+        hasSelectedInvoices = true;
       }
     }
     this.frm.get("total_invoice_amount")?.setValue(total.toFixed(2));
@@ -402,7 +404,14 @@ export class NewReceiptComponent implements OnInit {
       cash = cashAmount ? cashAmount : 0;
     }
     this.frm.get("ReceiptAmount")?.setValue(cash);
-    const balanceAmount = (total - cash).toFixed(2);
+
+    // Only calculate balance if invoices are selected, otherwise show 0
+    let balanceAmount = "0.00";
+    if (hasSelectedInvoices) {
+      balanceAmount = (total - cash).toFixed(2);
+    } else {
+      balanceAmount = "0.00";
+    }
 
     this.frm.get("balance_amount")?.setValue(balanceAmount);
 
