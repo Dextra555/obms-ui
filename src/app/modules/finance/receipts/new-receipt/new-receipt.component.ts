@@ -239,7 +239,17 @@ export class NewReceiptComponent implements OnInit {
   }
 
   isCheckboxDisabled(): boolean {
-    const amount = this.frm.get('ibgAmount')?.value;
+    let amount = 0;
+    const receiptTypeID = this.receiptTypeID;
+
+    if (receiptTypeID == "1") {
+      amount = this.frm.get('ChequeAmount')?.value;
+    } else if (receiptTypeID == "2") {
+      amount = this.frm.get('CashAmount')?.value;
+    } else if (receiptTypeID == "5") {
+      amount = this.frm.get('ibgAmount')?.value;
+    }
+
     return !amount || +amount === 0;
   }
   addBranchAmount(d?: IInvoiceAmount, isExisting: boolean = false) {
