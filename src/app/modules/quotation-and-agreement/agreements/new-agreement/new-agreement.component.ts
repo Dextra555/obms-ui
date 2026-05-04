@@ -1946,6 +1946,11 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
+  // Helper function to get actual days in a month
+  getDaysInMonth(year: number, month: number): number {
+    return new Date(year, month + 1, 0).getDate();
+  }
+
   DetailRowChange(): void {
 
 
@@ -1977,6 +1982,9 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
     const currentYear = currentDate.getFullYear();
 
     const currentMonth = currentDate.getMonth();
+
+    // Get actual days in the selected month
+    const daysInMonth = this.getDaysInMonth(currentYear, currentMonth);
 
 
 
@@ -2012,22 +2020,27 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
 
 
-    if (parseInt("0" + tNoOfGuards, 10) === 0) {
-
-      vMonthTotal = parseFloat(tPerMonth) || 0;
-
-    } else {
-
-      vMonthTotal = parseFloat(tNoOfGuards) * parseFloat(tPerMonth);
-
-    }
-
-
-
+    // Check Follow Calendar flag to determine calculation method
+    const followCalendar = this.frm.get('details.FollowCalender')?.value;
+    
     if (parseFloat(tPerMonth) > 0) {
-
+      if (followCalendar) {
+        // Follow Calendar = true: Use full month rate
+        if (parseInt("0" + tNoOfGuards, 10) === 0) {
+          vMonthTotal = parseFloat(tPerMonth) || 0;
+        } else {
+          vMonthTotal = parseFloat(tNoOfGuards) * parseFloat(tPerMonth);
+        }
+      } else {
+        // Follow Calendar = false: Calculate based on actual working days
+        const perDayRate = parseFloat(tPerMonth) / daysInMonth; // Actual days in selected month
+        if (parseInt("0" + tNoOfGuards, 10) === 0) {
+          vMonthTotal = perDayRate * parseFloat(tNoOfDays);
+        } else {
+          vMonthTotal = parseFloat(tNoOfGuards) * perDayRate * parseFloat(tNoOfDays);
+        }
+      }
       this.frm.get('details.MonthTotal')?.setValue(this.formatCurrency(Math.round(vMonthTotal)));
-
     } else if (this.type == 'S') {
 
       console.log("tNoOfGuards" + tNoOfGuards);
@@ -2063,8 +2076,8 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
     const tDiscountHour = parseFloat(this.frm.get('details.DiscountHour')?.value || '0');
 
     if (this.frm.get('details.HasDiscount')?.value && tDiscountHour > 0) {
-      // Calculate per-day rate from PerMonth for discount calculation
-      const perDayRate = parseFloat(tPerMonth) / parseFloat(tNoOfDays);
+      // Calculate per-day rate from PerMonth for discount calculation (use actual days in selected month)
+      const perDayRate = parseFloat(tPerMonth) / daysInMonth;
       // Validate that discount days cannot exceed (NoOfGuards * Working Days)
       const maxDiscountDays = tNoOfGuards * tNoOfDays;
       if (tDiscountHour > maxDiscountDays) {

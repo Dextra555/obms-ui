@@ -122,7 +122,7 @@ export class NewAttendanceComponent implements OnInit {
     { id: 10, name: 'Maternity Leave' },
     { id: 11, name: 'Paternity Leave' },
     { id: 12, name: 'Hospitalization Leave' },
-    { id: 13, name: 'Socso' },
+    { id: 13, name: 'ESI' },
     { id: 14, name: 'Non Schedule Off' },
     { id: 15, name: 'Replacement Leave' },
     { id: 16, name: 'Compensanate Leave' },
