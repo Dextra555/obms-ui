@@ -136,7 +136,8 @@ export class EsiStatementReportComponent implements OnInit {
       Branch: branchName,
       Client: clientName || 'All Clients',
       Period: `${months[formValues.Month - 1]} ${formValues.Year}`,
-      GeneratedDate: new Date().toLocaleString('en-IN')
+      GeneratedDate: new Date().toLocaleString('en-IN'),
+      TotalMonthlyWages: 0
     };
 
     const payload = { Parameters: { branch: formValues.BranchCode, client: formValues.ClientCode || '', period, reportTypeNum } };

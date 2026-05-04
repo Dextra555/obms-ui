@@ -153,9 +153,9 @@
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
-                        <mat-label>Special Allowance</mat-label>
-                        <input type="text" formControlName="SpecialAllowance" matInput placeholder="" autocomplete="off"
-                            readonly="true">
+                        <mat-label>Working Days Allowed</mat-label>
+                        <input type="text" formControlName="WorkingDaysAllowed" matInput placeholder=""
+                            autocomplete="off" readonly="true">
                     </mat-form-field>
                 </div>
             </div>
@@ -236,16 +236,13 @@
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
-                        <mat-label>Default Client <span style="color: red;">*</span></mat-label>
+                        <mat-label>Default Client</mat-label>
                         <mat-select formControlName="ClientName" [panelClass]="'custom-dropdown-panel'"
                             (selectionChange)="clientNameChange($event)">
                             <mat-option *ngFor="let employee of employeeModel" [value]="employee.Name">
                                 {{ employee.Shortname }}
                             </mat-option>
                         </mat-select>
-                        <mat-error *ngIf="attendanceForm.get('ClientName')?.hasError('required') && attendanceForm.get('ClientName')?.touched">
-                            Default Client is required
-                        </mat-error>
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-4 col-lg-2" style="margin-top: 10px;">
@@ -277,14 +274,15 @@
             <div class="row mb-3" *ngIf="employeeSelectedType == 'Guard'">
                 <div class="col-12 col-sm-12 col-md-4 col-lg-3">
                     <mat-form-field appearance="outline">
-                        <mat-label>Shift II Default Client <span style="color: red;">*</span></mat-label>
+                        <mat-label>Shift II Default Client</mat-label>
                         <mat-select formControlName="Shif2Client" [panelClass]="'custom-dropdown-panel'"
                             (selectionChange)="Shift2ClientChange($event)">
                             <mat-option *ngFor="let employee of employeeModel" [value]="employee.Name">
                                 {{ employee.Shortname }}
                             </mat-option>
                         </mat-select>
-                        <mat-error *ngIf="attendanceForm.get('Shif2Client')?.hasError('required') && attendanceForm.get('Shif2Client')?.touched">
+                        <mat-error
+                            *ngIf="attendanceForm.get('Shif2Client')?.hasError('required') && attendanceForm.get('Shif2Client')?.touched">
                             Shift II Default Client is required
                         </mat-error>
                     </mat-form-field>

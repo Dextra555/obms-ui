@@ -517,27 +517,11 @@ export class NewEmployeeComponent implements OnInit {
 
         this.frm.get('AttendanceAllowanceFollowCalendar')?.setValue(employment['AttendanceAllowanceFollowCalendar'] == "Y");
 
+        // Load Attendance Allowance Working Days from salaryDetail FIRST
+        this.frm.get('AttendanceAllowanceWorkingDays')?.setValue(salaryDetail?.AttendanceAllowanceWorkingDays || 0);
 
+        // THEN apply calendar disabled state logic
         this.calendarChangeEvent(employment['AttendanceAllowanceFollowCalendar'] == "Y");
-
-        // Load Attendance Allowance Working Days from salaryDetail AFTER calendarChangeEvent
-        console.log('=== COMPREHENSIVE DEBUG ===');
-        console.log('1. salaryDetail.AttendanceAllowanceWorkingDays:', salaryDetail?.AttendanceAllowanceWorkingDays);
-        console.log('2. Form control before setValue:', this.frm.get('AttendanceAllowanceWorkingDays'));
-        console.log('3. Is disabled before setValue:', this.frm.get('AttendanceAllowanceWorkingDays')?.disabled);
-
-        this.frm.get('AttendanceAllowanceWorkingDays')?.setValue(salaryDetail?.AttendanceAllowanceWorkingDays);
-
-        console.log('4. Form control after setValue:', this.frm.get('AttendanceAllowanceWorkingDays'));
-        console.log('5. Form value after setValue:', this.frm.get('AttendanceAllowanceWorkingDays')?.value);
-        console.log('6. Is disabled after setValue:', this.frm.get('AttendanceAllowanceWorkingDays')?.disabled);
-
-        // Enable the field to ensure the value displays properly
-        this.frm.get('AttendanceAllowanceWorkingDays')?.enable({ onlySelf: true });
-
-        console.log('7. Is disabled after enable:', this.frm.get('AttendanceAllowanceWorkingDays')?.disabled);
-        console.log('8. Final form value:', this.frm.get('AttendanceAllowanceWorkingDays')?.value);
-        console.log('==========================');
 
         // Reverse mapping: Set DepartmentId based on EMPPAY_JOB_TITLE
 
@@ -1167,7 +1151,14 @@ export class NewEmployeeComponent implements OnInit {
 
     data['SpecialAllowance'] = parseFloat(data['SpecialAllowance']) || 0;
 
-    data['AttendanceAllowanceWorkingDays'] = parseFloat(data['AttendanceAllowanceWorkingDays']) || 0;
+    // Handle Attendance Working Days based on calendar selection
+    if (this.frm.get('AttendanceAllowanceFollowCalendar')?.value) {
+      // When Follow Calendar is selected, send 0 to indicate backend should calculate based on calendar
+      data['AttendanceAllowanceWorkingDays'] = 0;
+    } else {
+      // When Follow Calendar is not selected, use the manual value entered by user
+      data['AttendanceAllowanceWorkingDays'] = parseFloat(data['AttendanceAllowanceWorkingDays']) || 0;
+    }
 
 
 
@@ -1423,14 +1414,18 @@ export class NewEmployeeComponent implements OnInit {
 
     if (flag) {
 
-      this.frm.get('AttendanceAllowanceWorkingDays')?.setValue("0");
-
+      // When Follow Calendar is checked, disable the field but preserve the current value
+      // The value should remain visible for reference but not editable
       this.frm.get('AttendanceAllowanceWorkingDays')?.disable({ onlySelf: true });
 
     } else {
 
-      this.frm.get('AttendanceAllowanceWorkingDays')?.setValue("0");
-
+      // When Follow Calendar is unchecked, enable the field for manual entry
+      // Only reset to 0 if the current value is 0 or undefined (to preserve user data)
+      const currentValue = this.frm.get('AttendanceAllowanceWorkingDays')?.value;
+      if (currentValue === 0 || currentValue === undefined || currentValue === null) {
+        this.frm.get('AttendanceAllowanceWorkingDays')?.setValue(0);
+      }
       this.frm.get('AttendanceAllowanceWorkingDays')?.enable({ onlySelf: true });
 
     }
