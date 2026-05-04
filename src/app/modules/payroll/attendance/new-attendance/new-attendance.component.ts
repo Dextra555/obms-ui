@@ -1664,26 +1664,31 @@ export class NewAttendanceComponent implements OnInit {
       return; // stop if user cancels the confirm dialog
     }
 
-    // Recalculate dynamic allowance before checking underworked/extra days
+    // Recalculate dynamic allowance before checking leaves
     this.calculateDynamicAllowance();
 
     // Underworked days check removed - functionality disabled
 
-    // Check for extra days and show warning
-    const extraDays = this.attendanceForm.value.ExtraDays || 0;
-    if (extraDays > 0) {
+    // Check if applied leave days match configured value
+    const appliedLeaveDays = this.calculateAppliedLeaveDays();
+    const configuredLeavesAllowed = parseFloat(this.attendanceForm.value.WorkingDaysAllowed) || 0;
+
+    // Only check if applied leave days are below configured value
+    if (appliedLeaveDays < configuredLeavesAllowed) {
       const result = await Swal.fire({
-        title: 'Extra Days Detected',
-        html: `Employee has worked <b>${extraDays} extra day(s)</b> beyond the allowed working days.<br><br>
-               Please fix the attendance before submitting.`,
+        title: 'Insufficient Leave Days',
+        html: `Employee has applied <b>${appliedLeaveDays} day(s) leave</b> but the configured total leaves month is <b>${configuredLeavesAllowed} day(s)</b>.<br><br>
+               Please apply at least ${configuredLeavesAllowed} leave days to submit attendance.`,
         icon: 'warning',
         confirmButtonText: 'OK',
         confirmButtonColor: '#3085d6'
       });
 
-      // Always stop submission - user must fix attendance first
+      // Stop submission - user must fix leave days
       return;
     }
+
+    // Leave days confirmation removed - proceed directly to submission
 
     // Validate client selection for Guard employees
     if (this.employeeSelectedType === 'Guard') {
@@ -2140,6 +2145,65 @@ export class NewAttendanceComponent implements OnInit {
     return totalDays;
   }
 
+  // Calculate applied leave days from attendance details
+  calculateAppliedLeaveDays(): number {
+    let totalLeaveDays = 0;
+    const formArray = this.dynamicForm.get('formArray') as FormArray;
+
+    if (formArray && formArray.length > 0) {
+      for (let i = 0; i < formArray.length; i++) {
+        const group = formArray.at(i);
+        const type = group.get('Type')?.value;
+
+        // Normalize type to number for consistent comparison
+        // Type can be: numeric (2, 6, 8, 9, 10, 11, 12, 14, 15, 16, 17), numeric string ('2', '6', '8'), or string names
+        let typeId: number | string = type;
+
+        // Convert to number if it's a string
+        if (typeof type === 'string') {
+          switch (type) {
+            case 'Off Day': typeId = 2; break;
+            case 'Unpaid Leave': typeId = 6; break;
+            case 'Absent': typeId = 7; break;
+            case 'Annual Leave': typeId = 8; break;
+            case 'Medical Leave': typeId = 9; break;
+            case 'Maternity Leave': typeId = 10; break;
+            case 'Paternity Leave': typeId = 11; break;
+            case 'Hospitalization Leave': typeId = 12; break;
+            case 'Socso': typeId = 13; break;
+            case 'Non Schedule Off': typeId = 14; break;
+            case 'Replacement Leave': typeId = 15; break;
+            case 'Compensanate Leave': typeId = 16; break;
+            case 'Marriage Leave': typeId = 17; break;
+            default: typeId = parseInt(type) || type; // Try to parse as number
+          }
+        }
+
+        // Convert to number if it's a numeric string
+        if (typeof typeId === 'string' && !isNaN(parseInt(typeId))) {
+          typeId = parseInt(typeId);
+        }
+
+        // Count leave types and off days:
+        // 2 = Off Day
+        // 6 = Unpaid Leave
+        // 8 = Annual Leave
+        // 9 = Medical Leave
+        // 10 = Maternity Leave
+        // 11 = Paternity Leave
+        // 12 = Hospitalization Leave
+        // 14 = Non Schedule Off
+        // 15 = Replacement Leave
+        // 16 = Compensate Leave
+        // 17 = Marriage Leave
+        if (typeId === 2 || typeId === 6 || typeId === 8 || typeId === 9 || typeId === 10 || typeId === 11 || typeId === 12 || typeId === 14 || typeId === 15 || typeId === 16 || typeId === 17) {
+          totalLeaveDays += 1;
+        }
+      }
+    }
+    return totalLeaveDays;
+  }
+
   // Calculate total days accounted for (worked + leave + holidays + off days)
   calculateTotalAccountedDays(): number {
     let totalDays = 0;
@@ -2181,17 +2245,51 @@ export class NewAttendanceComponent implements OnInit {
     return totalDays;
   }
 
+  // Calculate actual off days in the month
+  calculateOffDaysInMonth(attendanceDateStr: string): number {
+    const date = new Date(attendanceDateStr);
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    let offDays = 0;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const currentDate = new Date(year, month, day);
+      const dayOfWeek = currentDate.getDay();
+
+      // Count Sundays as off days (day 0 = Sunday)
+      if (dayOfWeek === 0) {
+        offDays++;
+      }
+    }
+
+    return offDays;
+  }
+
   // Calculate Working Days Allowed based on Follow Calendar flag
   calculateWorkingDaysAllowed(followCalendar: string | null | undefined, attendanceAllowanceWorkingDays: number | null | undefined, workingDays: number | null | undefined): number {
-    // If Follow Calendar is true, use actual calendar days in the month
+    // If Follow Calendar is true, use actual calendar days in the month minus off days (total leaves month)
     if (followCalendar === 'true' || followCalendar === 'Y') {
       // Calculate days in the attendance period month
       const attendanceDateStr = this.attendanceForm.value.AdvanceDate;
       const daysInMonth = this.getDaysInMonth(attendanceDateStr);
-      return daysInMonth;
+      // Calculate actual off days in the month (total leaves month)
+      const offDays = this.calculateOffDaysInMonth(attendanceDateStr);
+      return daysInMonth - offDays;
     }
-    // Otherwise use the configured AttendanceAllowanceWorkingDays, fallback to SalaryStructure WorkingDays, default to 26
-    return attendanceAllowanceWorkingDays || workingDays || 26;
+    // Otherwise use the configured AttendanceAllowanceWorkingDays, fallback to SalaryStructure WorkingDays, 
+    // but calculate based on total leaves month (calendar days - 4 Sundays)
+    if (attendanceAllowanceWorkingDays && attendanceAllowanceWorkingDays > 0) {
+      return attendanceAllowanceWorkingDays;
+    }
+    if (workingDays && workingDays > 0) {
+      return workingDays;
+    }
+    // Default: Calculate current month days minus actual off days
+    const attendanceDateStr = this.attendanceForm.value.AdvanceDate;
+    const daysInMonth = this.getDaysInMonth(attendanceDateStr);
+    const offDays = this.calculateOffDaysInMonth(attendanceDateStr);
+    return daysInMonth - offDays;
   }
 
   // Auto-set Sundays as Off Day leave functionality removed
