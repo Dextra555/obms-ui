@@ -138,7 +138,13 @@ export class PfStatementReportComponent implements OnInit {
       Branch: branchName,
       Client: clientName || 'All Clients',
       Period: `${months[formValues.Month - 1]} ${formValues.Year}`,
-      GeneratedDate: new Date().toLocaleString('en-IN')
+      GeneratedDate: new Date().toLocaleString('en-IN'),
+      TotalGrossWages: 0,
+      TotalEPFWages: 0,
+      TotalEPSWages: 0,
+      TotalEPFContributionRemitted: 0,
+      TotalEPSContributionRemitted: 0,
+      TotalEPFDifference: 0
     };
 
     const payload = {

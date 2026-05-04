@@ -46,20 +46,6 @@
             </mat-select>
           </mat-form-field>
         </div>
-        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Client (Optional)</mat-label>
-            <mat-select formControlName="ClientCode">
-              <mat-option value="">All Clients</mat-option>
-              <mat-option *ngFor="let client of clientModel" [value]="client.Code">
-                {{ client.Name }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-      </div>
-
-      <div class="row">
         <div class="col-12 col-sm-12 col-md-3 col-lg-2">
           <mat-form-field appearance="outline" class="w-100">
             <mat-label>Month</mat-label>
@@ -89,36 +75,13 @@
             </mat-select>
           </mat-form-field>
         </div>
-        <div class="col-12 col-sm-12 col-md-3 col-lg-4">
-          <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Employee Type</mat-label>
-            <mat-select formControlName="EmployeeType">
-              <mat-option value="Guard">Guard</mat-option>
-              <mat-option value="Staff">Staff</mat-option>
-              <mat-option value="All">All</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
       </div>
-
+      
       <!-- Report Type Buttons -->
       <div class="row">
         <div class="col-12 text-left">
           <button class="btn wlt-c-furg-btn-primary m-1" (click)="generateReport('monthly')" [disabled]="frm.invalid">
-            Monthly PF Statement
-          </button>
-          <button class="btn wlt-c-furg-btn-primary m-1" (click)="generateReport('summary')" [disabled]="frm.invalid">
-            PF Summary Report
-          </button>
-          <button class="btn wlt-c-furg-btn-primary m-1" (click)="generateReport('detailed')" [disabled]="frm.invalid">
-            Detailed PF Statement
-          </button>
-          <button class="btn wlt-c-furg-btn-primary m-1" (click)="generateReport('annual')" [disabled]="frm.invalid">
-            Annual PF Statement
-          </button>
-          <button class="btn wlt-c-furg-btn-primary m-1" (click)="generateReport('contribution')"
-            [disabled]="frm.invalid">
-            PF Contribution Analysis
+            PF Statement
           </button>
         </div>
       </div>
