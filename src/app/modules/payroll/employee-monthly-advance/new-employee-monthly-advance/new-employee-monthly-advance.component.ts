@@ -9,6 +9,7 @@ import { BranchModel } from 'src/app/model/branchModel';
 import { EmployeeMonthlyAdvance } from 'src/app/model/employeeMonthlyAdvance';
 import { SalaryMonthlyAdvance } from 'src/app/model/salaryMonthlyAdvance';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
+import { INDIAN_RELIGIONS } from 'src/app/model/indian-employee.model';
 import { DatasharingService } from 'src/app/service/datasharing.service';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
 import { PayrollModuleService } from 'src/app/service/payrollmodule.service';
@@ -30,6 +31,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
   branchModel!: BranchModel[];
   employeeModel!: EmployeeMonthlyAdvance[];
   salaryMonthlyAdvance: SalaryMonthlyAdvance = new SalaryMonthlyAdvance();
+  religionsWithAll: string[] = ['All', ...INDIAN_RELIGIONS];
   minDate = new Date();
   year!: number;
   month!: number;

@@ -167,6 +167,13 @@ export class CommonService {
     const params = { params: new HttpParams({ fromString: "?categoryName=" + categoryName }) };
     return this.httpClient.get<any>(this.apiUrl + 'register/GetScreensByCategory', params);
   }
+
+  addScreen(screenName: string, category: string): Observable<boolean> {
+    const params = new HttpParams()
+      .set('screenName', screenName)
+      .set('category', category);
+    return this.httpClient.post<boolean>(this.apiUrl + 'register/AddScreen', null, { params });
+  }
   getPermissionsWithScreens(categoryName: string, userName:string): Observable<any> {
     return this.httpClient.get<any>(this.apiUrl + 'register/GetPermissionsWithScreens',  {
       params: { categoryName: categoryName, userName: userName } });
