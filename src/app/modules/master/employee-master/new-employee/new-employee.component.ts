@@ -312,7 +312,6 @@ export class NewEmployeeComponent implements OnInit {
 
       AttendanceAllowanceWorkingDays: [0],
 
-      AttendanceAllowanceFollowCalendar: [false],
 
       SpecialAllowance: [0],
 
@@ -515,13 +514,6 @@ export class NewEmployeeComponent implements OnInit {
         this.onESIDeductionChange(this.frm.get('SOCSODETECT')?.value);
 
 
-        this.frm.get('AttendanceAllowanceFollowCalendar')?.setValue(employment['AttendanceAllowanceFollowCalendar'] == "Y");
-
-        // Load Attendance Allowance Working Days from salaryDetail FIRST
-        this.frm.get('AttendanceAllowanceWorkingDays')?.setValue(salaryDetail?.AttendanceAllowanceWorkingDays || 0);
-
-        // THEN apply calendar disabled state logic
-        this.calendarChangeEvent(employment['AttendanceAllowanceFollowCalendar'] == "Y");
 
         // Reverse mapping: Set DepartmentId based on EMPPAY_JOB_TITLE
 
@@ -1151,14 +1143,8 @@ export class NewEmployeeComponent implements OnInit {
 
     data['SpecialAllowance'] = parseFloat(data['SpecialAllowance']) || 0;
 
-    // Handle Attendance Working Days based on calendar selection
-    if (this.frm.get('AttendanceAllowanceFollowCalendar')?.value) {
-      // When Follow Calendar is selected, send 0 to indicate backend should calculate based on calendar
-      data['AttendanceAllowanceWorkingDays'] = 0;
-    } else {
-      // When Follow Calendar is not selected, use the manual value entered by user
-      data['AttendanceAllowanceWorkingDays'] = parseFloat(data['AttendanceAllowanceWorkingDays']) || 0;
-    }
+    // Handle Attendance Working Days - always use manual value since calendar option is removed
+    data['AttendanceAllowanceWorkingDays'] = parseFloat(data['AttendanceAllowanceWorkingDays']) || 0;
 
 
 
@@ -1266,7 +1252,6 @@ export class NewEmployeeComponent implements OnInit {
 
 
 
-    data['AttendanceAllowanceFollowCalendar'] = this.frm.get('AttendanceAllowanceFollowCalendar')?.value ? 'Y' : 'N';
 
 
 
@@ -1401,36 +1386,6 @@ export class NewEmployeeComponent implements OnInit {
   }
 
 
-
-  calendarChange(event: any) {
-
-    this.calendarChangeEvent(event.checked);
-
-  }
-
-
-
-  calendarChangeEvent(flag: boolean) {
-
-    if (flag) {
-
-      // When Follow Calendar is checked, disable the field but preserve the current value
-      // The value should remain visible for reference but not editable
-      this.frm.get('AttendanceAllowanceWorkingDays')?.disable({ onlySelf: true });
-
-    } else {
-
-      // When Follow Calendar is unchecked, enable the field for manual entry
-      // Only reset to 0 if the current value is 0 or undefined (to preserve user data)
-      const currentValue = this.frm.get('AttendanceAllowanceWorkingDays')?.value;
-      if (currentValue === 0 || currentValue === undefined || currentValue === null) {
-        this.frm.get('AttendanceAllowanceWorkingDays')?.setValue(0);
-      }
-      this.frm.get('AttendanceAllowanceWorkingDays')?.enable({ onlySelf: true });
-
-    }
-
-  }
 
   isTemporaryEmployeeChange(value: any) {
     if (value == '0') {
