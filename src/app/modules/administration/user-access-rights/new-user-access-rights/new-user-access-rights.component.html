@@ -29,11 +29,12 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-3 button-group">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-6 button-group">
                     <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('View')"> View</button>
                     <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('new')"> New</button>
                     <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('update')"> Update</button>
                     <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('delete')"> Delete</button>
+                    <button *ngIf="selectedCategory === 'Payroll'" class="btn wlt-c-furg-btn-success" mat-dialog-actions (click)="addRbiBankAdvanceScreen()"> Add RBI Advance Screen</button>
                 </div>                                
 
             </div>

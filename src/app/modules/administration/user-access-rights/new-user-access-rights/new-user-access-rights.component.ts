@@ -249,6 +249,54 @@ export class NewUserAccessRightsComponent implements OnInit {
     this._router.navigate(['/administration/new-user-access-rights']);
 
   }
+
+  addRbiBankAdvanceScreen(): void {
+    this.showLoadingSpinner = true;
+    this._commonService.addScreen('RBI Bank Advance Salary Process', 'Payroll').subscribe(
+      (result) => {
+        if (result) {
+          Swal.fire({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            title: 'Success',
+            text: 'RBI Bank Advance Salary Process screen added successfully!',
+            icon: 'success',
+            showCloseButton: false,
+            timer: 3000,
+          });
+          // Refresh the screens list
+          this.onCategoryChange();
+        } else {
+          Swal.fire({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            title: 'Info',
+            text: 'RBI Bank Advance Salary Process screen already exists.',
+            icon: 'info',
+            showCloseButton: false,
+            timer: 3000,
+          });
+        }
+        this.showLoadingSpinner = false;
+      },
+      (error) => {
+        Swal.fire({
+          toast: true,
+          position: 'top',
+          showConfirmButton: false,
+          title: 'Error',
+          text: 'Failed to add screen. Please try again.',
+          icon: 'error',
+          showCloseButton: false,
+          timer: 3000,
+        });
+        this.showLoadingSpinner = false;
+      }
+    );
+  }
+
   handleErrors(error: string) {
     if (error != null && error != '') {
       this.showLoadingSpinner = false;

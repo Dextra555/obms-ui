@@ -17,6 +17,7 @@ import { NonComplianceReportModule } from 'src/app/modules/report/payroll/non-co
 import { PfStatementReportModule } from 'src/app/modules/report/payroll/pf-statement-report/pf-statement-report.module';
 import { ProfessionalTaxSlabModule } from 'src/app/modules/master/professional-tax-slab/professional-tax-slab.module';
 import { RbiBankSalaryProcessModule } from 'src/app/modules/payroll/rbi-bank-salary-process/rbi-bank-salary-process.module';
+import { RbiBankAdvanceSalaryProcessModule } from 'src/app/modules/payroll/rbi-bank-advance-salary-process/rbi-bank-advance-salary-process.module';
 
 
 @NgModule({
@@ -37,7 +38,8 @@ import { RbiBankSalaryProcessModule } from 'src/app/modules/payroll/rbi-bank-sal
     NonComplianceReportModule,
     PfStatementReportModule,
     ProfessionalTaxSlabModule,
-    RbiBankSalaryProcessModule
+    RbiBankSalaryProcessModule,
+    RbiBankAdvanceSalaryProcessModule
   ],
   providers: [CommonService, MastermoduleService],
 })
