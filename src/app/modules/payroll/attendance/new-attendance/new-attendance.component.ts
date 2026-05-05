@@ -1673,53 +1673,22 @@ export class NewAttendanceComponent implements OnInit {
     const appliedLeaveDays = this.calculateAppliedLeaveDays();
     const configuredLeavesAllowed = parseFloat(this.attendanceForm.value.WorkingDaysAllowed) || 0;
 
-    // Check for mid-month joiners and apply flexible validation
-    const joinDateStr = this.attendanceForm.value.JoinDate;
-    const attendanceDateStr = this.attendanceForm.value.AdvanceDate;
-    let isMidMonthJoiner = false;
-    let toleranceDays = 0;
+    // Calculate effective working days for mid-month joiners
+    const effectiveWorkingDaysAllowed = this.calculateEffectiveWorkingDaysAllowed(configuredLeavesAllowed);
 
-    if (joinDateStr && joinDateStr !== '') {
-      const joinDate = new Date(joinDateStr);
-      const attendanceDate = new Date(attendanceDateStr);
-
-      // Check if employee joined in the same month and year as attendance period
-      if (joinDate.getMonth() === attendanceDate.getMonth() &&
-        joinDate.getFullYear() === attendanceDate.getFullYear()) {
-        isMidMonthJoiner = true;
-        // Allow tolerance of 2 days for mid-month joiners to account for calculation differences
-        toleranceDays = 2;
-      }
-    }
-
-    // Only check if applied leave days are significantly below configured value
-    const minimumRequired = isMidMonthJoiner
-      ? Math.max(0, configuredLeavesAllowed - toleranceDays)
-      : configuredLeavesAllowed;
-
-    if (appliedLeaveDays < minimumRequired) {
-      const message = isMidMonthJoiner
-        ? `Employee joined mid-month and has applied <b>${appliedLeaveDays} day(s) leave</b>.<br><br>
-           The calculated total leaves for this partial month is <b>${configuredLeavesAllowed} day(s)</b>.<br><br>
-           Please ensure leave allocation is reasonable for the attendance period.`
-        : `Employee has applied <b>${appliedLeaveDays} day(s) leave</b> but the configured total leaves month is <b>${configuredLeavesAllowed} day(s)</b>.<br><br>
-           Please apply at least ${configuredLeavesAllowed} leave days to submit attendance.`;
-
+    // Only check if applied leave days are below effective configured value
+    if (appliedLeaveDays < effectiveWorkingDaysAllowed) {
       const result = await Swal.fire({
-        title: 'Leave Allocation Verification',
-        html: message,
+        title: 'Insufficient Leave Days',
+        html: `Employee has applied <b>${appliedLeaveDays} day(s) leave</b> but effective working days for this period is <b>${effectiveWorkingDaysAllowed} day(s)</b>.<br><br>
+               Please apply at least ${effectiveWorkingDaysAllowed} leave days to submit attendance.`,
         icon: 'warning',
         confirmButtonText: 'OK',
-        confirmButtonColor: '#3085d6',
-        showCancelButton: true,
-        cancelButtonText: 'Proceed Anyway',
-        cancelButtonColor: '#6c757d'
+        confirmButtonColor: '#3085d6'
       });
 
-      // If user chooses to proceed anyway, allow submission
-      if (!result.isConfirmed) {
-        return;
-      }
+      // Stop submission - user must fix leave days
+      return;
     }
 
     // Leave days confirmation removed - proceed directly to submission
@@ -2300,96 +2269,52 @@ export class NewAttendanceComponent implements OnInit {
     return offDays;
   }
 
+  // Calculate Effective Working Days Allowed for mid-month joiners
+  calculateEffectiveWorkingDaysAllowed(configuredLeavesAllowed: number): number {
+    // Get employee joining date from form
+    const joiningDateStr = this.attendanceForm.value.DateOfJoining;
+    const attendanceDateStr = this.attendanceForm.value.AdvanceDate;
+
+    if (!joiningDateStr || !attendanceDateStr) {
+      return configuredLeavesAllowed; // Fallback to configured value
+    }
+
+    const joiningDate = new Date(joiningDateStr);
+    const attendanceDate = new Date(attendanceDateStr);
+
+    // If employee joined in the same month as attendance period
+    if (joiningDate.getMonth() === attendanceDate.getMonth() &&
+      joiningDate.getFullYear() === attendanceDate.getFullYear()) {
+
+      // Calculate days from joining date to end of month
+      const daysInMonth = this.getDaysInMonth(attendanceDateStr);
+      const effectiveDaysInMonth = daysInMonth - joiningDate.getDate() + 1;
+
+      // Calculate proportionate leave days based on actual days in month
+      const proportion = effectiveDaysInMonth / daysInMonth;
+      const effectiveLeaveDays = Math.round(configuredLeavesAllowed * proportion);
+
+      // Ensure at least 1 leave day if employee worked any days
+      return Math.max(1, effectiveLeaveDays);
+    }
+
+    // For full-month employees, return configured value
+    return configuredLeavesAllowed;
+  }
+
   // Calculate Working Days Allowed based on Follow Calendar flag
   calculateWorkingDaysAllowed(followCalendar: string | null | undefined, attendanceAllowanceWorkingDays: number | null | undefined, workingDays: number | null | undefined): number {
-    const attendanceDateStr = this.attendanceForm.value.AdvanceDate;
-    const joinDateStr = this.attendanceForm.value.JoinDate;
-
-    // Check if employee joined mid-month
-    let isMidMonthJoiner = false;
-    let joinDay = 1;
-
-    if (joinDateStr && joinDateStr !== '') {
-      const joinDate = new Date(joinDateStr);
-      const attendanceDate = new Date(attendanceDateStr);
-
-      // Check if employee joined in the same month and year as attendance period
-      if (joinDate.getMonth() === attendanceDate.getMonth() &&
-        joinDate.getFullYear() === attendanceDate.getFullYear()) {
-        isMidMonthJoiner = true;
-        joinDay = joinDate.getDate();
-      }
-    }
-
     // If Follow Calendar is true, use actual calendar days in the month minus off days (total leaves month)
     if (followCalendar === 'true' || followCalendar === 'Y') {
-      if (isMidMonthJoiner) {
-        // For mid-month joiners, calculate from join date to end of month
-        const attendanceDate = new Date(attendanceDateStr);
-        const year = attendanceDate.getFullYear();
-        const month = attendanceDate.getMonth();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        // Calculate working days from join day to end of month
-        let workingDays = 0;
-        for (let day = joinDay; day <= daysInMonth; day++) {
-          const currentDate = new Date(year, month, day);
-          const dayOfWeek = currentDate.getDay();
-
-          // Count days except Sundays (day 0 = Sunday)
-          if (dayOfWeek !== 0) {
-            workingDays++;
-          }
-        }
-        return workingDays;
-      } else {
-        // Calculate days in the attendance period month
-        const daysInMonth = this.getDaysInMonth(attendanceDateStr);
-        // Calculate actual off days in the month (total leaves month)
-        const offDays = this.calculateOffDaysInMonth(attendanceDateStr);
-        return daysInMonth - offDays;
-      }
+      // Calculate days in the attendance period month
+      const attendanceDateStr = this.attendanceForm.value.AdvanceDate;
+      const daysInMonth = this.getDaysInMonth(attendanceDateStr);
+      // Calculate actual off days in the month (total leaves month)
+      const offDays = this.calculateOffDaysInMonth(attendanceDateStr);
+      return daysInMonth - offDays;
     }
-
-    // For non-calendar follow mode, adjust for mid-month joiners
-    if (isMidMonthJoiner) {
-      // Calculate proportion of working days based on join date
-      const attendanceDate = new Date(attendanceDateStr);
-      const year = attendanceDate.getFullYear();
-      const month = attendanceDate.getMonth();
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-      // Calculate total working days in full month
-      let totalWorkingDays = 0;
-      for (let day = 1; day <= daysInMonth; day++) {
-        const currentDate = new Date(year, month, day);
-        const dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0) { // Exclude Sundays
-          totalWorkingDays++;
-        }
-      }
-
-      // Calculate working days from join date
-      let workingDaysFromJoin = 0;
-      for (let day = joinDay; day <= daysInMonth; day++) {
-        const currentDate = new Date(year, month, day);
-        const dayOfWeek = currentDate.getDay();
-        if (dayOfWeek !== 0) { // Exclude Sundays
-          workingDaysFromJoin++;
-        }
-      }
-
-      // Use configured working days or fallback, but adjust for mid-month joiner
-      const configuredWorkingDays = attendanceAllowanceWorkingDays && attendanceAllowanceWorkingDays > 0
-        ? attendanceAllowanceWorkingDays
-        : (workingDays && workingDays > 0 ? workingDays : totalWorkingDays);
-
-      // Calculate proportional working days
-      const proportion = workingDaysFromJoin / totalWorkingDays;
-      return Math.round(configuredWorkingDays * proportion);
-    }
-
-    // Otherwise use the configured AttendanceAllowanceWorkingDays, fallback to SalaryStructure WorkingDays
+    // Otherwise use the configured AttendanceAllowanceWorkingDays, fallback to SalaryStructure WorkingDays, 
+    // but calculate based on total leaves month (calendar days - 4 Sundays)
     if (attendanceAllowanceWorkingDays && attendanceAllowanceWorkingDays > 0) {
       return attendanceAllowanceWorkingDays;
     }
@@ -2397,57 +2322,10 @@ export class NewAttendanceComponent implements OnInit {
       return workingDays;
     }
     // Default: Calculate current month days minus actual off days
+    const attendanceDateStr = this.attendanceForm.value.AdvanceDate;
     const daysInMonth = this.getDaysInMonth(attendanceDateStr);
     const offDays = this.calculateOffDaysInMonth(attendanceDateStr);
     return daysInMonth - offDays;
-  }
-
-  // Helper method to test working days calculation (for debugging)
-  testWorkingDaysCalculation(): void {
-    console.log('=== Working Days Calculation Test ===');
-
-    // Test case: Guard joined on 10.01.2026, attendance for January 2026
-    const testJoinDate = '2026-01-10';
-    const testAttendanceDate = '2026-01-01'; // January 2026
-
-    // Temporarily set form values for testing
-    const originalJoinDate = this.attendanceForm.value.JoinDate;
-    const originalAttendanceDate = this.attendanceForm.value.AdvanceDate;
-
-    this.attendanceForm.patchValue({
-      JoinDate: testJoinDate,
-      AdvanceDate: testAttendanceDate
-    });
-
-    // Test different scenarios
-    console.log('Test Case: Guard joined on 10.01.2026');
-    console.log('Attendance Period: January 2026');
-
-    // Test with Follow Calendar = true
-    const result1 = this.calculateWorkingDaysAllowed('true', null, 26);
-    console.log(`Follow Calendar = true: ${result1} working days`);
-
-    // Test with Follow Calendar = false, using configured working days
-    const result2 = this.calculateWorkingDaysAllowed('false', 26, null);
-    console.log(`Follow Calendar = false, Configured = 26: ${result2} working days`);
-
-    // Test with Follow Calendar = false, using salary structure working days
-    const result3 = this.calculateWorkingDaysAllowed('false', null, 26);
-    console.log(`Follow Calendar = false, Salary Structure = 26: ${result3} working days`);
-
-    // Expected result for January 2026 (joined 10th):
-    // January 2026 has 31 days, Sundays: 4, 5, 12, 19, 26 (5 Sundays)
-    // From 10th to 31st: 22 days total
-    // Excluding Sundays (12, 19, 26): 19 working days
-    console.log('Expected: ~19 working days (22 days - 3 Sundays)');
-
-    // Restore original values
-    this.attendanceForm.patchValue({
-      JoinDate: originalJoinDate,
-      AdvanceDate: originalAttendanceDate
-    });
-
-    console.log('=== End Test ===');
   }
 
   // Auto-set Sundays as Off Day leave functionality removed
