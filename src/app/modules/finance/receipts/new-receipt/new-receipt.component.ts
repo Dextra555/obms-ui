@@ -433,13 +433,13 @@ export class NewReceiptComponent implements OnInit {
   }
 
   calculation() {
-    let total = 0;
+    let totalBalance = 0;
     for (let i = 0; i < this.invoiceList.length; i++) {
       if (this.rowCheckedState[i]) {
-        total += Number(this.invoiceList[i]['InvoiceAmount']);
+        totalBalance += Number(this.invoiceList[i]['Balance']);
       }
     }
-    this.frm.get("total_invoice_amount")?.setValue(total.toFixed(2));
+    this.frm.get("total_invoice_amount")?.setValue(totalBalance.toFixed(2));
 
 
     let cash = 0;
@@ -457,7 +457,7 @@ export class NewReceiptComponent implements OnInit {
       cash = cashAmount ? cashAmount : 0;
     }
     this.frm.get("ReceiptAmount")?.setValue(cash);
-    const balanceAmount = (total - cash).toFixed(2);
+    const balanceAmount = (totalBalance - cash).toFixed(2);
     this.frm.get("balance_amount")?.setValue(balanceAmount);
 
     // let TaxAmount = Number(this.frm.get("TaxPercentage")?.value) * Number(this.frm.get("ChequeAmount")?.value / (100+ Number(this.frm.get("TaxPercentage")?.value),10));
