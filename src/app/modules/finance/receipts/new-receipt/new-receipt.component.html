@@ -2,23 +2,20 @@
   <div class="container-fluid">
     <div class="row mb-2">
       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-        <h1 class="mb-1">New Recepit</h1>
-      </div><!-- /.col -->
+        <h1 class="mb-1">{{receiptID > 0 ? 'Edit' : 'New'}} Recepit</h1>
+      </div>
       <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
         <ol class="breadcrumb float-md-right">
-          <li class="breadcrumb-item">Finance</li>
-          <li class="breadcrumb-item"><a routerLink="/finance/receipts/search-receipt">Receipt</a></li>
-          <li class="breadcrumb-item active">New Receipt</li>
+          <li class="breadcrumb-item"><a routerLink="/dashboard">Report</a></li>
+          <li class="breadcrumb-item"><a routerLink="/finance/receipts/search-receipt">Search Receipt</a></li>
+          <li class="breadcrumb-item active">{{receiptID > 0 ? 'Edit' : 'New'}} Receipt</li>
         </ol>
-      </div><!-- /.col -->
-    </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
+      </div>
+    </div>
+  </div>
 </div>
 <mat-card>
   <mat-card-content>
-    <!--    <div class="text-left">-->
-    <!--      <button class="btn wlt-c-furg-btn-secondary" (click)="searchReceipt()"> Search</button>-->
-    <!--    </div>-->
     <form [formGroup]="frm">
       <div class="row">
         <div class="col-12 col-sm-12 col-md-4 col-lg-3">
@@ -35,7 +32,7 @@
           <mat-form-field appearance="outline">
             <mat-label>Branch</mat-label>
             <mat-select formControlName="Branch" (selectionChange)="branchChange($event.value)">
-              <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Name}}</mat-option>
+              <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Code}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -134,6 +131,7 @@
             <mat-form-field appearance="outline">
               <mat-label>Client</mat-label>
               <mat-select formControlName="client" (selectionChange)="clientChange($event.value)">
+                <mat-option [value]=""></mat-option>
                 <mat-option *ngFor="let d of clientList" value="{{d.Code}}">{{d.Name}}</mat-option>
               </mat-select>
             </mat-form-field>
@@ -148,8 +146,8 @@
         </ng-container>
       </div>
       <div class="row">
-        <ng-container *ngIf="isAdjustment">
-          <div class="col-12 col-sm-12" *ngIf="frm.get('client')?.value != ''">
+        <ng-container *ngIf="isAdjustment && showInvoiceTable">
+          <div class="col-12 col-sm-12" *ngIf="frm.get('client')?.value">
             <div class="table-responsive">
               <table mat-table [dataSource]="branchAmountTable()" class="wlt-table wlt-new-agreement table-striped"
                 formArrayName="branchAmount">
@@ -298,7 +296,7 @@
               <mat-form-field appearance="outline">
                 <mat-label>Banked In Name</mat-label>
                 <mat-select formControlName="BankID" (selectionChange)="bankSelectionChange($event.value)">
-                  <mat-option *ngFor="let d of bankInList" [value]="d.BankId">{{d.AccShortName}}</mat-option>
+                  <mat-option *ngFor="let d of bankInList" [value]="d.BankId">{{d.Accname}}</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -349,7 +347,8 @@
             <button class="btn btn-print mr-3" [disabled]="receiptID == 0" (click)="onPrint()">Print</button>
             <button
               *ngIf="this.userAccessModel.createAccess == true || this.userAccessModel.updateAccess == true || currentUser == 'superadmin'"
-              class="btn wlt-c-furg-btn-primary" (click)="onSubmit()"> {{ receiptID > 0 ? 'Update' : 'Save' }}</button>
+              class="btn wlt-c-furg-btn-primary" (click)="onSubmit()" [disabled]="frm.invalid"> {{ receiptID > 0 ?
+              'Update' : 'Save' }}</button>
           </div>
         </div>
       </div>

@@ -47,8 +47,8 @@ export class MastermoduleService {
 
   GetBankListByUserName(userName: string): Observable<any> {
     return this.httpClient.get<BranchModel[]>(this.apiUrl + 'Register/GetBankListByUserId', {
-        params: { name: userName }
-      }
+      params: { name: userName }
+    }
     ).pipe(catchError(this.errorHandle));
   }
   saveAndUpdateBranchMaster(branchDetails: BranchModel): Observable<any> {
@@ -291,9 +291,9 @@ export class MastermoduleService {
       .pipe(catchError(this.errorHandle));
   }
 
-  getUserAccessRights(userName: string,screenName:string): Observable<any> {
+  getUserAccessRights(userName: string, screenName: string): Observable<any> {
     return this.httpClient.get<BranchModel[]>(this.apiUrl + 'register/GetUserAccessRights', {
-      params: { userName: userName,screenName:screenName }
+      params: { userName: userName, screenName: screenName }
     }
     ).pipe(catchError(this.errorHandle));
   }
@@ -303,9 +303,9 @@ export class MastermoduleService {
     }
     ).pipe(catchError(this.errorHandle));
   }
-  getKKDNList(branch: string, Employeetype:string,dtDateJoinFrom:string,dtDateJoinTo: string,kdnVetting: string): Observable<any> {
+  getKKDNList(branch: string, Employeetype: string, dtDateJoinFrom: string, dtDateJoinTo: string, kdnVetting: string): Observable<any> {
     return this.httpClient.get<BranchModel[]>(this.apiUrl + 'master/GetKKDNList', {
-      params: { branch: branch.toString(),Employeetype,dtDateJoinFrom: dtDateJoinFrom.toString(),dtDateJoinTo: dtDateJoinTo.toString(), kdnVetting: kdnVetting.toString() }
+      params: { branch: branch.toString(), Employeetype, dtDateJoinFrom: dtDateJoinFrom.toString(), dtDateJoinTo: dtDateJoinTo.toString(), kdnVetting: kdnVetting.toString() }
     }
     ).pipe(catchError(this.errorHandle));
   }
@@ -333,6 +333,21 @@ export class MastermoduleService {
 
     return this.httpClient.get(`${this.apiUrl}Finance/monthly-invoices`, { params });
   }
+
+  getMonthlyInvoiceList(start: Date, end: Date): Observable<any> {
+    const normalizeDate = (d: Date) => {
+      const onlyDate = new Date(d);
+      onlyDate.setHours(0, 0, 0, 0);
+      return onlyDate.toISOString();
+    };
+
+    let params = new HttpParams()
+      .set('Start', normalizeDate(start))
+      .set('End', normalizeDate(end));
+
+    return this.httpClient.get<any>(`${this.apiUrl}Finance/GetMonthlyInvoiseList`, { params });
+  }
+
   getList(
     dtSalaryPeriod: string,
     dtEndPeriod: string
@@ -350,17 +365,17 @@ export class MastermoduleService {
     const params = new HttpParams()
       .set('dtSalaryPeriod', dtSalaryPeriod)
       .set('dtEndPeriod', dtEndPeriod)
-      .set('Branch',branch);
+      .set('Branch', branch);
     return this.httpClient.get<any[]>(`${this.apiUrl}Finance/GetListWithBranch`, { params });
   }
 
   // Indian Statutory Compliance Methods
-  
+
   // PF Configuration
   getPFConfigurationList(): Observable<PFConfiguration[]> {
     return this.httpClient.get<PFConfiguration[]>(`${this.apiUrl}statutory/pf-configuration`).pipe(catchError(this.errorHandle));
   }
-  
+
   saveAndUpdatePFConfiguration(pfDetails: PFConfiguration): Observable<any> {
     return this.httpClient.post<any[]>(`${this.apiUrl}statutory/saveAndUpdatePFConfiguration`,
       JSON.stringify(pfDetails),
@@ -370,7 +385,7 @@ export class MastermoduleService {
         })
       }).pipe(catchError(this.errorHandle));
   }
-  
+
   deletePFConfigurationById(id: number): Observable<any> {
     const params = { params: new HttpParams({ fromString: "?Id=" + id }) };
     return this.httpClient.delete(`${this.apiUrl}statutory/DeletePFConfigurationById`, params).pipe(catchError(this.errorHandle));
@@ -380,7 +395,7 @@ export class MastermoduleService {
   getESIConfigurationList(): Observable<ESIConfiguration[]> {
     return this.httpClient.get<ESIConfiguration[]>(`${this.apiUrl}statutory/esi-configuration`).pipe(catchError(this.errorHandle));
   }
-  
+
   saveAndUpdateESIConfiguration(esiDetails: ESIConfiguration): Observable<any> {
     return this.httpClient.post<any[]>(`${this.apiUrl}statutory/saveAndUpdateESIConfiguration`,
       JSON.stringify(esiDetails),
@@ -390,7 +405,7 @@ export class MastermoduleService {
         })
       }).pipe(catchError(this.errorHandle));
   }
-  
+
   deleteESIConfigurationById(id: number): Observable<any> {
     const params = { params: new HttpParams({ fromString: "?Id=" + id }) };
     return this.httpClient.delete(`${this.apiUrl}statutory/DeleteESIConfigurationById`, params).pipe(catchError(this.errorHandle));
@@ -400,7 +415,7 @@ export class MastermoduleService {
   getPTConfigurationList(): Observable<ProfessionalTaxConfiguration[]> {
     return this.httpClient.get<ProfessionalTaxConfiguration[]>(`${this.apiUrl}statutory/pt-configuration`).pipe(catchError(this.errorHandle));
   }
-  
+
   saveAndUpdatePTConfiguration(ptDetails: ProfessionalTaxConfiguration): Observable<any> {
     return this.httpClient.post<any[]>(`${this.apiUrl}statutory/saveAndUpdatePTConfiguration`,
       JSON.stringify(ptDetails),
@@ -410,7 +425,7 @@ export class MastermoduleService {
         })
       }).pipe(catchError(this.errorHandle));
   }
-  
+
   deletePTConfigurationById(id: number): Observable<any> {
     const params = { params: new HttpParams({ fromString: "?Id=" + id }) };
     return this.httpClient.delete(`${this.apiUrl}statutory/DeletePTConfigurationById`, params).pipe(catchError(this.errorHandle));
@@ -420,7 +435,7 @@ export class MastermoduleService {
   getTDSConfigurationList(): Observable<TDSSlabConfiguration[]> {
     return this.httpClient.get<TDSSlabConfiguration[]>(`${this.apiUrl}statutory/tds-configuration`).pipe(catchError(this.errorHandle));
   }
-  
+
   saveAndUpdateTDSSConfiguration(tdsDetails: TDSSlabConfiguration): Observable<any> {
     return this.httpClient.post<any[]>(`${this.apiUrl}statutory/saveAndUpdateTDSSConfiguration`,
       JSON.stringify(tdsDetails),
@@ -430,7 +445,7 @@ export class MastermoduleService {
         })
       }).pipe(catchError(this.errorHandle));
   }
-  
+
   deleteTDSSlabById(id: number): Observable<any> {
     const params = { params: new HttpParams({ fromString: "?Id=" + id }) };
     return this.httpClient.delete(`${this.apiUrl}statutory/DeleteTDSSlabById`, params).pipe(catchError(this.errorHandle));
@@ -440,11 +455,11 @@ export class MastermoduleService {
   getGSTConfigurationList(): Observable<GSTConfiguration[]> {
     return this.httpClient.get<GSTConfiguration[]>(`${this.apiUrl}statutory/gst-configuration`).pipe(catchError(this.errorHandle));
   }
-  
+
   getGSTConfigurationWithServices(): Observable<any> {
     return this.httpClient.get<any>(`${this.apiUrl}statutory/gst-configuration-with-services`).pipe(catchError(this.errorHandle));
   }
-  
+
   saveAndUpdateGSTConfiguration(gstDetails: GSTConfiguration): Observable<any> {
     return this.httpClient.post<any[]>(`${this.apiUrl}statutory/saveAndUpdateGSTConfiguration`,
       JSON.stringify(gstDetails),
@@ -454,7 +469,7 @@ export class MastermoduleService {
         })
       }).pipe(catchError(this.errorHandle));
   }
-  
+
   deleteGSTConfigurationById(id: number): Observable<any> {
     const params = { params: new HttpParams({ fromString: "?Id=" + id }) };
     return this.httpClient.delete(`${this.apiUrl}statutory/DeleteGSTConfigurationById`, params).pipe(catchError(this.errorHandle));

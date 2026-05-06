@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { SearchReceiptsComponent } from '../search-receipts/search-receipts.component';
 import { FinanceService } from "../../../../service/finance.service";
@@ -60,6 +60,7 @@ export class NewReceiptComponent implements OnInit {
   showLoadingSpinner: boolean = false;
   receiptID: number = 0;
   accShortName: string = '';
+  showInvoiceTable = false;
 
   constructor(private fb: FormBuilder, public dialog: MatDialog, private service: FinanceService,
     private route: Router, private _activatedRoute: ActivatedRoute, private _financeService: FinanceService,
@@ -87,19 +88,19 @@ export class NewReceiptComponent implements OnInit {
     }
     this.frm = this.fb.group({
       ID: [0],
-      ReceiptDate: [''],
-      Branch: [''],
-      PaymentFrom: [''],
+      ReceiptDate: ['', [Validators.required]],
+      Branch: ['', [Validators.required]],
+      PaymentFrom: ['', [Validators.required]],
       ReceiptType: ['1'],
       IsInvoiceAdjustment: [''],
       BankCode: [''],
       BankBranch: [''],
       ChequeNo: [''], // also IBG_no ReceiptType == 5
       ReceiptAmount: [0],//ChequeAmount || CashAmount
-      ChequeAmount: [0],
-      CashAmount: [0],
+      ChequeAmount: [0, [Validators.required]],
+      CashAmount: [0, [Validators.required]],
       ibgNo: [''],
-      ibgAmount: [0],
+      ibgAmount: [0, [Validators.required]],
       client: [''],
       total_invoice_amount: [''],
       balance_amount: [''],
@@ -113,7 +114,7 @@ export class NewReceiptComponent implements OnInit {
       DebitNoteAmount: [0],
       SuspendAmount: [0],
       Particulars: [''],
-      BankID: [''],
+      BankID: ['', [Validators.required]],
       branchAmount: this.rows,
     });
   }
@@ -190,6 +191,7 @@ export class NewReceiptComponent implements OnInit {
         this.changeReceiptType(data.receipt.ReceiptType);
         this.branchChange(data.receipt.Branch);
         this.bankSelectionChange(data.receipt.BankID);
+        //this.clientChange(data.receipt.client);
 
         if (Array.isArray(data.receipt.details)) {
           this.rows.clear();
@@ -239,18 +241,11 @@ export class NewReceiptComponent implements OnInit {
   }
 
   isCheckboxDisabled(): boolean {
-    let amount = 0;
-    const receiptTypeID = this.receiptTypeID;
+    const ibgAmount = +this.frm.get('ibgAmount')?.value || 0;
+    const chequeAmount = +this.frm.get('ChequeAmount')?.value || 0;
 
-    if (receiptTypeID == "1") {
-      amount = this.frm.get('ChequeAmount')?.value;
-    } else if (receiptTypeID == "2") {
-      amount = this.frm.get('CashAmount')?.value;
-    } else if (receiptTypeID == "5") {
-      amount = this.frm.get('ibgAmount')?.value;
-    }
-
-    return !amount || +amount === 0;
+    // Disable checkbox if both amounts are missing or zero
+    return ibgAmount === 0 && chequeAmount === 0;
   }
   addBranchAmount(d?: IInvoiceAmount, isExisting: boolean = false) {
     const row = this.fb.group({
@@ -297,6 +292,18 @@ export class NewReceiptComponent implements OnInit {
   branchChange(value: any) {
     this.service.GetClientByBranch(value).subscribe((d: any) => {
       this.clientList = d;
+      let code = '';
+
+      if (this.clientList && this.clientList.length > 0) {
+        const client = this.clientList.find(
+          (x: any) => x.Name === this.frm.get('PaymentFrom')?.value
+        );
+        code = client ? client.Code : '';
+      }
+
+      this.frm.patchValue({
+        client: code
+      });
     })
   }
 
@@ -318,26 +325,64 @@ export class NewReceiptComponent implements OnInit {
   }
 
   clientChange(value: any) {
-    this.service.GetReceiptInvoiceByClient(this.frm.get('Branch')?.value, value).subscribe((d: any[]) => {
+
+    // No client selected → hide table & clear data
+    if (!value) {
+      this.frm.patchValue({ PaymentFrom: null });
+
       this.rows.clear();
       this.rowCheckedState = [];
+      this.invoiceList = [];
+      this.showInvoiceTable = false;
 
-      d.forEach((item: any) => {
-        item['InvoiceDate'] = this.returnDate(item['InvoiceDate']);
-        item['Balance'] = Number(item['InvoiceAmount']) - Number(item['PaidAmount']);
+      return;
+    }
 
-        const exists = this.invoiceList.some((existing: any) =>
-          existing.InvoiceNo?.toString().trim() === item.InvoiceNo?.toString().trim()
-        );
+    this.service
+      // .GetReceiptInvoiceByClient(this.frm.get('Branch')?.value, value)
+      .getInvoiceDetails(this.frm.get('Branch')?.value, value, this.receiptID <= 0 ? -1 : this.receiptID)
+      .subscribe((d: any[]) => {
 
-        this.addBranchAmount(item, exists);
-
-        if (!exists) {
-          this.invoiceList.push(item);
+        // Empty response → hide table
+        if (!d || d.length === 0) {
+          this.rows.clear();
+          this.rowCheckedState = [];
+          this.invoiceList = [];
+          this.showInvoiceTable = false;
+          return;
         }
+
+        // Data exists → show table
+        this.showInvoiceTable = true;
+
+        const client = this.clientList.find((x: any) => x.Code === value);
+        this.frm.patchValue({
+          PaymentFrom: client ? client.Name : ''
+        });
+
+        this.rows.clear();
+        this.rowCheckedState = [];
+
+        d.forEach((item: any) => {
+          item['InvoiceDate'] = this.returnDate(item['InvoiceDate']);
+          item['Balance'] =
+            Number(item['InvoiceAmount']) - Number(item['PaidAmount']);
+
+          const exists = this.invoiceList.some(
+            (existing: any) =>
+              existing.InvoiceNo?.toString().trim() ===
+              item.InvoiceNo?.toString().trim()
+          );
+
+          this.addBranchAmount(item, exists);
+
+          if (!exists) {
+            this.invoiceList.push(item);
+          }
+        });
       });
-    });
   }
+
 
   returnDate(date?: any) {
     let currentDate = new Date();
@@ -366,24 +411,32 @@ export class NewReceiptComponent implements OnInit {
     // Use if-else in place of switch
     if (value?.toString() === '1') { // Cheque
       this.frm.patchValue({ ChequeAmount: amount });
+      this.frm.get('CashAmount')?.clearValidators(); // Clear validators
+      this.frm.get('ibgAmount')?.clearValidators(); // Clear validators
+      this.frm.get('CashAmount')?.updateValueAndValidity();
+      this.frm.get('ibgAmount')?.updateValueAndValidity();
     } else if (value?.toString() === '2') { // Cash
       this.frm.patchValue({ CashAmount: amount });
+      this.frm.get('ChequeAmount')?.clearValidators(); // Clear validators
+      this.frm.get('ibgAmount')?.clearValidators(); // Clear validators
+      this.frm.get('ChequeAmount')?.updateValueAndValidity();
+      this.frm.get('ibgAmount')?.updateValueAndValidity();
     } else if (value?.toString() === '5') { // IBG
       this.frm.patchValue({ ibgAmount: amount });
+      this.frm.get('ChequeAmount')?.clearValidators(); // Clear validators
+      this.frm.get('CashAmount')?.clearValidators(); // Clear validators
+      this.frm.get('ChequeAmount')?.updateValueAndValidity();
+      this.frm.get('CashAmount')?.updateValueAndValidity();
     }
 
     this.calculation();
   }
 
-
-
   calculation() {
     let total = 0;
-    let hasSelectedInvoices = false;
     for (let i = 0; i < this.invoiceList.length; i++) {
       if (this.rowCheckedState[i]) {
-        total += Number(this.invoiceList[i]['Balance']);
-        hasSelectedInvoices = true;
+        total += Number(this.invoiceList[i]['InvoiceAmount']);
       }
     }
     this.frm.get("total_invoice_amount")?.setValue(total.toFixed(2));
@@ -392,27 +445,19 @@ export class NewReceiptComponent implements OnInit {
     let cash = 0;
     const receiptTypeID = this.receiptTypeID;
 
-    if (receiptTypeID == "1") {
+    if (receiptTypeID.toString() == "1") {
       const chequeAmount = this.frm.get("ChequeAmount")?.value;
       cash = chequeAmount ? Number(chequeAmount) : 0;
-    } else if (receiptTypeID == "2") {
+    } else if (receiptTypeID.toString() == "2") {
       const cashAmount = this.frm.get("CashAmount")?.value;
       cash = cashAmount ? cashAmount : 0;
     }
-    else if (receiptTypeID == "5") {
+    else if (receiptTypeID.toString() == "5") {
       const cashAmount = this.frm.get("ibgAmount")?.value;
       cash = cashAmount ? cashAmount : 0;
     }
     this.frm.get("ReceiptAmount")?.setValue(cash);
-
-    // Only calculate balance if invoices are selected, otherwise show 0
-    let balanceAmount = "0.00";
-    if (hasSelectedInvoices) {
-      balanceAmount = (total - cash).toFixed(2);
-    } else {
-      balanceAmount = "0.00";
-    }
-
+    const balanceAmount = (total - cash).toFixed(2);
     this.frm.get("balance_amount")?.setValue(balanceAmount);
 
     // let TaxAmount = Number(this.frm.get("TaxPercentage")?.value) * Number(this.frm.get("ChequeAmount")?.value / (100+ Number(this.frm.get("TaxPercentage")?.value),10));
@@ -433,15 +478,15 @@ export class NewReceiptComponent implements OnInit {
     this.branchAmount = Number(this.frm.get("BranchCollection")?.value);
     const receiptTypeID = this.receiptTypeID;
 
-    if (receiptTypeID === "1") {
+    if (receiptTypeID.toString() === "1") {
       this.taxAmount = this.taxPercentage * this.chequeAmount / (100 + this.taxPercentage);
       this.hqAmount = (this.chequeAmount - this.taxAmount) * (this.hqPercentage / 100);
       this.branchAmount = this.chequeAmount - this.taxAmount - this.hqAmount;
-    } else if (receiptTypeID === "2") {
+    } else if (receiptTypeID.toString() === "2") {
       this.taxAmount = this.taxPercentage * this.cashAmount / (100 + this.taxPercentage);
       this.hqAmount = (this.cashAmount - this.taxAmount) * (this.hqPercentage / 100);
       this.branchAmount = this.cashAmount - this.taxAmount - this.hqAmount;
-    } else if (receiptTypeID === "5") {
+    } else if (receiptTypeID.toString() === "5") {
       this.taxAmount = this.taxPercentage * this.ibgAmount / (100 + this.taxPercentage);
       this.hqAmount = (this.ibgAmount - this.taxAmount) * (this.hqPercentage / 100);
       this.branchAmount = this.ibgAmount - this.taxAmount - this.hqAmount;
@@ -457,9 +502,9 @@ export class NewReceiptComponent implements OnInit {
     const hqPercentage = this.frm.get('HQPercentage')?.value || 0;
 
     let baseAmount = 0;
-    if (this.receiptTypeID == '1') {
+    if (this.receiptTypeID.toString() == '1') {
       baseAmount = parseFloat(this.frm.get('ChequeAmount')?.value) || 0;
-    } else if (this.receiptTypeID == '2') {
+    } else if (this.receiptTypeID.toString() == '2') {
       baseAmount = parseFloat(this.frm.get('CashAmount')?.value) || 0;
     }
 
@@ -492,6 +537,42 @@ export class NewReceiptComponent implements OnInit {
   }
   onSubmit() {
     let data = this.frm.getRawValue();
+    if (this.frm.invalid) {
+      return;
+    }
+    if (this.frm.get('ReceiptType')?.value == '5') {
+      // if (this.frm.get('ibgNo')?.value?.length !== 18) {
+      //   this.showMessage('IBG number must be 18 digit', 'warning', 'Warning Message')
+      //   return;
+      // }
+    }
+    if (this.frm.get('ReceiptType')?.value == '1') {
+      const bankBranch = this.frm.get('BankBranch')?.value;
+      if (this.frm.get('ChequeNo')?.value?.length !== 6) {
+        this.showMessage('ChequeNo number must be 6 digit', 'warning', 'Warning Message')
+        return;
+      }
+      if (!bankBranch) {
+        this.showMessage('Bank Branch cannot be empty.', 'warning', 'Warning Message')
+        return;
+      }
+    }
+
+    // if (this.frm.get('ReceiptType')?.value == '5' || this.frm.get('ReceiptType')?.value == '1') {
+    //   data['ReceiptAmount'] = this.frm.get('ChequeAmount')?.value;
+    // }
+    // else {
+    //   data['ReceiptAmount'] = this.frm.get('CashAmount')?.value;
+    // }
+
+    if (this.isAdjustment == true) {
+      const clientValue = this.frm.get('client')?.value;
+      if (!clientValue) {
+        this.showMessage('Please select Client.', 'warning', 'Warning Message');
+        return;
+      }
+    }
+
     data['ReceiptDate'] = this.returnDate(this.frm.get('ReceiptDate')?.value);
     data['ChequeNo'] = this.frm.get('ChequeNo')?.value ? this.frm.get('ChequeNo')?.value : this.frm.get('ibgNo')?.value ? this.frm.get('ibgNo')?.value : '';
     const isInvoiceAdjustment = this.frm.get("IsInvoiceAdjustment")?.value;
@@ -506,17 +587,6 @@ export class NewReceiptComponent implements OnInit {
       data['BankID'] = 0;
       //this.frm.get("BankID")?.setValue(0);
     }
-
-    // Convert decimal fields to handle empty strings
-    data['HQPercentage'] = data['HQPercentage'] ? Number(data['HQPercentage']) : 0;
-    data['TaxPercentage'] = data['TaxPercentage'] ? Number(data['TaxPercentage']) : 0;
-    data['TaxAmount'] = data['TaxAmount'] ? Number(data['TaxAmount']) : 0;
-    data['HQAmount'] = data['HQAmount'] ? Number(data['HQAmount']) : 0;
-    data['BranchCollection'] = data['BranchCollection'] ? Number(data['BranchCollection']) : 0;
-    data['CreditNoteAmount'] = data['CreditNoteAmount'] ? Number(data['CreditNoteAmount']) : 0;
-    data['DebitNoteAmount'] = data['DebitNoteAmount'] ? Number(data['DebitNoteAmount']) : 0;
-    data['SuspendAmount'] = data['SuspendAmount'] ? Number(data['SuspendAmount']) : 0;
-    data['ReceiptAmount'] = data['ReceiptAmount'] ? Number(data['ReceiptAmount']) : 0;
     let details: any = [];
     var balance = this.frm.get("ReceiptAmount")?.value
     for (let i = 0; i < this.invoiceList.length; i++) {
@@ -577,12 +647,30 @@ export class NewReceiptComponent implements OnInit {
       }
     }
     data['details'] = details;
+    data['TaxPercentage'] = data['TaxPercentage'] == '' ? '0.00' : data['TaxPercentage'];
+    data['HQPercentage'] = data['HQPercentage'] == '' ? '0.00' : data['HQPercentage']
+    console.log('data: ', data)
 
-    this.service.SaveAndUpdateReceipt(data).subscribe((d: any) => {
-      this.showMessage("Receipt Saved/Updated Successfully", 'success', 'Success Message');
-      this.frm.reset();
-      this.route.navigate(['/finance/receipts/search-receipt']);
-    })
+    this._financeService.SaveAndUpdateReceipt(data).subscribe({
+      next: (response: any) => {
+
+        if (response && response.ReceiptID) {
+          const receiptID = response.ReceiptID;
+
+          this.showMessage("Receipt Saved/Updated Successfully", 'success', 'Success Message');
+          if (this.receiptID > 0) {
+            this.route.navigate(['/report/finance/receipt-voucher-report'], { queryParams: { ASN: this.accShortName }, queryParamsHandling: 'merge' });
+          } else {
+            this.route.navigate(['/report/finance/receipt-voucher-report'], { queryParams: { id: receiptID, ASN: this.accShortName }, queryParamsHandling: 'merge' });
+          }
+          this.frm.reset();
+        }
+      },
+      error: (err) => {
+        this.showMessage('Error saving receipt', 'error', 'Error Message');
+      }
+    });
+
   }
   deleteClickButton(): void {
     this.showLoadingSpinner = true;
@@ -621,8 +709,6 @@ export class NewReceiptComponent implements OnInit {
     this.isAdjustment = this.frm.get("IsInvoiceAdjustment")?.value;
   }
 
-
-
   changeBalanceStatus() {
     var balanceStatus = this.frm.get("balance_status")?.value;
     var balanceAmount = this.frm.get("balance_amount")?.value;
@@ -646,7 +732,10 @@ export class NewReceiptComponent implements OnInit {
       icon: icon, // Dynamically set the icon based on the parameter
       showCloseButton: false,
       timer: 5000,
-      width: '600px'
+      width: '600px',
+      customClass: {
+        popup: 'swal-top-offset'
+      }
     });
     this.hideSpinner();
     return;

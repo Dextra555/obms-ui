@@ -33,24 +33,24 @@ export const environment = {
   CIMB_SecurityCode: '0000000000000000',
   CIMB_BNMCode: '9100000',
 
-   // Indian Bank configuration
-   SBI: 'SBI',
-   SBI_OrganizationCode: 'SBIN0001234',
-   SBI_OrganizationName: 'OBMS INDIA PRIVATE LIMITED',
-   SBI_SecurityCode: '0000000000000000',
-   SBI_BNMCode: '9100000',
+  // Indian Bank configuration
+  SBI: 'SBI',
+  SBI_OrganizationCode: 'SBIN0001234',
+  SBI_OrganizationName: 'OBMS INDIA PRIVATE LIMITED',
+  SBI_SecurityCode: '0000000000000000',
+  SBI_BNMCode: '9100000',
 
-   HDFC: 'HDFC',
-   HDFC_OrganizationCode: 'HDFC0001234',
-   HDFC_OrganizationName: 'OBMS INDIA PRIVATE LIMITED',
-   HDFC_SecurityCode: '0000000000000000',
-   HDFC_BNMCode: '9100000',
+  HDFC: 'HDFC',
+  HDFC_OrganizationCode: 'HDFC0001234',
+  HDFC_OrganizationName: 'OBMS INDIA PRIVATE LIMITED',
+  HDFC_SecurityCode: '0000000000000000',
+  HDFC_BNMCode: '9100000',
 
-   ICICI: 'ICICI',
-   ICICI_OrganizationCode: 'ICIC0001234',
-   ICICI_OrganizationName: 'OBMS INDIA PRIVATE LIMITED',
-   ICICI_SecurityCode: '0000000000000000',
-   ICICI_BNMCode: '9100000',
+  ICICI: 'ICICI',
+  ICICI_OrganizationCode: 'ICIC0001234',
+  ICICI_OrganizationName: 'OBMS INDIA PRIVATE LIMITED',
+  ICICI_SecurityCode: '0000000000000000',
+  ICICI_BNMCode: '9100000',
 
   //Development Server configuration - Local DEV
   baseUrl: 'http://localhost:5000/api/',

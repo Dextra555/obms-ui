@@ -10,6 +10,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { DatasharingService } from 'src/app/service/datasharing.service';
 import { forkJoin } from 'rxjs';
 import { MatSelectChange } from '@angular/material/select';
+import { FinanceService } from 'src/app/service/finance.service';
 
 @Component({
   selector: 'app-supplier-statement',
@@ -20,22 +21,23 @@ export class SupplierStatementComponent implements OnInit {
   url: string = environment.baseReportUrl;
   urlSafe: SafeResourceUrl | undefined;
   currentUrl: string = "Finance/"
-  category: string = '';  
+  category: string = '';
   frm!: FormGroup;
   branchList: any = [];
   supplierList: any = [];
   categoryList: any = [];
   paytoList: any = [];
-  currentUser: string = ""; 
+  currentUser: string = "";
   errorMessage: string = '';
   warningMessage: string = '';
   showLoadingSpinner: boolean = false;
   userAccessModel!: UserAccessModel;
   reportPageName: string = "";
 
-  constructor(public sanitizer: DomSanitizer, private _masterService: MastermoduleService, private service: InventoryService, 
-    private empService: EmployeeService, private fb: FormBuilder,private router: Router, private _dataService: DatasharingService) {
-    
+  constructor(public sanitizer: DomSanitizer, private _masterService: MastermoduleService, private service: InventoryService,
+    private empService: EmployeeService, private fb: FormBuilder, private router: Router, private _dataService: DatasharingService,
+    private _financeService: FinanceService) {
+
     this.frm = fb.group({
       Branch: ["0"],
       Supplier: ["0"],
@@ -112,12 +114,12 @@ export class SupplierStatementComponent implements OnInit {
     );
   }
   onSupplierSelectionChange(event: any) {
-    console.log('Supplier: ',this.frm.get("Supplier")?.value ?? 0)
-    forkJoin({     
+    console.log('Supplier: ', this.frm.get("Supplier")?.value ?? 0)
+    forkJoin({
       categoryList: this._masterService.getInventoryCategories(event.value),
       paytoList: this._masterService.getSuppliers(event.value)
     }).subscribe({
-      next: (result) => {       
+      next: (result) => {
         this.categoryList = result.categoryList;
         this.paytoList = result.paytoList;
       },
@@ -138,25 +140,43 @@ export class SupplierStatementComponent implements OnInit {
 
     return `${year}-${month}-${day}`;
   }
-  clkBtn(number: number) {    
+  clkBtn(number: number) {
     this.reportPageName = number == 1 ? "SupplierStatementReport.aspx?" : 'InvoiceCollectionTotalReportNoTax.aspx?';
     this.reportPageName += "LoginID=" + this.currentUser;
   }
   onSubmit() {
-    this.url = environment.baseReportUrl;
-    this.url += this.currentUrl;
-    let localURL = "";
-    if (this.frm.invalid) {
+    if (this.frm.invalid) return;
+
+    const startDate = this.returnDate(this.frm.get("StartDate")?.value);
+    const endDate = this.returnDate(this.frm.get("EndDate")?.value);
+    const branch = this.frm.get("Branch")?.value ?? '';
+    const supplier = this.frm.get("Supplier")?.value ?? 0;
+    const payTo = this.frm.get("payTo")?.value ?? 0;
+    const category = this.frm.get("Category")?.value ?? '';
+    const status = this.frm.get("ActivityType")?.value ?? '';
+
+    if (supplier == 0) {
+      this.frm.get("Supplier")?.setErrors({ required: true });
       return;
     }
-    localURL += "&StartDate=" + this.returnDate(this.frm.get("StartDate")?.value)
-    localURL += "&EndDate=" + this.returnDate(this.frm.get("EndDate")?.value)
-    localURL += "&Branch=" + (this.frm.get("Branch")?.value ?? 0)
-    localURL += "&Supplier=" + (this.frm.get("Supplier")?.value ?? 0)
-    // if (this.frm.get("payTo")?.value) {
-    //   localURL += "&Supplier=" + (this.frm.get("payTo")?.value ?? 0)
-    // }
-    this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url + this.reportPageName + localURL);
+    const payload = { startDate, endDate, branch, supplier, payTo, category, status };
+
+    this._financeService.executeSupplierReport(payload).subscribe({
+      next: () => {
+        let localURL = '';
+        localURL += `&StartDate=${startDate}`;
+        localURL += `&EndDate=${endDate}`;
+        localURL += `&Branch=${branch}`;
+        localURL += `&Supplier=${supplier}`;
+
+        this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(
+          environment.baseReportUrl + this.currentUrl + this.reportPageName + localURL
+        );
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
   }
 
   handleErrors(error: string) {

@@ -1,13 +1,14 @@
-import {Component, OnInit} from '@angular/core';
-import {environment} from "../../../../../environments/environment";
-import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {MastermoduleService} from "../../../../service/mastermodule.service";
-import {InventoryService} from "../../../../service/inventory.service";
-import {EmployeeService} from "../../../../service/employee.service";
+import { Component, OnInit } from '@angular/core';
+import { environment } from "../../../../../environments/environment";
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { MastermoduleService } from "../../../../service/mastermodule.service";
+import { InventoryService } from "../../../../service/inventory.service";
+import { EmployeeService } from "../../../../service/employee.service";
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { Router, NavigationEnd } from '@angular/router';
 import { DatasharingService } from 'src/app/service/datasharing.service';
+import { FinanceService } from 'src/app/service/finance.service';
 
 @Component({
   selector: 'app-client-statement',
@@ -30,9 +31,10 @@ export class ClientStatementComponent implements OnInit {
   userAccessModel!: UserAccessModel;
   reportPageName: string = "";
 
-  constructor(public sanitizer: DomSanitizer, private _masterService: MastermoduleService, private service: InventoryService, 
-    private empService: EmployeeService, private fb: FormBuilder,private router: Router, private _dataService: DatasharingService) {
-   
+  constructor(public sanitizer: DomSanitizer, private _masterService: MastermoduleService, private service: InventoryService,
+    private empService: EmployeeService, private fb: FormBuilder, private router: Router, private _dataService: DatasharingService,
+    private _financeService: FinanceService) {
+
     this.frm = fb.group({
       Branch: ["0"],
       Client: ["0"],
@@ -106,24 +108,52 @@ export class ClientStatementComponent implements OnInit {
 
     return `${year}-${month}-${day}`;
   }
-  clkBtn(number: number) {    
+  clkBtn(number: number) {
     this.reportPageName = number == 1 ? "ClientStatementReport.aspx?" : 'InvoiceCollectionTotalReportNoTax.aspx?';
     this.reportPageName += "LoginID=" + this.currentUser;
   }
   onSubmit() {
     this.url = environment.baseReportUrl;
     this.url += this.currentUrl;
-    let localURL = "";
+    this.errorMessage = '';
+
     if (this.frm.invalid) {
       return;
     }
 
-    localURL += "&StartDate=" + this.returnDate(this.frm.get("StartDate")?.value)
-    localURL += "&EndDate=" + this.returnDate(this.frm.get("EndDate")?.value)
-    localURL += "&Branch=" + (this.frm.get("Branch")?.value ?? 0)
-    localURL += "&Client=" + (this.frm.get("Client")?.value ?? 0)
+    const branch = this.frm.get("Branch")?.value;
+    if (!branch || branch == '0') {
+      this.errorMessage = 'Please select the Branch';
+      return;
+    }
 
-    this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url + this.reportPageName + localURL);
+    const startDate = this.returnDate(this.frm.get("StartDate")?.value);
+    const endDate = this.returnDate(this.frm.get("EndDate")?.value);
+    const client = this.frm.get("Client")?.value ?? '';
+
+    const payload = {
+      startDate: startDate,
+      endDate: endDate,
+      branch: branch,
+      client: client
+    };
+
+    this._financeService.generateClientStatement(payload).subscribe({
+      next: () => {
+        let localURL = '';
+        localURL += "&StartDate=" + startDate;
+        localURL += "&EndDate=" + endDate;
+        localURL += "&Branch=" + branch;
+        localURL += "&Client=" + client;
+
+        this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(
+          this.url + this.reportPageName + localURL
+        );
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to generate client statement.';
+      }
+    });
   }
 
   branchChange(data: any) {

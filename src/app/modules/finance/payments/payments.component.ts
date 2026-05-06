@@ -501,20 +501,28 @@ export class PaymentsComponent implements AfterViewInit {
 
   supplierChange(value: any) {
     this.supplierRows.clear();
-    this._financeService.GetPaymentSupplierInvoices(value, this.currentUser).subscribe((d: any) => {
+
+    const paymentId = this.paymentID > 0 ? this.paymentID : 0;
+
+    let apiCall$;
+
+    if (paymentId > 0) {
+      apiCall$ = this._financeService.getCreditorInvoicePaymentList(this.currentUser, paymentId);
+    } else {
+      apiCall$ = this._financeService.getCreditorInvoicePaymentListBySupplier(this.currentUser, paymentId, value);
+    }
+
+    apiCall$.subscribe((d: any) => {
       if (d?.length > 0) {
         this.showDataSourceTable = true;
       } else {
         this.showDataSourceTable = false;
       }
+
       d.forEach((d: ISupplierInvoice) => {
-        // d.Amount = "0";
-        // d.ID = 0;
-        // d.PaymentID = 0;
         this.addSupplierInvoiceAmount(d);
       });
 
-      // ✅ Set PaymentToD *after* invoices are loaded
       const selectedSupplier = this.supplierList.find((x: any) => x.Id == value);
       if (selectedSupplier) {
         this.frm.get("PaymentTo")?.setValue(selectedSupplier.Name);

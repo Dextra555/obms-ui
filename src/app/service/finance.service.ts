@@ -137,6 +137,12 @@ export class FinanceService {
     ).pipe(catchError(this.errorHandle));
   }
 
+  getInvoiceDetails(branch: string, client: string, receiptId: number): Observable<any> {
+    const params = { params: new HttpParams({ fromString: "?branch=" + branch + "&client=" + client + "&receiptId=" + receiptId }) };
+    return this.httpClient.get<any>(this.apiUrl + 'Finance/invoice-details', params
+    ).pipe(catchError(this.errorHandle));
+  }
+
 
   GetReceiptDetailRowAmount(ReceiptDetailsID: string, ReceiptID: string, InvoiceID: string): Observable<any> {
     const params = { params: new HttpParams({ fromString: "?ReceiptDetailsID=" + ReceiptDetailsID + "&ReceiptID=" + ReceiptID + "&InvoiceID=" + InvoiceID }) };
@@ -300,6 +306,47 @@ export class FinanceService {
 
   getEmployeeTypes(): Observable<any> {
     return this.httpClient.get<any>(`${this.apiUrl}Master/GetEmployeeTypeList`);
+  }
+
+  // 1️⃣ Branch payment list
+  getBranchPaymentList(userId: string, paymentId: number): Observable<any[]> {
+    const params = new HttpParams()
+      .set('userId', userId)
+      .set('paymentId', paymentId.toString());
+    return this.httpClient.get<any[]>(
+      `${this.apiUrl}Finance/branch-payment-details`,
+      { params }
+    );
+  }
+
+  // 2️⃣ Creditor invoice payment list
+  getCreditorInvoicePaymentList(userId: string, paymentId: number): Observable<any[]> {
+    const params = new HttpParams()
+      .set('userId', userId)
+      .set('paymentId', paymentId.toString());
+    return this.httpClient.get<any[]>(
+      `${this.apiUrl}Finance/creditor-invoice-payment-details`,
+      { params }
+    );
+  }
+
+  getCreditorInvoicePaymentListBySupplier(userId: string, paymentId: number, supplier: number): Observable<any[]> {
+    const params = new HttpParams()
+      .set('userId', userId)
+      .set('paymentId', paymentId.toString())
+      .set('supplier', supplier.toString());
+    return this.httpClient.get<any[]>(
+      `${this.apiUrl}Finance/creditor-invoice-payment-details-by-supplier`,
+      { params }
+    );
+  }
+
+  generateClientStatement(payload: any) {
+    return this.httpClient.post(`${this.apiUrl}Finance/client-statement`, payload);
+  }
+
+  executeSupplierReport(payload: any) {
+    return this.httpClient.post(`${this.apiUrl}Finance/supplier-report`, payload);
   }
 
   private errorHandle(error: HttpErrorResponse) {
