@@ -346,7 +346,7 @@ export class NewAttendanceComponent implements OnInit {
             AttendanceAllowanceFollowCalendar: employeeDetails.AttendanceAllowanceFollowCalendar,
             AttendanceAllowanceWorkingDays: employeeDetails.AttendanceAllowanceWorkingDays,
             WorkingDays: employeeDetails.WorkingDays,
-            WorkingDaysAllowed: this.calculateWorkingDaysAllowed(employeeDetails.AttendanceAllowanceFollowCalendar, employeeDetails.AttendanceAllowanceWorkingDays, employeeDetails.WorkingDays),
+            WorkingDaysAllowed: employeeDetails.AttendanceAllowanceWorkingDays || 0,
             Age: this.calculateAge(employeeDetails.EMP_DATE_OF_BIRTH),
           });
 

@@ -837,6 +837,15 @@ export class NewAgreementComponent implements OnInit, AfterViewInit {
 
     }
 
+    if (details['NoOfGuards'] == 0) {
+
+      this.errorDescription = "Number of Guards cannot be 0";
+
+      return;
+
+    }
+
+
 
 
     if (details['Category'] == "") {
