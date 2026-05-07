@@ -403,20 +403,20 @@ export class NewEmployeeUniformLoanComponent implements OnInit {
     this.salaryMonthlyAdvance = this.employeeUniformLoanForm.value;
     this.salaryMonthlyAdvance.AdvanceDate = new Date(this.formatDate(this.employeeUniformLoanForm.value.AdvanceTakenDate));
     this.salaryMonthlyAdvance.AdvanceTakenDate = new Date(this.formatDate(this.employeeUniformLoanForm.value.AdvanceTakenDate));
-    this.salaryMonthlyAdvance.EmployeeID = this.EmployeeID;
+    this.salaryMonthlyAdvance.EmployeeID = this.employeeUniformLoanForm.value.EmployeeID;
 
     // Your existing method
-    this._payrollService.checkExistAdvance(this.EmployeeID, this.formatDate(AdvanceDate), 4).subscribe({
+    this._payrollService.checkExistAdvance(this.employeeUniformLoanForm.value.EmployeeID, this.formatDate(AdvanceDate), 4).subscribe({
       next: (exists) => {
         if (exists) {
           this.showMessage(`Record Exists. Please check.`, 'warning', 'Warning Message');
         } else {
           // Use forkJoin to combine multiple service calls
           forkJoin({
-            salaryProcessed: this._payrollService.getSalaryProcessDate(this.EmployeeID, this.year, this.month).pipe(
+            salaryProcessed: this._payrollService.getSalaryProcessDate(this.employeeUniformLoanForm.value.EmployeeID, this.year, this.month).pipe(
               catchError(() => of(false)) // Handle errors and fallback to false
             ),
-            resignDate: this._payrollService.getResignDateByEmployeeID(this.EmployeeID).pipe(
+            resignDate: this._payrollService.getResignDateByEmployeeID(this.employeeUniformLoanForm.value.EmployeeID).pipe(
               catchError(() => of('1900-01-01T00:00:00')) // Fallback to default date if an error occurs
             )
           }).subscribe({

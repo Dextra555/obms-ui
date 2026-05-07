@@ -1067,11 +1067,44 @@ export class NewAttendanceComponent implements OnInit {
   }
   setStaffButtonClick(): void {
     this.dynamicEditable = 'set';
-    let iNoOfDays = new Date().getDate();
-    if (this.attendanceDetails.length > 0) {
-      this.updateStaffFormFields(this.attendanceDetails, iNoOfDays, 1);
+    let iNoOfDays = 0;
+    let iStartDay = 1;
+
+    const advanceDate = new Date(this.attendanceForm.value.AdvanceDate);
+    const today = new Date();
+    const joinDate = this.attendanceForm.value.JoinDate ? new Date(this.attendanceForm.value.JoinDate) : null;
+    const resignDate = this.attendanceForm.value.ResignedDate ? new Date(this.attendanceForm.value.ResignedDate) : null;
+
+    // Check if the AdvanceDate is in the current month and year
+    if (advanceDate.getMonth() === today.getMonth() && advanceDate.getFullYear() === today.getFullYear()) {
+      iNoOfDays = advanceDate.getDate();
     } else {
-      this.addStaffFormFields(iNoOfDays, 1);
+      iNoOfDays = this.getDaysInMonth(advanceDate.toString()); // Use utility function to get days in month
+    }
+
+    // Check if the employee has a resignation date
+    if (resignDate) {
+      const attendanceDate = new Date(advanceDate.getFullYear(), advanceDate.getMonth(), 1);
+      if (attendanceDate > resignDate) {
+        this.showMessage(`Employee has resigned on ${resignDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`, 'warning', 'Warning Message');
+        this.getEmployeeListByEmployeeType(this.branchCode, this.attendanceForm.value.EmployeeType, this.StartPeriod, this.EndPeriod, 'Active');
+        this.clearFormFields();
+        this.hideloadingSpinner();
+        return;
+      } else if (advanceDate.getMonth() === resignDate.getMonth() && advanceDate.getFullYear() === resignDate.getFullYear()) {
+        iNoOfDays = resignDate.getDate();
+      }
+    }
+
+    // Check if the AdvanceDate is in the employee's joining month and year
+    if (joinDate && advanceDate.getMonth() === joinDate.getMonth() && advanceDate.getFullYear() === joinDate.getFullYear()) {
+      iStartDay = joinDate.getDate();
+    }
+
+    if (this.attendanceDetails.length > 0) {
+      this.updateStaffFormFields(this.attendanceDetails, iNoOfDays, iStartDay);
+    } else {
+      this.addStaffFormFields(iNoOfDays, iStartDay);
     }
   }
   editButtonClick(): void {
