@@ -12,6 +12,8 @@ import { Router } from '@angular/router';
 import { DatasharingService } from 'src/app/service/datasharing.service';
 import { FinanceService } from 'src/app/service/finance.service';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
+import Swal from 'sweetalert2';
+import { DialogConfirmationComponent } from 'src/app/components/dialog-confirmation/dialog-confirmation.component';
 export interface PeriodicElement {
   payment_date: string;
   creditor_type: string;
@@ -41,9 +43,14 @@ export class SearchPaymentsComponent implements OnInit {
   errorMessage: string = '';
   showLoadingSpinner: boolean = false;
   searchOption: string = 'Payment Date';
-  displayedColumns: string[] = ['PaymentDate','VoucherNo', 'ChequeNo', 'Amount', 'PaymentTo', 'Particulars', 'action'];
-  dataSource: any;
+  displayedColumns: string[] = ['PaymentDate', 'VoucherNo', 'ChequeNo', 'Amount', 'PaymentTo', 'Particulars', 'action'];
+  dataSource = new MatTableDataSource<any>();
   dtPaymentDate!: string;
+  catrgoryName: string = '';
+  accShortName: string = '';
+  payToList: any = [];
+  categoryList: any = [];
+  pageSizeOptions: number[] = [];
 
   private formatDate(date: any) {
     const d = new Date(date);
@@ -74,6 +81,9 @@ export class SearchPaymentsComponent implements OnInit {
       deleteAccess: false,
       createAccess: false,
     }
+     for (let i = 10; i <= 50; i += 10) {
+      this.pageSizeOptions.push(i);
+    }
   }
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -84,7 +94,7 @@ export class SearchPaymentsComponent implements OnInit {
   paginator!: MatPaginator;
   @ViewChild(MatSort)
   sort!: MatSort;
- 
+
   announceSortChange(sortState: Sort) {
     if (sortState.direction) {
       this._liveAnnouncer.announce(`Sorted ${sortState.direction}ending`);
@@ -124,6 +134,9 @@ export class SearchPaymentsComponent implements OnInit {
                 this.handleErrors(error);
               }
             );
+            this._financeService.GetPaymentMaster(this.currentUser).subscribe((d: any) => {
+              this.categoryList = d['categories'];
+            })
           } else {
             this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
                       You do not have permissions to view this page. <br>
@@ -131,7 +144,7 @@ export class SearchPaymentsComponent implements OnInit {
                       Thank you`;
 
           }
-          this.hideLoadingSpinner()
+          this.hideSpinner()
         }
       },
       (error) => {
@@ -144,51 +157,224 @@ export class SearchPaymentsComponent implements OnInit {
     this.searchOption = event.value;
   }
   seachCategory() {
-    const dialogRef = this.dialog.open(CategorySearchComponent, {
-      disableClose: true,
-      panelClass: ['wlt-c-lg-admin-dialog', 'animate__animated', 'animate__slideInDown'],
-      width: '900px',
-      //  position: { right: '0'}
-    });
+    // const dialogRef = this.dialog.open(CategorySearchComponent, {
+    //   disableClose: true,
+    //   panelClass: ['wlt-c-lg-admin-dialog', 'animate__animated', 'animate__slideInDown'],
+    //   width: '900px',
+    //   //  position: { right: '0'}
+    // });
+    this.route.navigate(['/finance/category-search']);
   }
-  onSearchClick() {    
+  onSearchClick() {
     this.showLoadingSpinner = true;
     this.dtPaymentDate = this.formatDate(new Date(this.frm.value.payment_date));
     const bank = this.frm.value.bank == undefined ? '0' : this.frm.value.bank;
     const cheque_no = this.frm.value.cheque_no == undefined ? '0' : this.frm.value.cheque_no;
     this._financeService
-    .getBothPayments(this.dtPaymentDate, bank, cheque_no)
-    .subscribe(
-      ([dateData, bankAndChequeData]) => {
-         // Initialize an empty array for the data source
-         let finalDataSource = [...dateData];
+      .getBothPayments(this.dtPaymentDate, bank, cheque_no)
+      .subscribe(
+        ([dateData, bankAndChequeData]) => {
+          // Initialize an empty array for the data source
+          let finalDataSource = [...dateData];
 
-         // Check if cheque number is provided and add bankAndChequeData
-         if (this.frm.value.cheque_no && this.frm.value.cheque_no.trim() !== '') {
-           finalDataSource = [...bankAndChequeData];
-         }
- 
-         // Bind the filtered data to the dataSource
-         this.dataSource = finalDataSource; 
-                 
-         this.hideLoadingSpinner();   
-      },
-      (error) => {
-        this.handleErrors(error);
-      }
-    );
+          // Check if cheque number is provided and add bankAndChequeData
+          if (this.frm.value.cheque_no && this.frm.value.cheque_no.trim() !== '') {
+            finalDataSource = [...bankAndChequeData];
+          }
+
+          // Bind the filtered data to the dataSource
+          this.dataSource = new MatTableDataSource(finalDataSource);
+          this.pageSizeOptions = [];
+
+        const totalRows = finalDataSource.length;
+
+        // Build page sizes: 10,20,30... up to total rows (max 1000)
+        for (let i = 10; i <= totalRows && i <= 1000; i += 10) {
+          this.pageSizeOptions.push(i);
+        }
+
+        // If total rows less than 10, still allow showing all
+        if (totalRows > 0 && totalRows < 10) {
+          this.pageSizeOptions.push(totalRows);
+        }
+          this.dataSource.sort = this.sort;
+          this.dataSource.paginator = this.paginator;
+          this.hideSpinner();
+        },
+        (error) => {
+          this.handleErrors(error);
+        }
+      );
   }
   onEditClick(data: any): void {
     this.route.navigate(['/finance/payments'], { queryParams: { id: data.ID }, queryParamsHandling: 'merge' });
   }
+  // onPrint(data: any) {
+  //   this.getPaymentData(data.ID )
+  //   console.log('====>',this.catrgoryName + '====>' + this.accShortName)
+  //   this.route.navigate(['/report/finance/print-voucher-report'], { queryParams: { Category: this.catrgoryName, ASN: this.accShortName }, queryParamsHandling: 'merge' });
+  // }
+  // getPaymentData(id: number) {
+  //   forkJoin({
+  //     branchPayment: this._financeService.getBranchPayment(id)
+  //   }).subscribe({
+  //     next: (results) => {
+  //       const branchPayment = results.branchPayment;
+
+  //       if (branchPayment.ItemCategory) {
+  //         this.GetPaymentMasterCategoryTypeChangePayTo(branchPayment.ItemCategory);
+  //       }
+  //       if (branchPayment.BankID) {
+  //         this.bankSelectionChange(branchPayment.BankID);
+  //       }
+
+
+  //       this.hideSpinner(); // Stop loading spinner after all updates
+  //     },
+  //     error: (err) => {
+  //       this.showMessage(`Error loading data: ${err}`, 'error', 'Error Message');
+  //       this.hideSpinner();
+  //     }
+  //   });
+  // }
+
+  // GetPaymentMasterCategoryTypeChangePayTo(value: any) {
+  //   this._financeService.GetPaymentMasterCategoryTypeChangePayTo(value).subscribe((d: any) => {
+  //     this.payToList = d;
+
+  //     // ✅ Find and extract the selected category name
+  //     const selected = this.categoryList.find((item: any) => item.ID == value);
+  //     if (selected) {
+  //       this.catrgoryName = selected.Name;
+  //     }
+  //   })
+  // }
+
+  // bankSelectionChange(value: any): void {
+  //   // Get bank short name
+  //   this._financeService.getBankShortName(value).subscribe({
+  //     next: (response: any) => {
+  //       this.accShortName = response;
+  //     },
+  //     error: (error) => this.handleErrors(error)
+  //   });
+  // }
+
+  onPrint(data: any) {
+    this.getPaymentData(data.ID);
+  }
+
+  deleteClickButton(data: any): void {
+    this.showLoadingSpinner = true;
+
+    this.dialog
+      .open(DialogConfirmationComponent, {
+        data: `Are you sure you want to delete this payment?`
+      })
+      .afterClosed()
+      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {
+        if (result.confirmDialog) {
+
+          this._financeService.deletePayment(data.ID, this.currentUser).subscribe({
+            next: res => {
+              // ✅ remove row from table
+              // Remove row from table
+              this.dataSource.data = this.dataSource.data.filter(
+                (x: any) => x.ID !== data.ID
+              );
+
+              // Optional: reset to first page
+              if (this.paginator) {
+                this.paginator.firstPage();
+              }
+              this.showMessage(`Payment deleted successfully.`, 'success', 'Success Message');
+            },
+            error: err => {
+              this.showMessage(`Payment Failed to delete records due to ${err}`, 'error', 'Error Message');
+            }
+          });
+
+        } else {
+          this.hideSpinner();
+        }
+      });
+
+  }
+  getPaymentData(id: number) {
+    forkJoin({
+      branchPayment: this._financeService.getBranchPayment(id)
+    }).subscribe({
+      next: (results) => {
+        const branchPayment = results.branchPayment;
+
+        // run both calls in parallel if values exist
+        const calls: any = {};
+        if (branchPayment.ItemCategory) {
+          calls.category = this._financeService.GetPaymentMasterCategoryTypeChangePayTo(branchPayment.ItemCategory);
+        }
+        if (branchPayment.BankID) {
+          calls.bank = this._financeService.getBankShortName(branchPayment.BankID);
+        }
+
+        if (Object.keys(calls).length > 0) {
+          forkJoin(calls).subscribe({
+            next: (res: any) => {
+              if (res.category) {
+                const selected = this.categoryList.find((item: any) => item.ID == branchPayment.ItemCategory);
+                if (selected) {
+                  this.catrgoryName = selected.Name;
+                }
+              }
+              if (res.bank) {
+                this.accShortName = res.bank;
+              }
+
+              this.route.navigate(
+                ['/report/finance/print-voucher-report'],
+                { queryParams: { id: id, Category: this.catrgoryName, ASN: this.accShortName }, queryParamsHandling: 'merge' }
+              );
+            },
+            error: (err) => {
+              this.showMessage(`Error loading details: ${err}`, 'error', 'Error Message');
+            }
+          });
+        } else {
+          this.hideSpinner();
+        }
+      },
+      error: (err) => {
+        this.showMessage(`Error loading payment: ${err}`, 'error', 'Error Message');
+        this.hideSpinner();
+      }
+    });
+  }
+
+  private showMessage(message: string, icon: 'success' | 'warning' | 'info' | 'error' = 'info',
+    title: 'Success Message' | 'Warning Message' | 'Error Message'): void {
+    Swal.fire({
+      toast: true,
+      position: 'top',
+      showConfirmButton: false,
+      title: title,
+      text: message,
+      icon: icon, // Dynamically set the icon based on the parameter
+      showCloseButton: false,
+      timer: 5000,
+      width: '600px',
+      customClass: {
+        popup: 'swal-top-offset'
+      }
+    });
+    this.hideSpinner();
+    return;
+  }
   handleErrors(error: string) {
     if (error != null && error != '') {
-      this.errorMessage = error;
-      this.showLoadingSpinner = false
+      this.hideSpinner();
     }
-  }
-  hideLoadingSpinner() {
-    this.showLoadingSpinner = false
+  };
+  hideSpinner() {
+    this.showLoadingSpinner = false;
   }
 }
 

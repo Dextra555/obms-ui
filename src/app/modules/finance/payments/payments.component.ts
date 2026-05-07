@@ -103,42 +103,60 @@ export class PaymentsComponent implements AfterViewInit {
   }
 
   ngOnInit(): void {
+
     this.frm.get("Supplier")?.disable({ onlySelf: true });
 
+    // 1️⃣ FIRST: Load master data
+    this._financeService.GetPaymentMaster(this.currentUser)
+      .subscribe((d: any) => {
 
-    this._financeService.GetPaymentMaster(this.currentUser).subscribe((d: any) => {
-      this.bankList = d['banks'];
-      this.categoryList = d['categories'];
-      this.supplierList = d['suppliers'];
-      this.otherList = d['other'];
-      d['other'].forEach((d: IBranchAmount) => {
-        d.Amount = 0
-        d.ID = 0;
-        d.PaymentID = 0;
-        this.addBranchAmount(d);
-      })
-      // this.dataSource = new MatTableDataSource(d['other']);
-    })
+        // ---- master data loaded ----
+        this.bankList = d['banks'];
+        this.categoryList = d['categories'];
+        this.supplierList = d['suppliers'];
+        this.otherList = d['other'];
 
-    if (this.currentUser == 'null' || this.currentUser == undefined) {
-      this._dataService.getUsername().subscribe((username) => {
-        this.currentUser = username;
-        this.getUserAccessRights(this.currentUser, 'Payments');
+        d['other'].forEach((x: IBranchAmount) => {
+          x.Amount = 0;
+          x.ID = 0;
+          x.PaymentID = 0;
+          this.addBranchAmount(x);
+        });
+
+        // 2️⃣ AFTER master data → get user access
+        if (!this.currentUser || this.currentUser === 'null') {
+          this._dataService.getUsername().subscribe(username => {
+            this.currentUser = username;
+            this.getUserAccessRights(this.currentUser, 'Payments');
+            this.processRouteParams(); // 🔑
+          });
+        } else {
+          this.getUserAccessRights(this.currentUser, 'Payments');
+          this.processRouteParams(); // 🔑
+        }
       });
-    } else {
-      this.getUserAccessRights(this.currentUser, 'Payments');
-    }
+  }
+  private processRouteParams(): void {
 
-    this._activatedRoute.queryParams.subscribe((params) => {
-      if (params['id'] != undefined) {
-        this.showLoadingSpinner = true; // Start loading spinner before data fetch
+    this._activatedRoute.queryParams.subscribe(params => {
+
+      if (params['id']) {
+        this.showLoadingSpinner = true;
         this.paymentID = params['id'];
-        this.getPaymentData(params['id']);
+        this.getPaymentData(this.paymentID);
+
       } else {
         this.paymentID = 0;
+
+        if (this.bankList?.length) {
+          const defaultBankId = this.bankList[0].BankId;
+          this.frm.get('BankID')?.setValue(defaultBankId);
+          this.bankSelectionChange(defaultBankId);
+        }
       }
     });
   }
+
 
   frmInitialization() {
     this.frm = this.fb.group({
@@ -152,7 +170,7 @@ export class PaymentsComponent implements AfterViewInit {
       cheque_status: [''],
       PaymentToD: [''],
       category_type: ['U'],
-      ItemCategory: [''],
+      ItemCategory: ['', Validators.required],
       PaymentTo: ['', Validators.required],
       Particulars: ['', Validators.required],
       Amount: [''],
@@ -193,10 +211,15 @@ export class PaymentsComponent implements AfterViewInit {
           this.GetPaymentMasterCategoryTypeChangePayTo(branchPayment.ItemCategory);
         }
         if (branchPayment.BankID) {
+          this.frm.get('BankID')?.setValue(branchPayment.BankID);
           this.bankSelectionChange(branchPayment.BankID);
         }
-        this.creditorChange(branchPayment.CreditorType?.toString());
-        //this.paymentTypeChange(branchPayment.PaymentType?.toString());
+        if (branchPayment.CreditorType) {
+          this.creditorChange(branchPayment.CreditorType?.toString());
+        }
+        if (branchPayment.PaymentType) {
+          this.paymentTypeChange(branchPayment.PaymentType?.toString());
+        }
 
         this.existingPaymentType = branchPayment.PaymentType?.toString();
         this.existingChequeNo = branchPayment.ChequeNo;
@@ -226,20 +249,31 @@ export class PaymentsComponent implements AfterViewInit {
   }
 
   addSupplierInvoiceAmount(d?: ISupplierInvoice) {
+    // Parse values and fix 2 decimals
+    const total = d?.Total != null ? Number(Number(d.Total).toFixed(2)) : null;
+    const paid = d?.PaidAmount != null ? Number(Number(d.PaidAmount).toFixed(2)) : null;
+    const amount = d?.Amount != null ? Number(Number(d.Amount).toFixed(2)) : null;
+
+    const balance =
+      total !== null && paid !== null
+        ? Number((total - paid).toFixed(2))
+        : null;
+
     const row = this.fb.group({
       ID: [d?.ID],
       PaymentID: [d?.PaymentID],
-      Code: [d && d.Code ? d.Code : null],
-      Name: [d && d.Name ? d.Name : null],
-      InvoiceID: [d && d.InvoiceID ? d.InvoiceID : null],
-      InvoiceNo: [d && d.InvoiceNo ? d.InvoiceNo : null],
-      Total: [d && d.Total ? d.Total : null],
-      Amount: [d && d.Amount ? d.Amount : null],
-      PaidAmount: [d && d.PaidAmount ? d.PaidAmount : null],
-      BranchUserName: [d && d.BranchUserName ? d.BranchUserName : null],
-      Balance: [d && Number(d.Total) - Number(d.PaidAmount)],
-      Supplier: [d && d.Supplier ? d.Supplier : null]
+      Code: [d?.Code ?? null],
+      Name: [d?.Name ?? null],
+      InvoiceID: [d?.InvoiceID ?? null],
+      InvoiceNo: [d?.InvoiceNo ?? null],
+      Total: [total],
+      Amount: [this.paymentID === 0 ? null : amount],
+      PaidAmount: [paid],
+      BranchUserName: [d?.BranchUserName ?? null],
+      Balance: [balance],
+      Supplier: [d?.Supplier ?? null]
     });
+
     this.supplierRows.push(row);
   }
 
@@ -309,8 +343,40 @@ export class PaymentsComponent implements AfterViewInit {
   }
 
   onSubmit() {
-    this.showLoadingSpinner = true;
     let data = this.frm.getRawValue();
+    if (this.frm.invalid) {
+      return;
+    }
+    if (this.frm.get('PaymentType')?.value == '1') {
+      if (this.frm.get('ChequeNo')?.value == '' && this.frm.get('ChequeNo')?.value == undefined) {
+        this.showMessage(`Please enter cheque no.`, 'warning', 'Warning Message')
+        return;
+      }
+    }
+    if (this.frm.get('PaymentType')?.value == '2') {
+      if (this.frm.get('ChequeNo')?.value == '' && this.frm.get('ChequeNo')?.value == undefined) {
+        this.showMessage(`Please enter Voucher no.`, 'warning', 'Warning Message')
+        return;
+      }
+    }
+    if (this.frm.get('PaymentType')?.value == '3') {
+      this.frm.patchValue({
+        ChequeNo: 'Contra'
+      })
+      data['BankID'] = 0;
+    }
+    if (this.frm.get('PaymentType')?.value == '4') {
+      this.frm.patchValue({
+        ChequeNo: 'OFT'
+      })
+    }
+    this.showLoadingSpinner = true;
+
+    data['BankID'] = data['BankID'] != '' ? data['BankID'] : 0;
+    if (data['BankID'] == 0) {
+      this.accShortName = 'Contra';
+    }
+
     if (!data['details']) {
       data['details'] = [];
     }
@@ -349,8 +415,10 @@ export class PaymentsComponent implements AfterViewInit {
     }
 
     data['Amount'] = Number(totalAmount);
-    data['BankID'] = data['BankID'] ? Number(data['BankID']) : null;
-    data['Supplier'] = data['Supplier'] ? Number(data['Supplier']) : null;
+    if (!(Number(data['Amount']) > 0)) {
+      this.showMessage('Current payment must be greater than zero', 'warning', 'Warning Message');
+      return;
+    }
     data['PaymentDate'] = this.returnDate(this.frm.get('PaymentDate')?.value);
     let total = 0;
     this.checklistItems.forEach((item) => {
@@ -363,11 +431,34 @@ export class PaymentsComponent implements AfterViewInit {
     data['PaymentPurpose'] = total;
     data['userId'] = this.currentUser;
 
-    this._financeService.saveAndUpdatePayment(data).subscribe((d: any) => {
-      this.showMessage("Payment Saved/Updated Successfully", 'success', 'Success Message');
-      this.frm.reset();
-      this.route.navigate(['/finance/search-payments']);
-    })
+    // this._financeService.saveAndUpdatePayment(data).subscribe((d: any) => {
+    //   this.showMessage("Payment Saved/Updated Successfully", 'success', 'Success Message');
+    //   this.frm.reset();
+    //   this.route.navigate(['/report/finance/print-voucher-report'], { queryParams: { Category: this.catrgoryName, ASN: this.accShortName }, queryParamsHandling: 'merge' });
+    //   //this.route.navigate(['/finance/search-payments']);
+    // })
+
+    this._financeService.saveAndUpdatePayment(data).subscribe({
+      next: (response: any) => {
+        console.log('Response from API:', response);
+
+        if (response && response.PaymentID) {
+          const paymentId = response.PaymentID;
+
+          this.showMessage("Payment Saved/Updated Successfully", 'success', 'Success Message');
+          if (this.paymentID > 0) {
+            this.route.navigate(['/report/finance/print-voucher-report'], { queryParams: { Category: this.catrgoryName, ASN: this.accShortName }, queryParamsHandling: 'merge' });
+          } else {
+            this.route.navigate(['/report/finance/print-voucher-report'], { queryParams: { id: paymentId, Category: this.catrgoryName, ASN: this.accShortName }, queryParamsHandling: 'merge' });
+          }
+          this.frm.reset();
+        }
+      },
+      error: (err) => {
+        this.showMessage('Error saving payment', 'error', 'Error Message');
+      }
+    });
+
   }
 
   onPrint() {
@@ -456,17 +547,18 @@ export class PaymentsComponent implements AfterViewInit {
       // Get next cheque number
       this._financeService.getNextChequeNumber(value).subscribe({
         next: (chequeNo: any) => {
-          const finalChequeNo = chequeNo.toString();
-          this.frm.patchValue({ ChequeNo: finalChequeNo });
-
-          // If cheque number is not zero, get number of cheques
-          if (finalChequeNo != 0) {
-            this._financeService.getNoOfCheques(value).subscribe({
-              next: (lblchequeNo: any) => {
-                this.lblNoOfCheques = lblchequeNo;
-              },
-              error: (error) => this.handleErrors(error)
-            });
+          if (chequeNo !== null && chequeNo !== undefined) {
+            const finalChequeNo = chequeNo.toString();
+            this.frm.patchValue({ ChequeNo: finalChequeNo });
+            // If cheque number is not zero, get number of cheques
+            if (finalChequeNo != 0) {
+              this._financeService.getNoOfCheques(value).subscribe({
+                next: (lblchequeNo: any) => {
+                  this.lblNoOfCheques = lblchequeNo;
+                },
+                error: (error) => this.handleErrors(error)
+              });
+            }
           }
         },
         error: (error) => this.handleErrors(error)
@@ -499,6 +591,60 @@ export class PaymentsComponent implements AfterViewInit {
 
   }
 
+  // supplierChange(value: any) {
+  //   this.supplierRows.clear();
+  //   const paymentId = this.paymentID > 0 ? this.paymentID : 0;
+  //   if(paymentId > 0){
+  //      this._financeService.getCreditorInvoicePaymentList(this.currentUser, paymentId).subscribe((d: any) => {
+  //     if (d?.length > 0) {
+  //       this.showDataSourceTable = true;
+  //     } else {
+  //       this.showDataSourceTable = false;
+  //     }
+  //     d.forEach((d: ISupplierInvoice) => {
+  //       // d.Amount = "0";
+  //       // d.ID = 0;
+  //       // d.PaymentID = 0;
+  //       this.addSupplierInvoiceAmount(d);
+  //     });
+
+  //     // ✅ Set PaymentToD *after* invoices are loaded
+  //     const selectedSupplier = this.supplierList.find((x: any) => x.Id == value);
+  //     if (selectedSupplier) {
+  //       this.frm.get("PaymentTo")?.setValue(selectedSupplier.Name);
+  //       this.frm.get("PaymentToD")?.setValue(selectedSupplier.Name);
+  //       this.frm.get("PaymentToD")?.disable({ onlySelf: true });
+  //     }
+  //   });
+  //   }else{
+
+
+  //   // this._financeService.GetPaymentSupplierInvoices(value, this.currentUser).subscribe((d: any) => {
+  //   // this._financeService.getCreditorInvoicePaymentList(this.currentUser, paymentId).subscribe((d: any) => {
+  //    this._financeService.getCreditorInvoicePaymentListBySupplier(this.currentUser, paymentId,value).subscribe((d: any) => {
+  //     if (d?.length > 0) {
+  //       this.showDataSourceTable = true;
+  //     } else {
+  //       this.showDataSourceTable = false;
+  //     }
+  //     d.forEach((d: ISupplierInvoice) => {
+  //       // d.Amount = "0";
+  //       // d.ID = 0;
+  //       // d.PaymentID = 0;
+  //       this.addSupplierInvoiceAmount(d);
+  //     });
+
+  //     // ✅ Set PaymentToD *after* invoices are loaded
+  //     const selectedSupplier = this.supplierList.find((x: any) => x.Id == value);
+  //     if (selectedSupplier) {
+  //       this.frm.get("PaymentTo")?.setValue(selectedSupplier.Name);
+  //       this.frm.get("PaymentToD")?.setValue(selectedSupplier.Name);
+  //       this.frm.get("PaymentToD")?.disable({ onlySelf: true });
+  //     }
+  //   });
+  //   }
+  // }
+
   supplierChange(value: any) {
     this.supplierRows.clear();
 
@@ -507,8 +653,11 @@ export class PaymentsComponent implements AfterViewInit {
     let apiCall$;
 
     if (paymentId > 0) {
-      apiCall$ = this._financeService.getCreditorInvoicePaymentList(this.currentUser, paymentId);
+       apiCall$ = this._financeService.getCreditorInvoicePaymentList(this.currentUser, paymentId);
+      //apiCall$ = this._financeService.getCreditorInvoicePaymentListBySupplier(this.currentUser, paymentId, value);
     } else {
+      // this._financeService.GetPaymentSupplierInvoices(value, this.currentUser).subscribe((d: any) => {
+      // this._financeService.getCreditorInvoicePaymentList(this.currentUser, paymentId).subscribe((d: any) => {
       apiCall$ = this._financeService.getCreditorInvoicePaymentListBySupplier(this.currentUser, paymentId, value);
     }
 
@@ -520,9 +669,13 @@ export class PaymentsComponent implements AfterViewInit {
       }
 
       d.forEach((d: ISupplierInvoice) => {
+        // d.Amount = "0";
+        // d.ID = 0;
+        // d.PaymentID = 0;
         this.addSupplierInvoiceAmount(d);
       });
 
+      // ✅ Set PaymentToD *after* invoices are loaded
       const selectedSupplier = this.supplierList.find((x: any) => x.Id == value);
       if (selectedSupplier) {
         this.frm.get("PaymentTo")?.setValue(selectedSupplier.Name);
@@ -532,6 +685,7 @@ export class PaymentsComponent implements AfterViewInit {
     });
   }
 
+
   validatePayments() {
     const invoiceArray = this.frm.get('SupplierInvoice') as FormArray;
 
@@ -539,7 +693,12 @@ export class PaymentsComponent implements AfterViewInit {
       this.hasInvalidPayment = invoiceArray.controls.some(ctrl => {
         const current = +ctrl.get('Amount')?.value || 0;
         const balance = +ctrl.get('Balance')?.value || 0;
-        return current > balance;
+        const paidAmount = +ctrl.get('PaidAmount')?.value || 0;
+
+        // 🔑 Take the highest of Balance or PaidAmount
+        const maxAllowed = Math.max(balance, paidAmount);
+
+        return current > maxAllowed;
       });
     });
   }
@@ -555,7 +714,10 @@ export class PaymentsComponent implements AfterViewInit {
       icon: icon, // Dynamically set the icon based on the parameter
       showCloseButton: false,
       timer: 5000,
-      width: '600px'
+      width: '600px',
+      customClass: {
+        popup: 'swal-top-offset'
+      }
     });
     this.hideSpinner();
     return;

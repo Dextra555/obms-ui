@@ -40,13 +40,14 @@ export class PrintVoucherReportComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  printReportClick(paymentID: number, category: number, asn: string) {
+  printReportClick(paymentID: number, category: any, asn: string) {
     this.url = environment.baseReportUrl;
     this.url += 'Finance/BranchPaymentReport.aspx?';
-    this.url += "LoginID=" + this.currentUser;
-    this.url += "&ID=" + paymentID;
-    this.url += "&Category=" + category;
-    this.url += "&ASN=" + asn;
+    this.url += "LoginID=" + encodeURIComponent(this.currentUser);
+    this.url += "&ID=" + encodeURIComponent(paymentID);
+    this.url += "&Category=" + encodeURIComponent(category);
+    this.url += "&ASN=" + encodeURIComponent(asn);
+
     this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url);
   }
 
