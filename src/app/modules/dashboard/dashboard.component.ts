@@ -10,9 +10,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 
   selector: 'app-dashboard',
 
-  templateUrl: './dashboard.component.html',
-
-  styleUrls: ['./dashboard.component.css']
+  templateUrl: './dashboard.component.html'
 
 })
 
@@ -34,7 +32,7 @@ export class DashboardComponent implements OnInit {
 
     this.reportPath = "product-list.rdlc";
 
-   }
+  }
 
 
 
@@ -52,7 +50,7 @@ export class DashboardComponent implements OnInit {
 
     event.model.parameters = reportParams;
 
-}
+  }
 
 
 
