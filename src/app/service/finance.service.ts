@@ -234,6 +234,24 @@ export class FinanceService {
     return this.httpClient.get<any[]>(`${this.apiUrl}Finance/InventoryCategoryList`);
   }
 
+  getPaymentListByCategory(categoryId: string, startDate: string, endDate: string): Observable<any> {
+    const params = new HttpParams()
+      .set('categoryId', categoryId)
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+    return this.httpClient.get<any>(`${this.apiUrl}Finance/PaymentListByCategory`, { params })
+      .pipe(catchError(this.errorHandle));
+  }
+
+  getBranchPaymentsTotalAmountByCategory(categoryId: string, startDate: string, endDate: string): Observable<any> {
+    const params = new HttpParams()
+      .set('categoryId', categoryId)
+      .set('startDate', startDate)
+      .set('endDate', endDate);
+    return this.httpClient.get<any>(`${this.apiUrl}Finance/BranchPaymentsTotalAmountByCategory`, { params })
+      .pipe(catchError(this.errorHandle));
+  }
+
   getDeletedPayments(paymentDate: string): Observable<any[]> {
     return this.httpClient.get<any[]>(`${this.apiUrl}Finance/PaymentRecycleBin`, {
       params: new HttpParams().set('paymentDate', paymentDate)
