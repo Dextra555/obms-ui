@@ -1773,34 +1773,29 @@ export class NewAttendanceComponent implements OnInit {
       }
     }
 
-    // Get allowed leave values from form
-    const annualAllowed = this.attendanceForm.get('Annual')?.value;
-    const medicalAllowed = this.attendanceForm.get('Medical')?.value;
-    const maternityAllowed = this.attendanceForm.get('Maternity')?.value;
-    const paternityAllowed = this.attendanceForm.get('Paternity')?.value;
-    const hospitalizationAllowed = this.attendanceForm.get('Hospitalization')?.value;
+    // // Get allowed leave values from form
+    // const medicalAllowed = this.attendanceForm.get('Medical')?.value;
+    // const maternityAllowed = this.attendanceForm.get('Maternity')?.value;
+    // const paternityAllowed = this.attendanceForm.get('Paternity')?.value;
+    // const hospitalizationAllowed = this.attendanceForm.get('Hospitalization')?.value;
 
-    // Check if taken leaves exceed allowed limits
-    if (this.iAnnualLeave > annualAllowed) {
-      this.showMessage('Annual Leave exceeds allowed limit.', 'warning', 'Warning Message');
-      return;
-    }
-    if (this.iMedicalLeave > medicalAllowed) {
-      this.showMessage('Medical Leave exceeds allowed limit.', 'warning', 'Warning Message');
-      return;
-    }
-    if (this.iMaternityLeave > maternityAllowed) {
-      this.showMessage('Maternity Leave exceeds allowed limit.', 'warning', 'Warning Message');
-      return;
-    }
-    if (this.iPaternityLeave > paternityAllowed) {
-      this.showMessage('Paternity Leave exceeds allowed limit.', 'warning', 'Warning Message');
-      return;
-    }
-    if (this.iHospitalizationLeave > hospitalizationAllowed) {
-      this.showMessage('Hospitalization Leave exceeds allowed limit.', 'warning', 'Warning Message');
-      return;
-    }
+    // // Check if taken leaves exceed allowed limits
+    // if (this.iMedicalLeave > medicalAllowed) {
+    //   this.showMessage('Medical Leave exceeds allowed limit.', 'warning', 'Warning Message');
+    //   return;
+    // }
+    // if (this.iMaternityLeave > maternityAllowed) {
+    //   this.showMessage('Maternity Leave exceeds allowed limit.', 'warning', 'Warning Message');
+    //   return;
+    // }
+    // if (this.iPaternityLeave > paternityAllowed) {
+    //   this.showMessage('Paternity Leave exceeds allowed limit.', 'warning', 'Warning Message');
+    //   return;
+    // }
+    // if (this.iHospitalizationLeave > hospitalizationAllowed) {
+    //   this.showMessage('Hospitalization Leave exceeds allowed limit.', 'warning', 'Warning Message');
+    //   return;
+    // }
     let dtAdvanceDate = this.attendanceForm.value.AdvanceDate;
     this.dtAdvanceDate = this.formatDate(
       new Date(dtAdvanceDate.getFullYear(), dtAdvanceDate.getMonth() + 1, 0)
