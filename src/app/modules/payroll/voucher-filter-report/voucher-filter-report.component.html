@@ -1,0 +1,174 @@
+<div class="wlt-c-furg-content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                <h1 class="md-1">Voucher Filter Report</h1>
+            </div><!-- /.col -->
+            <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
+                <ol class="breadcrumb float-md-right">
+                    <li class="breadcrumb-item"><a routerLink="/dashboard">Master</a></li>
+                    <li class="breadcrumb-item">Voucher Filter Report</li>
+                </ol>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<!-- Step 1: Filter Form -->
+<mat-card *ngIf="!showVoucherReport">
+    <mat-card-content>
+        <form [formGroup]="voucherFilterForm">
+            <div class="row" *ngIf="warningMessage ===''">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-2">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Voucher Period</mat-label>
+                        <div style="display: flex; align-items: center;">
+                            <input matInput [matDatepicker]="picker" formControlName="VoucherPeriod"
+                                [value]="formatPeriod(voucherFilterForm.value.VoucherPeriod)">
+                            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        </div>
+                        <mat-hint>MM/YYYY</mat-hint>
+                        <mat-datepicker #picker startView="year"
+                            (monthSelected)="chosenMonthHandler($event, picker)"></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Branch Code</mat-label>
+                        <mat-select formControlName="BranchCode">
+                            <mat-option value=""></mat-option>
+                            <mat-option *ngFor="let branch of branchModel" [value]="branch.Code">
+                                {{ branch.Code }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-12 col-lg-4" *ngIf="errorMessage !==''">
+                    <mat-label style="color:red">{{errorMessage}}</mat-label>
+                </div>
+            </div>
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12" *ngIf="warningMessage ===''">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-8">
+                        <mat-label class="mr-3"><strong>Employee Type</strong></mat-label>
+                        <br />
+                        <mat-radio-group aria-label="Select a Type" formControlName="EmployeeType">
+                            <mat-radio-button value="Guard">Guard</mat-radio-button>
+                            <mat-radio-button value="Staff">Staff</mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12" *ngIf="warningMessage ===''">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-8">
+                        <mat-label class="mr-3"><strong>Voucher Type</strong></mat-label>
+                        <br />
+                        <mat-radio-group aria-label="Select Voucher Type" formControlName="VoucherType"
+                            (change)="voucherTypeSelectionChange($event)">
+                            <mat-radio-button value="DailyAdvance">Daily Advance Voucher</mat-radio-button>
+                            <mat-radio-button value="Loan">Loan Voucher</mat-radio-button>
+                            <mat-radio-button value="UniformLoan">Uniform Loan Voucher</mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12" *ngIf="warningMessage ===''">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                        <mat-label class="mr-3"><strong>Payment Mode</strong></mat-label>
+                        <br />
+                        <mat-radio-group aria-label="Select Payment Mode" formControlName="PaymentType">
+                            <mat-radio-button value="Bank">Bank</mat-radio-button>
+                            <mat-radio-button value="Cash">Cash</mat-radio-button>
+                            <mat-radio-button value="Cheque">Cheque</mat-radio-button>
+                            <mat-radio-button value="All">All</mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                        <div class="text-right">
+                            <button class="btn wlt-c-furg-btn-primary" [disabled]="voucherFilterForm.invalid"
+                                (click)="searchVouchers()">Search Vouchers</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" *ngIf="voucherFilterForm.get('PaymentType')?.value === 'Bank'">
+                <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Bank</mat-label>
+                        <mat-select formControlName="BankCode">
+                            <mat-option [value]="">-- Select Bank --</mat-option>
+                            <mat-option *ngFor="let bank of bankList" [value]="bank.BankCode">
+                                {{ bank.BankCode }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </form>
+        <br />
+        <div *ngIf="warningMessage !==''">
+            <mat-label style="color:red" [innerHTML]="warningMessage"></mat-label>
+        </div>
+        <div *ngIf="errorMessage !==''">
+            <mat-label style="color:red" [innerHTML]="errorMessage"></mat-label>
+        </div>
+    </mat-card-content>
+</mat-card>
+
+<!-- Step 2: Voucher List -->
+<mat-card *ngIf="showVoucherList && voucherList.length > 0">
+    <mat-card-content>
+        <h3 class="mb-3">Voucher List</h3>
+        <button class="btn btn-secondary mb-3" (click)="backToFilter()">Back to Filter</button>
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>Voucher No</th>
+                    <th>Date</th>
+                    <th>Employee</th>
+                    <th>Amount</th>
+                    <th>Payment Type</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let voucher of voucherList">
+                    <td>{{ voucher.VoucherNo }}</td>
+                    <td>{{ voucher.Date | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ voucher.EmployeeName }}</td>
+                    <td>{{ voucher.Amount }}</td>
+                    <td>{{ voucher.PaymentType }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" (click)="viewVoucher(voucher.ID)">View Voucher</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="showVoucherList && voucherList.length === 0">
+    <mat-card-content>
+        <p class="text-center">No vouchers found matching the criteria.</p>
+        <button class="btn btn-secondary" (click)="backToFilter()">Back to Filter</button>
+    </mat-card-content>
+</mat-card>
+
+<!-- Step 3: Individual Voucher Report -->
+<mat-card *ngIf="showVoucherReport">
+    <mat-card-content>
+        <button class="btn btn-secondary mb-3" (click)="backToList()">Back to List</button>
+        <iframe width="1200px" height="1200px" #myFrame [src]="urlSafe"></iframe>
+    </mat-card-content>
+</mat-card>
+
+<!-- model pop up for logic started -->
+<div [style.display]="showLoadingSpinner ? 'block' : 'none'"
+    style="margin-top: -10.5rem; display: block; margin-left: -6.5rem;">
+    <div class="d-flex justify-content-center">
+        <span class="loader"></span>
+    </div>
+</div>
+<!-- model pop up for logic ended -->
