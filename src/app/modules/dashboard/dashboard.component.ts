@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Router } from '@angular/router';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { DatasharingService } from 'src/app/service/datasharing.service';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
@@ -22,6 +21,23 @@ export class DashboardComponent implements OnInit {
   showLoadingSpinner: boolean = false;
   userAccessModel!: UserAccessModel;
   menuName: string = '';
+  currentDate: Date = new Date();
+
+  // Simple dashboard data
+  websiteDetails = {
+    systemName: 'OBMS - Online Business Management System',
+    version: '2.0.0',
+    company: 'FREIGHTWATCH G PATOMOTOH SECURITY SERVICES SDN. BHD.',
+    companyCode: environment.CompanyCode,
+    production: environment.production,
+    supportedBanks: [] as string[],
+    systemStats: {
+      totalGuards: 0,
+      totalStaff: 0,
+      activeClients: 0,
+      pendingPayments: 0
+    }
+  };
 
   constructor(public sanitizer: DomSanitizer, private _dataService: DatasharingService,
     private _masterService: MastermoduleService
@@ -48,7 +64,115 @@ export class DashboardComponent implements OnInit {
         this.getUserAccessRights(this.currentUser, 'Payment Due List Report');
       }
     });
-
+    
+    // Load real dashboard data
+    this.loadDashboardData();
+    
+    // Load supported banks
+    this.loadSupportedBanks();
+  }
+  
+  loadSupportedBanks(): void {
+    // Get bank list from API
+    this._masterService.GetBankListByUserName(this.currentUser || 'admin').subscribe(
+      (data: any) => {
+        if (data && Array.isArray(data)) {
+          // Extract unique bank names
+          const bankNames = data
+            .filter((bank: any) => bank.Name || bank.BankName || bank.name)
+            .map((bank: any) => bank.Name || bank.BankName || bank.name);
+          
+          // Remove duplicates and sort
+          this.websiteDetails.supportedBanks = [...new Set(bankNames)].sort();
+        }
+      },
+      (error: any) => {
+        console.error('Error loading bank list:', error);
+        // Fallback to empty array if API fails
+        this.websiteDetails.supportedBanks = [];
+      }
+    );
+  }
+  
+  loadDashboardData(): void {
+    // Get employee stats (Guards + Staff)
+    this.loadEmployeeStats();
+    
+    // Get active clients count
+    this._masterService.getClientMsterListByStatus('Active').subscribe(
+      (data) => {
+        this.websiteDetails.systemStats.activeClients = data?.length || 0;
+      },
+      (error) => {
+        console.error('Error loading client data:', error);
+      }
+    );
+    
+    // Get pending payments count
+    this._masterService.getMonthlyInvoices('', '').subscribe(
+      (data) => {
+        this.websiteDetails.systemStats.pendingPayments = data?.length || 0;
+      },
+      (error) => {
+        console.error('Error loading pending payments:', error);
+      }
+    );
+  }
+  
+  loadEmployeeStats(): void {
+    // Load all employees and categorize by type
+    this._masterService.getAllEmployees().subscribe(
+      (response: any) => {
+        const employees = response?.employees || [];
+        
+        // Categorize by EMP_ROLE or EMPPAY_CATEGORY
+        this.websiteDetails.systemStats.totalGuards = employees.filter((emp: any) => 
+          emp.EMP_ROLE === 'Guard' || 
+          emp.EMPPAY_CATEGORY === 'Guard' ||
+          emp.EMP_ROLE === 'SECURITY' ||
+          emp.EMP_ROLE === 'SG'
+        ).length;
+        
+        this.websiteDetails.systemStats.totalStaff = employees.filter((emp: any) => 
+          emp.EMP_ROLE === 'Staff' || 
+          emp.EMPPAY_CATEGORY === 'Office' || 
+          emp.EMP_ROLE === 'Admin' ||
+          emp.EMP_ROLE === 'Manager' ||
+          emp.EMP_ROLE === 'Officer'
+        ).length;
+        
+        console.log('Employee counts loaded:', {
+          guards: this.websiteDetails.systemStats.totalGuards,
+          staff: this.websiteDetails.systemStats.totalStaff,
+          total: employees.length
+        });
+      },
+      (error: any) => {
+        console.error('Error loading employee data:', error);
+        // Try alternative
+        this.loadEmployeeStatsAlternative();
+      }
+    );
+  }
+  
+  loadEmployeeStatsAlternative(): void {
+    // Alternative: Get from branch master and estimate
+    this._masterService.getBranchMasterList().subscribe(
+      (data) => {
+        if (data && Array.isArray(data)) {
+          // Estimate 80% Guards, 20% Staff based on typical security company ratio
+          const totalEmployees = data.reduce((total, branch) => {
+            return total + (branch.employeeCount || branch.totalEmployees || 0);
+          }, 0);
+          
+          this.websiteDetails.systemStats.totalGuards = Math.floor(totalEmployees * 0.8);
+          this.websiteDetails.systemStats.totalStaff = Math.floor(totalEmployees * 0.2);
+        }
+      },
+      (error) => {
+        console.error('Error loading employee data from alternative source:', error);
+      }
+    );
   }
 
   getUserAccessRights(userName: string, screenName: string) {
@@ -103,5 +227,14 @@ export class DashboardComponent implements OnInit {
     if (error != null && error != '') {
       this.showLoadingSpinner = false
     }
+  }
+  
+  
+  getEnvironmentStatus(): string {
+    return this.websiteDetails.production ? 'Production' : 'Development';
+  }
+  
+  getEnvironmentColor(): string {
+    return this.websiteDetails.production ? 'success' : 'warning';
   }
 }

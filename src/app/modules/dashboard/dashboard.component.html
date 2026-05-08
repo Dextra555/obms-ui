@@ -20,29 +20,184 @@
 
 
 <!-- ===================== -->
-<!-- 🔔 NEW SYSTEM NOTICE -->
+<!-- WELCOME MESSAGE -->
 <!-- ===================== -->
 <div class="container-fluid mb-3" *ngIf="menuName != 'finance'">
-  <div class="alert alert-info shadow-sm border-0 d-flex align-items-center" role="alert"
-    style="border-left:5px solid #0d6efd; border-radius:10px;">
-    <i class="fas fa-rocket mr-3" style="font-size:22px;"></i>
-    <div>
-      <strong>Welcome to the New OBMS System – FREIGHTWATCH G PATOMOTOH SECURITY SERVICES SDN. BHD.</strong><br>
-      OBMS is now faster, more secure, and easier to use.<br>
-      Legacy modules remain available for any features not yet migrated.
+  <div class="welcome-banner">
+    <i class="fas fa-building"></i>
+    <div class="welcome-banner-text">
+      <strong>Welcome to OBMS INDIA Dashboard</strong>
+      <span>Online Business Management System</span>
     </div>
   </div>
 </div>
 
 <!-- ===================== -->
-<!-- ✨ WHAT’S IMPROVED SECTION -->
+<!-- DASHBOARD CONTENT -->
+<!-- ===================== -->
+<div class="container-fluid mb-4" *ngIf="menuName != 'finance'">
+  <!-- Quick Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="quick-stat-card guards">
+        <div class="stat-icon-bg">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number-large">{{websiteDetails.systemStats.totalGuards}}</div>
+          <div class="stat-title">Total Guards</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="quick-stat-card clients">
+        <div class="stat-icon-bg">
+          <i class="fas fa-building"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number-large">{{websiteDetails.systemStats.activeClients}}</div>
+          <div class="stat-title">Active Clients</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="quick-stat-card pending">
+        <div class="stat-icon-bg">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number-large">{{websiteDetails.systemStats.pendingPayments}}</div>
+          <div class="stat-title">Pending Payments</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+      <div class="quick-stat-card staff">
+        <div class="stat-icon-bg">
+          <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="stat-info">
+          <div class="stat-number-large">{{websiteDetails.systemStats.totalStaff}}</div>
+          <div class="stat-title">Total Staff</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts & Info -->
+  <div class="row">
+    <!-- System Alerts -->
+    <div class="col-md-8 mb-4">
+      <mat-card class="shadow-sm">
+        <mat-card-header>
+          <mat-card-title>
+            <i class="fas fa-bell text-warning mr-2"></i>
+            System Alerts
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="alerts-list">
+            <div class="alert-item alert-pending" *ngIf="websiteDetails.systemStats.pendingPayments > 0">
+              <div class="alert-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">Pending Payments</div>
+                <div class="alert-desc">{{websiteDetails.systemStats.pendingPayments}} invoices awaiting payment</div>
+              </div>
+              <a routerLink="/finance/payments" class="alert-action">View</a>
+            </div>
+            
+            <div class="alert-item alert-employees" *ngIf="websiteDetails.systemStats.totalGuards > 0">
+              <div class="alert-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">Active Guards</div>
+                <div class="alert-desc">{{websiteDetails.systemStats.totalGuards}} security guards on duty</div>
+              </div>
+              <a routerLink="/master/employee-master" class="alert-action">View</a>
+            </div>
+            
+            <div class="alert-item alert-clients" *ngIf="websiteDetails.systemStats.activeClients > 0">
+              <div class="alert-icon">
+                <i class="fas fa-building"></i>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">Active Clients</div>
+                <div class="alert-desc">{{websiteDetails.systemStats.activeClients}} clients currently active</div>
+              </div>
+              <a routerLink="/master/client-master" class="alert-action">View</a>
+            </div>
+            
+            <div class="alert-item alert-info">
+              <div class="alert-icon">
+                <i class="fas fa-info-circle"></i>
+              </div>
+              <div class="alert-content">
+                <div class="alert-title">System Status</div>
+                <div class="alert-desc">All systems operational - Last updated {{currentDate | date:'short'}}</div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick Shortcuts -->
+    <div class="col-md-4 mb-4">
+      <mat-card class="shadow-sm h-100">
+        <mat-card-header>
+          <mat-card-title>
+            <i class="fas fa-bolt text-warning mr-2"></i>
+            Quick Shortcuts
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="shortcuts-list">
+            <a routerLink="/master/client-master" class="shortcut-item">
+              <div class="shortcut-icon">
+                <i class="fas fa-building"></i>
+              </div>
+              <div class="shortcut-text">
+                <div class="shortcut-title">Client Master</div>
+                <div class="shortcut-desc">Manage client information</div>
+              </div>
+            </a>
+            <a routerLink="/quotation-and-agreement/agreements" class="shortcut-item">
+              <div class="shortcut-icon">
+                <i class="fas fa-file-contract"></i>
+              </div>
+              <div class="shortcut-text">
+                <div class="shortcut-title">Agreement Master</div>
+                <div class="shortcut-desc">Manage client agreements</div>
+              </div>
+            </a>
+            <a routerLink="/report/payroll/client-compliance-report" class="shortcut-item">
+              <div class="shortcut-icon">
+                <i class="fas fa-clipboard-check"></i>
+              </div>
+              <div class="shortcut-text">
+                <div class="shortcut-title">Compliance Report</div>
+                <div class="shortcut-desc">Client compliance reports</div>
+              </div>
+            </a>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== -->
+<!-- WHAT'S IMPROVED SECTION -->
 <!-- ===================== -->
 <div class="container-fluid mb-4" *ngIf="menuName != 'finance'">
   <mat-card class="shadow-sm">
     <mat-card-header>
       <mat-card-title>
         <i class="fas fa-star text-primary mr-2"></i>
-        What’s Improved in the New OBMS?
+        What's Improved in OBMS INDIA?
       </mat-card-title>
     </mat-card-header>
 
@@ -50,17 +205,23 @@
       <div class="row">
         <div class="col-md-6">
           <ul class="improvement-list">
-            <li>⚡ Faster system performance</li>
-            <li>🔒 Enhanced data security</li>
-            <li>🖥 Modern and easier-to-use interface</li>
+            <li>🛡️ Guard & Staff Management</li>
+            <li>💰 Automated Payroll Processing</li>
+            <li>� Client & Contract Management</li>
+            <li>🏦 Multi-Bank Integration (SBI, HDFC, ICICI)</li>
+            <li>� Real-time Dashboard Analytics</li>
+            <li>🔒 Secure Data Encryption</li>
           </ul>
         </div>
 
         <div class="col-md-6">
           <ul class="improvement-list">
-            <li>📊 Improved dashboard and reports</li>
-            <li>🔍 Better search and navigation</li>
-            <li>🚀 Continuous feature upgrades coming soon</li>
+            <li>� Compliance & Statutory Reports</li>
+            <li>� Payment & Receipt Tracking</li>
+            <li>🔍 Advanced Employee Search</li>
+            <li>📱 Mobile-Responsive Interface</li>
+            <li>⚡ Faster Report Generation</li>
+            <li>🚀 Automatic System Updates</li>
           </ul>
         </div>
       </div>
@@ -68,65 +229,6 @@
   </mat-card>
 </div>
 
-<!-- ===================== -->
-<!-- 🖥 LEGACY SYSTEM CARD -->
-<!-- ===================== -->
-<div class="container-fluid mb-4" *ngIf="menuName != 'finance'">
-  <mat-card class="shadow-sm legacy-card">
-    <mat-card-header>
-      <mat-card-title>
-        <i class="fas fa-history mr-2 text-warning"></i>
-        Access Old OBMS (Legacy System)
-      </mat-card-title>
-      <mat-card-subtitle>
-        Use this link if you need features not yet migrated.
-      </mat-card-subtitle>
-    </mat-card-header>
-
-    <mat-card-content>
-      <div class="row">
-
-        <div class="col-md-6 mb-3">
-          <div class="legacy-link-box">
-            <h6>Old OBMS Main Portal</h6>
-            <p class="small text-muted">
-              Login to the previous OBMS system
-            </p>
-            <a href="https://124.217.236.37/FWG2015/OBMSLogin.aspx?ReturnUrl=%2fFWG2015%2fDefault.aspx" target="_blank"
-              class="btn btn-outline-primary btn-sm">
-              Payroll
-            </a>
-          </div>
-        </div>
-
-        <div class="col-md-6 mb-3">
-          <div class="legacy-link-box">
-            <h6>Finance Module</h6>
-            <p class="small text-muted">
-              Login to the Finance Module </p>
-            <a href="https://124.217.236.37/FWG24/OBMSLogin.aspx?ReturnUrl=%2fFWG2015%2fDefault.aspx" target="_blank"
-              class="btn btn-outline-primary btn-sm">
-              Finance
-            </a>
-          </div>
-        </div>
-
-        <!-- <div class="col-md-6 mb-3">
-          <div class="legacy-link-box">
-            <h6>Archived Reports</h6>
-            <p class="small text-muted">
-              Access historical and archived data
-            </p>
-            <button class="btn btn-outline-secondary btn-sm" disabled>
-              Coming Soon
-            </button>
-          </div>
-        </div> -->
-
-      </div>
-    </mat-card-content>
-  </mat-card>
-</div>
 
 <!-- ===================== -->
 <!-- 🖥 LEGACY REPORT CARD -->

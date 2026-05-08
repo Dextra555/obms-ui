@@ -101,9 +101,24 @@ export class MastermoduleService {
     ).pipe(catchError(this.errorHandle));
   }
 
+  getClientMsterListForAttendance(): Observable<any> {
+    return this.httpClient.get<any[]>(this.apiUrl + 'master/GetClientMsterListForAttendance'
+    ).pipe(catchError(this.errorHandle));
+  }
+
   getClientMsterListByBranch(branchCode: string): Observable<any> {
     const params = { params: new HttpParams({ fromString: "?branchCode=" + branchCode }) };
     return this.httpClient.get<any[]>(this.apiUrl + 'master/GetClientMsterListByBranch', params
+    ).pipe(catchError(this.errorHandle));
+  }
+
+  getClientMasterListByComplianceStatus(branchCode: string, status: string): Observable<any> {
+    const params = { 
+      params: new HttpParams({ 
+        fromString: "?branchCode=" + branchCode + "&status=" + status 
+      }) 
+    };
+    return this.httpClient.get<any[]>(this.apiUrl + 'master/GetClientMasterListByComplianceStatus', params
     ).pipe(catchError(this.errorHandle));
   }
 
@@ -580,6 +595,40 @@ export class MastermoduleService {
   deleteInvoiceFormatById(id: number): Observable<any> {
     const params = { params: new HttpParams({ fromString: "?Id=" + id }) };
     return this.httpClient.delete(`${this.apiUrl}master/deleteInvoiceFormatById`, params).pipe(catchError(this.errorHandle));
+  }
+
+  // Server Status and Dashboard Methods
+  getServerStatus(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}dashboard/server-status`).pipe(catchError(this.errorHandle));
+  }
+
+  getSystemMetrics(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}dashboard/system-metrics`).pipe(catchError(this.errorHandle));
+  }
+
+  getLiveDashboardData(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}dashboard/live-data`).pipe(catchError(this.errorHandle));
+  }
+
+  getDatabaseStatus(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}dashboard/database-status`).pipe(catchError(this.errorHandle));
+  }
+
+  getActiveUsersCount(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}dashboard/active-users`).pipe(catchError(this.errorHandle));
+  }
+
+  // Employee count methods for Dashboard
+  getAllEmployees(): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}Employee/Employees`, {
+      params: { name: 'none' }
+    }).pipe(catchError(this.errorHandle));
+  }
+
+  getEmployeeCountByBranch(branchId: string): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}Employee/EmployeeNoByBranchID`, {
+      params: { branchId }
+    }).pipe(catchError(this.errorHandle));
   }
 
   //to handle got any error from server response
