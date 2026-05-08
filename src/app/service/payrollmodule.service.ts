@@ -1231,6 +1231,30 @@ export class PayrollModuleService {
 
   }
 
+  getVoucherDetailsByFilter(branch: string, period: string, employeeType: string, bankCode: string, paymentType: string, voucherType: string): Observable<any[]> {
+
+    let params = new HttpParams()
+
+      .set('branch', branch)
+
+      .set('period', period)
+
+      .set('employeeType', employeeType)
+
+      .set('bankCode', bankCode)
+
+      .set('paymentType', paymentType)
+
+      .set('voucherType', voucherType);
+
+
+
+    return this.httpClient.get<any[]>(`${this.apiUrl}payroll/GetVoucherDetailsByFilter`, { params })
+
+      .pipe(catchError(this.errorHandle));
+
+  }
+
   getLatestAttendancePeriod(employeeId: number, year: number, month: number): Observable<string> {
 
     return this.httpClient.get<string>(

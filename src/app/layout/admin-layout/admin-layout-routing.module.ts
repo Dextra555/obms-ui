@@ -128,6 +128,7 @@ import { SearchPaymentsComponent } from 'src/app/modules/finance/payments/search
 import { UniformLoanReportComponent } from 'src/app/modules/payroll/employee-uniform-loan/uniform-loan-report/uniform-loan-report.component';
 import { DailyAdvanceVoucherReportComponent } from 'src/app/modules/payroll/new-employee-daily-advance/daily-advance-voucher-report/daily-advance-voucher-report.component';
 import { LoanVoucherReportComponent } from 'src/app/modules/payroll/employee-loan/loan-voucher-report/loan-voucher-report.component';
+import { VoucherFilterReportComponent } from 'src/app/modules/payroll/voucher-filter-report/voucher-filter-report.component';
 import { AccountingProfitAndLossComponent } from 'src/app/modules/report/accounting/accounting-profit-and-loss/accounting-profit-and-loss.component';
 import { BalanceSheetReportComponent } from 'src/app/modules/report/accounting/balance-sheet-report/balance-sheet-report.component';
 import { TrailBalanceReportComponent } from 'src/app/modules/report/accounting/trail-balance-report/trail-balance-report.component';
@@ -238,6 +239,7 @@ const routes: Routes = [
   { path: 'payroll/loan-voucher-report', component: LoanVoucherReportComponent, canActivate: [AuthGuard] },
   { path: 'payroll/new-employee-uniform-loan', component: NewEmployeeUniformLoanComponent, canActivate: [AuthGuard] },
   { path: 'payroll/uniform-loan-report', component: UniformLoanReportComponent, canActivate: [AuthGuard] },
+  { path: 'payroll/voucher-filter-report', component: VoucherFilterReportComponent, canActivate: [AuthGuard] },
   { path: 'payroll/misc-transactions', component: MiscTransctionsComponent, canActivate: [AuthGuard] },
   { path: 'payroll/new-misc-transactions', component: NewMiscTransactionsComponent, canActivate: [AuthGuard] },
   { path: 'payroll/new-attendance', component: NewAttendanceComponent, canActivate: [AuthGuard] },

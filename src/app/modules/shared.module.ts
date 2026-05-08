@@ -194,6 +194,7 @@ import { PrintIndianInvoiceComponent } from './report/finance/print-indian-invoi
 import { UniformLoanReportComponent } from './payroll/employee-uniform-loan/uniform-loan-report/uniform-loan-report.component';
 import { DailyAdvanceVoucherReportComponent } from './payroll/new-employee-daily-advance/daily-advance-voucher-report/daily-advance-voucher-report.component';
 import { LoanVoucherReportComponent } from './payroll/employee-loan/loan-voucher-report/loan-voucher-report.component';
+import { VoucherFilterReportComponent } from './payroll/voucher-filter-report/voucher-filter-report.component';
 import { AccountingProfitAndLossComponent } from './report/accounting/accounting-profit-and-loss/accounting-profit-and-loss.component';
 import { BalanceSheetReportComponent } from './report/accounting/balance-sheet-report/balance-sheet-report.component';
 import { TrailBalanceReportComponent } from './report/accounting/trail-balance-report/trail-balance-report.component';
@@ -368,7 +369,8 @@ import { DesignationMasterComponent } from './master/designation-master/designat
     CommercialBreakdownEnhancedDialogComponent,
     EmployeeImportDialogComponent,
     DepartmentMasterComponent,
-    DesignationMasterComponent
+    DesignationMasterComponent,
+    VoucherFilterReportComponent
 
   ],
   imports: [
