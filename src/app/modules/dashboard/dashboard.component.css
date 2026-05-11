@@ -123,6 +123,10 @@
   border-left-color: #17a2b8;
 }
 
+.quick-stat-card.agreement {
+  border-left-color: #e53e3e;
+}
+
 .stat-icon-bg {
   width: 60px;
   height: 60px;
@@ -149,6 +153,10 @@
 
 .staff .stat-icon-bg {
   background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+.agreement .stat-icon-bg {
+  background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
 }
 
 .stat-info {

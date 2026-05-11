@@ -35,7 +35,8 @@ export class DashboardComponent implements OnInit {
       totalGuards: 0,
       totalStaff: 0,
       activeClients: 0,
-      pendingPayments: 0
+      pendingPayments: 0,
+      agreementsPostedThisMonth: 0
     }
   };
 
@@ -115,6 +116,16 @@ export class DashboardComponent implements OnInit {
       },
       (error) => {
         console.error('Error loading pending payments:', error);
+      }
+    );
+
+    // Get agreements posted this month
+    this._masterService.getAgreementsPostedThisMonth().subscribe(
+      (count) => {
+        this.websiteDetails.systemStats.agreementsPostedThisMonth = count || 0;
+      },
+      (error) => {
+        console.error('Error loading agreements posted this month:', error);
       }
     );
   }

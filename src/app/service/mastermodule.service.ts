@@ -631,6 +631,12 @@ export class MastermoduleService {
     }).pipe(catchError(this.errorHandle));
   }
 
+  // Agreement methods for Dashboard
+  getAgreementsPostedThisMonth(): Observable<number> {
+    return this.httpClient.get<number>(`${this.apiUrl}Agreement/GetAgreementsPostedThisMonth`)
+      .pipe(catchError(this.errorHandle));
+  }
+
   //to handle got any error from server response
   private errorHandle(error: HttpErrorResponse) {
     let errorMessage: string = '';
