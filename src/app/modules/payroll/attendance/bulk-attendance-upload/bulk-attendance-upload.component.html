@@ -1,0 +1,224 @@
+<div class="wlt-c-furg-content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <h1 class="mb-1">Bulk Attendance Upload </h1>
+      </div><!-- /.col -->
+      <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
+        <ol class="breadcrumb float-md-right">
+          <li class="breadcrumb-item"><a routerLink="/dashboard">Master</a></li>
+          <li class="breadcrumb-item"><a routerLink="/payroll/new-attendance">Payroll</a></li>
+          <li class="breadcrumb-item active">Bulk Attendance Upload</li>
+        </ol>
+      </div><!-- /.col -->
+    </div><!-- /.row -->
+  </div><!-- /.container-fluid -->
+</div>
+
+<!-- Attendance Codes Reference Card -->
+<mat-card class="codes-reference-card">
+  <mat-card-content>
+    <h3>Attendance Codes Reference</h3>
+    <div class="codes-grid">
+      <div class="code-item" *ngFor="let code of attendanceCodes">
+        <span class="code-badge" [ngClass]="'color-' + getAttendanceCodeColor(code)">{{ code }}</span>
+        <span class="code-description">{{ getAttendanceCodeDescription(code) }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-content>
+    <form [formGroup]="uploadForm">
+      <div class="row" *ngIf="errorMessage !==''">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+          <mat-label style="color:red">{{errorMessage}}</mat-label>
+        </div>
+      </div>
+
+      <!-- Period and Branch Selection -->
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Attendance Period</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="period">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-hint>Select month/year for attendance</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Branch</mat-label>
+            <mat-select formControlName="branchCode">
+              <mat-option value="">Select Branch</mat-option>
+              <mat-option *ngFor="let branch of branches" [value]="branch.Code">
+                {{ branch.Name }}
+              </mat-option>
+            </mat-select>
+            <mat-hint>Select branch for attendance</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+          <div class="action-buttons">
+            <button mat-raised-button color="primary" (click)="downloadTemplate()" [disabled]="uploadForm.invalid">
+              <mat-icon>download</mat-icon>
+              Download Template
+            </button>
+
+            <button mat-raised-button color="accent" (click)="showInstructions()">
+              <mat-icon>help_outline</mat-icon>
+              Instructions
+            </button>
+
+            <button mat-raised-button (click)="clearForm()">
+              <mat-icon>refresh</mat-icon>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <mat-card class="upload-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>cloud_upload</mat-icon>
+              Upload Attendance File
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="file-drop-area" (click)="triggerFileInput()">
+              <mat-icon class="upload-icon">cloud_upload</mat-icon>
+              <h3>Click to browse or drop Excel file here</h3>
+              <p>Supported format: .xlsx (Max size: 10MB)</p>
+              <p class="info-text">File must be generated from the template</p>
+              <input type="file" id="fileInput" class="file-input" accept=".xlsx" (change)="onFileSelected($event)">
+            </div>
+
+            <div *ngIf="selectedFile" class="selected-file">
+              <mat-icon>description</mat-icon>
+              <div class="file-info">
+                <span class="file-name">{{ selectedFile.name }}</span>
+                <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+              </div>
+              <button mat-icon-button (click)="clearForm()" class="clear-btn" color="warn">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+
+            <div class="upload-actions">
+              <button mat-raised-button color="primary" (click)="uploadFile()" [disabled]="!selectedFile || isUploading"
+                class="upload-btn">
+                <mat-icon *ngIf="!isUploading">upload</mat-icon>
+                <mat-progress-spinner *ngIf="isUploading" diameter="20" mode="indeterminate">
+                </mat-progress-spinner>
+                {{ isUploading ? 'Processing...' : 'Upload File' }}
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Results Section -->
+      <div *ngIf="uploadResult" class="results-section mt-4">
+        <mat-card class="results-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon [color]="uploadResult.success ? 'primary' : 'warn'">
+                {{ uploadResult.success ? 'check_circle' : 'error' }}
+              </mat-icon>
+              Upload Results
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <!-- Summary -->
+            <div class="summary-section">
+              <div class="summary-item">
+                <span class="label">Total Records:</span>
+                <span class="value">{{ uploadResult.totalRecords }}</span>
+              </div>
+              <div class="summary-item success">
+                <span class="label">Successful:</span>
+                <span class="value">{{ uploadResult.successfulRecords }}</span>
+              </div>
+              <div class="summary-item error">
+                <span class="label">Failed:</span>
+                <span class="value">{{ uploadResult.failedRecords }}</span>
+              </div>
+              <div class="summary-item info">
+                <span class="label">Message:</span>
+                <span class="value">{{ uploadResult.message }}</span>
+              </div>
+            </div>
+
+            <!-- Failed Records -->
+            <div *ngIf="uploadResult.failedRecords > 0" class="failed-records mt-4">
+              <h4 mat-subheader>Failed Records</h4>
+              <mat-table [dataSource]="uploadResult.errors" class="error-table">
+                <ng-container matColumnDef="rowNumber">
+                  <mat-header-cell *matHeaderCellDef>Row</mat-header-cell>
+                  <mat-cell *matCellDef="let error">{{ error.rowNumber }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="employeeCode">
+                  <mat-header-cell *matHeaderCellDef>Employee Code</mat-header-cell>
+                  <mat-cell *matCellDef="let error">{{ error.employeeCode }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="employeeName">
+                  <mat-header-cell *matHeaderCellDef>Employee Name</mat-header-cell>
+                  <mat-cell *matCellDef="let error">{{ error.employeeName }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="errorMessage">
+                  <mat-header-cell *matHeaderCellDef>Error</mat-header-cell>
+                  <mat-cell *matCellDef="let error" class="error-message">{{ error.errorMessage }}</mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="errorDisplayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: errorDisplayedColumns;"></mat-row>
+              </mat-table>
+            </div>
+
+            <!-- Successful Records -->
+            <div *ngIf="uploadResult.successfulRecords > 0" class="successful-records mt-4">
+              <h4 mat-subheader>Successfully Uploaded</h4>
+              <mat-table [dataSource]="uploadResult.successRecords" class="success-table">
+                <ng-container matColumnDef="rowNumber">
+                  <mat-header-cell *matHeaderCellDef>Row</mat-header-cell>
+                  <mat-cell *matCellDef="let success">{{ success.rowNumber }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="employeeCode">
+                  <mat-header-cell *matHeaderCellDef>Employee Code</mat-header-cell>
+                  <mat-cell *matCellDef="let success">{{ success.employeeCode }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="employeeName">
+                  <mat-header-cell *matHeaderCellDef>Employee Name</mat-header-cell>
+                  <mat-cell *matCellDef="let success">{{ success.employeeName }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="attendanceID">
+                  <mat-header-cell *matHeaderCellDef>Attendance ID</mat-header-cell>
+                  <mat-cell *matCellDef="let success">{{ success.attendanceID }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="message">
+                  <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+                  <mat-cell *matCellDef="let success" class="success-message">{{ success.message }}</mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="successDisplayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: successDisplayedColumns;"></mat-row>
+              </mat-table>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>

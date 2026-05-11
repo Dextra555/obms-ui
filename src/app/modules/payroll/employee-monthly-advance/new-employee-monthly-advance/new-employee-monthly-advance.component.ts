@@ -4,12 +4,12 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { catchError, debounceTime, forkJoin, map, Observable, of, Subject, switchMap } from 'rxjs';
 import { BranchModel } from 'src/app/model/branchModel';
 import { EmployeeMonthlyAdvance } from 'src/app/model/employeeMonthlyAdvance';
 import { SalaryMonthlyAdvance } from 'src/app/model/salaryMonthlyAdvance';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
-import { INDIAN_RELIGIONS } from 'src/app/model/indian-employee.model';
+import { AgreementService } from 'src/app/modules/quotation-and-agreement/agreement.service';
 import { DatasharingService } from 'src/app/service/datasharing.service';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
 import { PayrollModuleService } from 'src/app/service/payrollmodule.service';
@@ -31,7 +31,6 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
   branchModel!: BranchModel[];
   employeeModel!: EmployeeMonthlyAdvance[];
   salaryMonthlyAdvance: SalaryMonthlyAdvance = new SalaryMonthlyAdvance();
-  religionsWithAll: string[] = ['All', ...INDIAN_RELIGIONS];
   minDate = new Date();
   year!: number;
   month!: number;
@@ -40,6 +39,14 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
   userAccessModel!: UserAccessModel;
   empId: number = 0;
   dtAdvanceDate!: string;
+  clientList: any;
+  branchSearchString: string = '';
+  clientSearchString: string = '';
+  filteredBranchList: any[] = [];
+  filteredClientList: any[] = [];
+  branchSearchSubject = new Subject<string>();
+  clientSearchSubject = new Subject<string>();
+
 
   private formatDate(date: any) {
     const d = new Date(date);
@@ -53,7 +60,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
 
 
   constructor(private fb: FormBuilder, public dialog: MatDialog, private _dataService: DatasharingService,
-    private _masterService: MastermoduleService, private _router: Router,
+    private _masterService: MastermoduleService, private _router: Router, public service: AgreementService,
     private _activatedRoute: ActivatedRoute, private _payrollService: PayrollModuleService) {
     this.employeeAdvanceForm = this.fb.group({
       ID: [0],
@@ -72,6 +79,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
       IsDeleted: [false],
       LastUpdate: [this.formatDate(new Date)],
       LastUpdatedBy: ['Admin'],
+      Client: ['']
     });
 
     this.salaryMonthlyAdvance.ID = 0;
@@ -97,6 +105,18 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Branch search debounce
+    this.branchSearchSubject.pipe(debounceTime(3000)).subscribe(() => {
+      this.branchSearchString = '';
+      this.branchModel = [...this.filteredBranchList];
+    });
+
+    // Client search debounce
+    this.clientSearchSubject.pipe(debounceTime(3000)).subscribe(() => {
+      this.clientSearchString = '';
+      this.clientList = [...this.filteredClientList];
+    });
+
     this.currentUser = sessionStorage.getItem('username')!;
     if (this.currentUser == null || this.currentUser == undefined) {
       this._dataService.getUsername().subscribe((username) => {
@@ -111,7 +131,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
     this._activatedRoute.queryParams.subscribe((params) => {
       if (params['id'] != undefined) {
         this.employeeAdvanceTitleStatus = 'edit';
-        this.getEmployeeListById(params['id']);
+        this.getEmployeeListById(params['empid'], params['id']);
       }
     });
     this.createForm();
@@ -153,12 +173,9 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
     );
   }
   addFormFieldsdata(data: any) {
-    console.log('[NewEmployeeMonthlyAdvance] addFormFieldsdata called with data:', data);
-    console.log('[NewEmployeeMonthlyAdvance] Data length:', data?.length);
     const formArray = this.dynamicForm.get('formArray') as FormArray;
     formArray.clear();
     for (let i = 0; i < data.length; i++) {
-      console.log(`[NewEmployeeMonthlyAdvance] Adding employee ${i}:`, data[i]);
       formArray.push(this.fb.group({
         ID: [data[i].ID],
         EMP_ID: [data[i].EMP_ID],
@@ -173,12 +190,12 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
         Particulars: [data[i].Particulars],
       }));
     }
-    console.log('[NewEmployeeMonthlyAdvance] FormArray length after adding:', formArray.length);
   }
   getBranchMasterList() {
     this._masterService.getBranchMaster('null').subscribe((responseData) => {
       if (responseData != null) {
         this.branchModel = responseData
+        this.filteredBranchList = [...this.branchModel];
       }
     },
       (error) => this.handleErrors(error)
@@ -199,82 +216,262 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
     this._masterService.GetBranchListByUserName(userName).subscribe(
       (data) => {
         this.branchModel = data
+        this.filteredBranchList = [...this.branchModel];
       },
       (error) => {
         this.handleErrors(error);
       }
     );
   }
+  // changeAdvanceDate(type: string, event: MatDatepickerInputEvent<Date>) {
+  //   this.employeeAdvanceForm.value.AdvanceDate = this.formatDate(`${type}: ${event.value}`);
+  //   const advanceDate = new Date(this.employeeAdvanceForm.get('AdvanceDate')?.value);
+  //   const selectedBranch = this.employeeAdvanceForm.get('BranchCode')?.value;
+  //   const client = this.employeeAdvanceForm.get('Client')?.value;
+  //   this.dtAdvanceDate = this.formatDate(advanceDate);
+  //   if (selectedBranch != null && selectedBranch != undefined && selectedBranch != ''
+  //     && client != null && client != undefined && client != ''
+  //   ) {
+  //     forkJoin({
+  //       employeeList: this._payrollService.getEmployeeAdvanceList(this.dtAdvanceDate, selectedBranch, this.employeeAdvanceForm.value.EmployeeType, client, 1, 0, this.employeeAdvanceForm.value.Race)
+  //     }).subscribe(
+  //       ({ employeeList }) => {
+  //         // Handle successful response
+  //         this.addFormFieldsdata(employeeList);
+  //         this.hideSpinner();
+  //       },
+  //       (error) => this.handleErrors(error) // Handle errors
+  //     );
+  //   }
+  //   if (selectedBranch != null && selectedBranch != undefined && selectedBranch != '') {
+  //     this.getEmployeeListByEmployeeType(this.dtAdvanceDate, selectedBranch, this.employeeAdvanceForm.value.EmployeeType, 1, 0, this.employeeAdvanceForm.value.Race)
+  //     this.getAdvanceVoucherNo(selectedBranch, '1');
+  //   }
+  // }
+  // onBranchSelectionChange(event: any) {
+  //   if (event.value != '' && event.value != undefined) {
+  //     const advanceDate = new Date(this.employeeAdvanceForm.get('AdvanceDate')?.value);
+  //     const selectedBranch = this.employeeAdvanceForm.get('BranchCode')?.value;
+  //     this.service.getClientsByBranchID(this.branchCode, this.currentUser!).subscribe({
+  //       next: (clientData: any) => {
+  //         this.clientList = clientData['clients'];
+  //       },
+  //       error: (err) => {
+  //         console.error('Error loading data:', err);
+  //       }
+  //     });
+  //     this.dtAdvanceDate = this.formatDate(advanceDate);
+  //     if (this.dtAdvanceDate != null && this.dtAdvanceDate != 'NaN-NaN-NaN' && selectedBranch != '') {
+  //       this.getEmployeeListByEmployeeType(this.dtAdvanceDate, selectedBranch, this.employeeAdvanceForm.value.EmployeeType, 1, 0, this.employeeAdvanceForm.value.Race)
+  //       this.getAdvanceVoucherNo(selectedBranch, '1');
+  //     } else {
+  //       this.employeeAdvanceForm.patchValue({
+  //         Race: 'All'
+  //       })
+  //     }
+  //   }else{
+  //     this.clearEmployeeAdvanceDetails();
+  //     this.clientList = [];
+  //   }
+  // }
+  // onClientChange(clientCode: any) {
+  //   if (clientCode != 0) {
+  //     const advanceDate = this.formatDate(this.employeeAdvanceForm.get('AdvanceDate')?.value);
+  //     const selectedBranch = this.employeeAdvanceForm.get('BranchCode')?.value;
+
+  //     forkJoin({
+  //       employeeList: this._payrollService.getEmployeeAdvanceList(advanceDate, selectedBranch, this.employeeAdvanceForm.value.EmployeeType, clientCode, 1, 0, this.employeeAdvanceForm.value.Race)
+  //     }).subscribe(
+  //       ({ employeeList }) => {
+  //         // Handle successful response
+  //         this.addFormFieldsdata(employeeList);
+  //         this.hideSpinner();
+  //       },
+  //       (error) => this.handleErrors(error) // Handle errors
+  //     );
+  //   } else {
+
+  //   }
+
+  // }
+  // radioButtonTypeSelectionChange(event: any) {
+  //   const advanceDate = new Date(this.employeeAdvanceForm.get('AdvanceDate')?.value);
+  //   const branchCode = this.employeeAdvanceForm.get('BranchCode')?.value;
+  //   this.dtAdvanceDate = this.formatDate(advanceDate);
+  //   const client = this.employeeAdvanceForm.get('Client')?.value;
+  //   if (branchCode != '' && branchCode != null && branchCode != undefined
+  //     && advanceDate != null && advanceDate != undefined && advanceDate != null
+  //     && client != '' && client != null && client != undefined) {
+  //     forkJoin({
+  //       employeeList: this._payrollService.getEmployeeAdvanceList(this.dtAdvanceDate, branchCode, this.employeeAdvanceForm.value.EmployeeType, client, 1, 0, this.employeeAdvanceForm.value.Race)
+  //     }).subscribe(
+  //       ({ employeeList }) => {
+  //         // Handle successful response
+  //         this.addFormFieldsdata(employeeList);
+  //         this.hideSpinner();
+  //       },
+  //       (error) => this.handleErrors(error) // Handle errors
+  //     );
+  //   }
+  //   if (branchCode != '' && branchCode != null && branchCode != undefined
+  //     && advanceDate != null && advanceDate != undefined && advanceDate != null
+  //   ) {
+  //     this.errorMessage = '';
+  //     this.getEmployeeListByEmployeeType(this.dtAdvanceDate, branchCode, event.value, 1, 0, this.employeeAdvanceForm.value.Race)
+  //   } else {
+  //     this.employeeAdvanceForm.patchValue({
+  //       Race: 'All'
+  //     })
+  //   }
+  // }
+  // radioButtonRaceSelectionChange(event: any) {
+  //   const advanceDate = this.formatDate(this.employeeAdvanceForm.get('AdvanceDate')?.value);
+  //   const branchCode = this.employeeAdvanceForm.get('BranchCode')?.value;
+  //   const client = this.employeeAdvanceForm.get('Client')?.value;
+  //   if (branchCode != '' && branchCode != null && branchCode != undefined
+  //     && advanceDate != null && advanceDate != undefined && advanceDate != null
+  //     && client != '' && client != null && client != undefined) {
+  //     forkJoin({
+  //       employeeList: this._payrollService.getEmployeeAdvanceList(this.dtAdvanceDate, branchCode, this.employeeAdvanceForm.value.EmployeeType, client, 1, 0, this.employeeAdvanceForm.value.Race)
+  //     }).subscribe(
+  //       ({ employeeList }) => {
+  //         // Handle successful response
+  //         this.addFormFieldsdata(employeeList);
+  //         this.hideSpinner();
+  //       },
+  //       (error) => this.handleErrors(error) // Handle errors
+  //     );
+  //   }
+  //   if (branchCode != '' && branchCode != null && branchCode != undefined
+  //     && advanceDate != null && advanceDate != undefined && advanceDate != null) {
+  //     this.getEmployeeListByEmployeeType(advanceDate, branchCode, this.employeeAdvanceForm.value.EmployeeType, 1, 0, event.value)
+  //   } else {
+  //     this.employeeAdvanceForm.patchValue({
+  //       Race: '5'
+  //     })
+  //   }
+  // }
+
   changeAdvanceDate(type: string, event: MatDatepickerInputEvent<Date>) {
-    this.employeeAdvanceForm.value.AdvanceDate = this.formatDate(`${type}: ${event.value}`);
-    const advanceDate = new Date(this.employeeAdvanceForm.get('AdvanceDate')?.value);
-    const selectedBranch = this.employeeAdvanceForm.get('BranchCode')?.value;
-    this.dtAdvanceDate = this.formatDate(advanceDate);
-    if (selectedBranch != null && selectedBranch != undefined && selectedBranch != '') {
-      this.getEmployeeListByEmployeeType(this.dtAdvanceDate, selectedBranch, this.employeeAdvanceForm.value.EmployeeType, 1, 0, this.employeeAdvanceForm.value.Race)
-      this.getAdvanceVoucherNo(selectedBranch, '1');
-    }
+    if (!event.value) return;
+
+    const formatted = this.formatDate(event.value);
+    this.employeeAdvanceForm.patchValue({ AdvanceDate: formatted });
+
+    this.loadEmployeeData(true); // Date affects voucher
   }
-  onBranchSelectionChange() {
-    this.errorMessage = '';
-    const advanceDate = new Date(this.employeeAdvanceForm.get('AdvanceDate')?.value);
-    const selectedBranch = this.employeeAdvanceForm.get('BranchCode')?.value;
+  onBranchSelectionChange(event: any) {
+    const branch = event.value;
 
-    this.dtAdvanceDate = this.formatDate(advanceDate);
-    // this._payrollService.getEmployeeListByBranchCode(selectedBranch).subscribe(
-    //   (data) => {
-    //     this.addFormFieldsdata(data);
-    //   },
-    //   (error) => this.handleErrors(error)
-    // );
-    if (this.dtAdvanceDate != null && this.dtAdvanceDate != 'NaN-NaN-NaN' && selectedBranch != '') {
-      this.errorMessage = '';
-      this.getEmployeeListByEmployeeType(this.dtAdvanceDate, selectedBranch, this.employeeAdvanceForm.value.EmployeeType, 1, 0, this.employeeAdvanceForm.value.Race)
-      this.getAdvanceVoucherNo(selectedBranch, '1');
-    } else {
-      this.errorMessage = 'Please select advance date selection.';
-      this.employeeAdvanceForm.patchValue({
-        EmployeeType: 'None',
-        Race: 'All'
-      })
+    if (!branch) {
+      const formArray = this.dynamicForm.get('formArray') as FormArray;
+      formArray.clear();
+      this.clientList = [];
+      return;
     }
 
+    this.branchCode = branch;
 
+    // Load clients for selected branch
+    this.service.getClientsByBranchID(branch).subscribe({
+      next: (clientData: any) => {
+        this.clientList = clientData['clients'];
+        this.filteredClientList = [...this.clientList];
+      },
+      error: (err) => console.error('Error loading clients:', err)
+    });
+
+    this.loadEmployeeData(true); // Branch affects voucher
+  }
+  onClientChange(clientCode: any) {
+    this.employeeAdvanceForm.patchValue({ Client: clientCode });
+    this.loadEmployeeData(false);
   }
   radioButtonTypeSelectionChange(event: any) {
-    const advanceDate = new Date(this.employeeAdvanceForm.get('AdvanceDate')?.value);
-    const branchCode = this.employeeAdvanceForm.get('BranchCode')?.value;
-    this.dtAdvanceDate = this.formatDate(advanceDate);
-
-    if (advanceDate != null && branchCode != '') {
-      this.errorMessage = '';
-      this.getEmployeeListByEmployeeType(this.dtAdvanceDate, branchCode, event.value, 1, 0, this.employeeAdvanceForm.value.Race)
-    } else {
-      this.errorMessage = 'Please select advance date and branch selection.';
-      this.employeeAdvanceForm.patchValue({
-        EmployeeType: 'None',
-        Race: 'All'
-      })
-    }
+    this.employeeAdvanceForm.patchValue({ EmployeeType: event.value });
+    this.errorMessage = '';
+    this.loadEmployeeData(false);
   }
   radioButtonRaceSelectionChange(event: any) {
-    const advanceDate = this.formatDate(this.employeeAdvanceForm.get('AdvanceDate')?.value);
+    this.employeeAdvanceForm.patchValue({ Race: event.value });
+    this.loadEmployeeData(false);
+  }
+
+  searchDropdown(searchString: string, list: any[], key: string): any[] {
+    if (!searchString) return [...list]; // if empty, return full list
+    return list.filter(item => item[key].toLowerCase().includes(searchString.toLowerCase()));
+  }
+
+  onKeyDropdown(
+    event: KeyboardEvent,
+    searchStringProp: 'branchSearchString' | 'clientSearchString',
+    listProp: 'branchModel' | 'clientList',
+    filteredListProp: 'filteredBranchList' | 'filteredClientList',
+    keyName: string,
+    subject: Subject<string>
+  ) {
+    const key = event.key;
+
+    this[searchStringProp] = this[searchStringProp] || '';
+
+    if (key.length === 1) {
+      this[searchStringProp] += key.toLowerCase();
+    } else if (key === 'Backspace') {
+      this[searchStringProp] = this[searchStringProp].slice(0, -1);
+    } else if (key === 'Escape') {
+      this[searchStringProp] = '';
+    }
+
+    // Apply filter immediately
+    this[listProp] = this.searchDropdown(this[searchStringProp], this[filteredListProp], keyName);
+
+    // Trigger debounce to reset after 2s of inactivity
+    subject.next(this[searchStringProp]);
+  }
+  private loadEmployeeData(triggerVoucher: boolean = false) {
+    this.showLoadingSpinner = true;
+    const advanceDateRaw = this.employeeAdvanceForm.get('AdvanceDate')?.value;
     const branchCode = this.employeeAdvanceForm.get('BranchCode')?.value;
-    if (advanceDate != null && branchCode != '') {
-      this.errorMessage = '';
-      this.getEmployeeListByEmployeeType(advanceDate, branchCode, this.employeeAdvanceForm.value.EmployeeType, 1, 0, event.value)
+    const client = this.employeeAdvanceForm.get('Client')?.value;
+    const employeeType = this.employeeAdvanceForm.get('EmployeeType')?.value;
+    const race = this.employeeAdvanceForm.get('Race')?.value;
+
+    // Stop spinner if required fields missing
+    if (!advanceDateRaw || !branchCode) {
+      this.clientList = [];
+      this.hideSpinner();
+      return;
+    }
+
+    const advanceDate = this.formatDate(advanceDateRaw);
+    this.dtAdvanceDate = advanceDate;
+
+    if (client && client !== 0) {
+      forkJoin({
+        employeeList: this._payrollService.getEmployeeAdvanceList(advanceDate, branchCode, employeeType, client, 1, 0, race)
+      }).subscribe(
+        ({ employeeList }) => {
+          this.addFormFieldsdata(employeeList);
+          this.hideSpinner();
+        },
+        (error) => {
+          this.handleErrors(error);
+          this.hideSpinner();
+        }
+      );
     } else {
-      this.errorMessage = 'Please select advance date and branch selection.';
-      this.employeeAdvanceForm.patchValue({
-        EmployeeType: '3',
-        Race: '5'
-      })
+      this.getEmployeeListByEmployeeType(advanceDate, branchCode, employeeType, 1, 0, race);
+    }
+
+    // Voucher reload only when date or branch changes
+    if (triggerVoucher) {
+      this.getAdvanceVoucherNo(branchCode, '1');
     }
   }
 
-  getEmployeeListById(id: number): void {
+  getEmployeeListById(empid: number, id: number): void {
     this.showLoadingSpinner = true;
-    this._payrollService.getSalaryAdvanceById(id).subscribe(
+    this._payrollService.getSalaryAdvanceById(empid, id).subscribe(
       (data) => {
         this._payrollService.getEmployeeListByAdvanceID(data[0].ID).subscribe(
           (data) => {
@@ -297,7 +494,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
           LastUpdate: this.formatDate(data[0].LastUpdate),
           LastUpdatedBy: data[0].LastUpdatedBy,
         });
-        this._payrollService.getEmployeeById(id).subscribe(
+        this._payrollService.getEmployeeById(empid).subscribe(
           (data) => {
             this.employeeAdvanceForm.patchValue({
               BranchCode: data[0].EMP_BRANCH_CODE
@@ -310,16 +507,14 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
   }
 
   getEmployeeListByEmployeeType(dvanceDate: string, branchCode: string, employeeType: number, transType: number, advanceAmount: number, race: string): void {
-    console.log('[NewEmployeeMonthlyAdvance] getEmployeeListByEmployeeType called');
-    console.log('[NewEmployeeMonthlyAdvance] Parameters:', { dvanceDate, branchCode, employeeType, transType, advanceAmount, race });
     this._payrollService.getListByEmplyeeType(dvanceDate, branchCode, employeeType, transType, advanceAmount, race).subscribe(
       (data) => {
-        console.log('[NewEmployeeMonthlyAdvance] Employee list received:', data);
         this.addFormFieldsdata(data);
+        this.hideSpinner();
       },
       (error) => {
-        console.error('[NewEmployeeMonthlyAdvance] Error getting employee list:', error);
         this.handleErrors(error);
+        this.hideSpinner();
       }
     );
   }
@@ -349,116 +544,11 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
     }
   }
 
-  // savebuttonClick(): void {
-  //   this.showLoadingSpinner = true;
-  //   this.salaryMonthlyAdvance = this.employeeAdvanceForm.value;
-  //   this.salaryMonthlyAdvance.AdvanceDate = new Date(this.formatDate(this.employeeAdvanceForm.value.AdvanceDate));
-  //   this.salaryMonthlyAdvance.AdvanceTakenDate = new Date(this.formatDate(this.employeeAdvanceForm.value.AdvanceDate));
-
-  //   var dateYear = new Date(this.salaryMonthlyAdvance.AdvanceDate);
-  //   this.year = dateYear.getFullYear();
-  //   var dateMonth = new Date(this.salaryMonthlyAdvance.AdvanceDate);
-  //   this.month = dateMonth.getMonth() + 1;
-
-  //   const formArray = this.dynamicForm.get('formArray') as FormArray;
-  //   for (let i = 0; i < formArray.length; i++) {
-  //     const formGroup = formArray.at(i) as FormGroup;
-  //     this.salaryMonthlyAdvance.ID = formGroup.get('ID')?.value;
-  //     this.salaryMonthlyAdvance.EmployeeID = formGroup.get('EMP_ID')?.value;
-  //     this.salaryMonthlyAdvance.Amount = formGroup.get('Amount')?.value;
-  //     this.salaryMonthlyAdvance.Particulars = formGroup.get('Particulars')?.value;
-  //     this.salaryMonthlyAdvance.PaymentType = formGroup.get('PAYMODE')?.value;
-
-  //     this._payrollService.saveAndUpdateSalaryMonthlyAdvance(this.salaryMonthlyAdvance).subscribe((response) => {
-  //       if (response.True == 'True') {
-  //       } else if (response.ResignDate == 'ResignDate') {
-  //         this.showMessage(`${response.Message}`, 'warning', 'Warning Message');
-  //       } else if (response.Success == 'Success') {
-  //         this.showMessage(`${response.Message}`, 'success', 'Success Message');
-  //         this._router.navigate(['/payroll/employee-monthly-advance']);
-  //       }
-  //       this._dataService.setUsername(this.currentUser);
-  //       this.showLoadingSpinner = false;
-  //     },
-  //       (error) => this.handleErrors(error)
-  //     );
-  //   }
-
-  // }
-
-  // savebuttonClick(): void {
-  //   this.showLoadingSpinner = true;
-  //   this.salaryMonthlyAdvance = { ...this.employeeAdvanceForm.value };
-  //   this.salaryMonthlyAdvance.AdvanceDate = new Date(this.formatDate(this.salaryMonthlyAdvance.AdvanceDate));
-  //   this.salaryMonthlyAdvance.AdvanceTakenDate = new Date(this.formatDate(this.salaryMonthlyAdvance.AdvanceDate));
-
-  //   const formArray = this.dynamicForm.get('formArray') as FormArray;
-  //   const saveRequests: Observable<any>[] = [];
-
-  //   this._payrollService.getAdvanceVoucherNo(this.employeeAdvanceForm.value.BranchCode, '1').pipe(
-  //     map(response => {
-  //       if (response && response.voucherNo) {
-  //         return response.voucherNo.toString();
-  //       }
-  //     })
-  //   ).subscribe(
-  //     voucherNo => {
-  //       for (let i = 0; i < formArray.length; i++) {
-  //         const formGroup = formArray.at(i) as FormGroup;
-  //         const advanceData = { 
-  //           ...this.salaryMonthlyAdvance,
-  //           ID: formGroup.get('ID')?.value,
-  //           EmployeeID: formGroup.get('EMP_ID')?.value,
-  //           Amount: formGroup.get('Amount')?.value,
-  //           Particulars: formGroup.get('Particulars')?.value,
-  //           PaymentType: formGroup.get('PAYMODE')?.value,
-  //           VoucherNo: '0000000'+ i,
-  //         };
-
-  //         const saveRequest = this._payrollService.saveAndUpdateSalaryMonthlyAdvance(advanceData);
-  //         saveRequests.push(saveRequest);
-  //       }
-
-  //       if (saveRequests.length === 0) {
-  //         this.showLoadingSpinner = false;
-  //         return;
-  //       }
-
-  //       forkJoin(saveRequests).subscribe(
-  //         (responses) => {
-  //           responses.forEach(response => {
-  //             if (response.True === 'True') {
-  //             } else if (response.ResignDate === 'ResignDate') {
-  //               this.showMessage(`${response.Message}`, 'warning', 'Warning Message');
-  //             } else if (response.Success === 'Success') {
-  //               this.showMessage(`${response.Message}`, 'success', 'Success Message');
-  //               this._router.navigate(['/payroll/employee-monthly-advance']);
-  //             }
-  //           });
-  //           this.showLoadingSpinner = false;
-  //         },
-  //         (error) => {
-  //           this.handleErrors(error);
-  //         }
-  //       );
-  //     },
-  //     (error) => {
-  //       this.handleErrors(error);
-  //     }
-  //   );
-  // }
-
-
-
   savebuttonClick(): void {
-    console.log('[NewEmployeeMonthlyAdvance] savebuttonClick called');
     this.showLoadingSpinner = true;
     this.salaryMonthlyAdvance = this.employeeAdvanceForm.value;
     this.salaryMonthlyAdvance.AdvanceDate = new Date(this.formatDate(this.employeeAdvanceForm.value.AdvanceDate));
     this.salaryMonthlyAdvance.AdvanceTakenDate = new Date(this.formatDate(this.employeeAdvanceForm.value.AdvanceDate));
-
-    console.log('[NewEmployeeMonthlyAdvance] Form data:', this.employeeAdvanceForm.value);
-    console.log('[NewEmployeeMonthlyAdvance] SalaryMonthlyAdvance object:', this.salaryMonthlyAdvance);
 
     const dateYear = new Date(this.salaryMonthlyAdvance.AdvanceDate);
     this.year = dateYear.getFullYear();
@@ -467,18 +557,14 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
 
     const formArray = this.dynamicForm.get('formArray') as FormArray;
     const requests = [];
-    console.log('[NewEmployeeMonthlyAdvance] FormArray length:', formArray.length);
-
     if (formArray.length > 0) {
+
       for (let i = 0; i < formArray.length; i++) {
         const formGroup = formArray.at(i) as FormGroup;
         const amount = formGroup.get('Amount')?.value;
 
-        console.log(`[NewEmployeeMonthlyAdvance] Processing item ${i}, Amount: ${amount}`);
-
         // Skip if Amount is null, empty, or 0
         if (!amount || parseFloat(amount) === 0) {
-          console.log(`[NewEmployeeMonthlyAdvance] Skipping item ${i} due to zero/null amount`);
           continue;
         }
 
@@ -490,21 +576,25 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
           Particulars: formGroup.get('Particulars')?.value,
           PaymentType: formGroup.get('PAYMODE')?.value,
           VoucherNo: (i + 1).toString().padStart(8, '0'),
+          LastUpdatedBy: this.currentUser,
         };
-
-        console.log(`[NewEmployeeMonthlyAdvance] Adding request for item ${i}:`, salaryAdvance);
         requests.push(this._payrollService.saveAndUpdateSalaryMonthlyAdvance(salaryAdvance));
       }
 
-      console.log(`[NewEmployeeMonthlyAdvance] Total requests to execute: ${requests.length}`);
-
+      if (requests.length === 0) {
+        this.showMessage(
+          'Please update the amount for this record. The amount cannot be empty or zero. If no amount is required, please delete this record.',
+          'warning',
+          'Warning Message'
+        );
+        this.hideSpinner();
+        return;
+      }
       forkJoin(requests).subscribe(
         (responses) => {
-          console.log('[NewEmployeeMonthlyAdvance] Responses received:', responses);
           const failedResponses: any[] = [];
 
-          responses.forEach((response, index) => {
-            console.log(`[NewEmployeeMonthlyAdvance] Processing response ${index}:`, response);
+          responses.forEach(response => {
             if (response.True === 'True') {
               this.showMessage(response.Message, 'warning', 'Warning Message');
             } else if (response.ResignDate === 'ResignDate') {
@@ -513,13 +603,11 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
               this.showMessage(response.Message, 'success', 'Success Message');
               this._router.navigate(['/payroll/employee-monthly-advance']);
             } else {
-              console.error(`[NewEmployeeMonthlyAdvance] Unknown response type for item ${index}:`, response);
               failedResponses.push(response);  // Store failed responses
             }
           });
 
           if (failedResponses.length > 0) {
-            console.error('[NewEmployeeMonthlyAdvance] Failed responses:', failedResponses);
             this.handleErrors(`Failed Responses: ${failedResponses}`);
           }
 
@@ -527,7 +615,6 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
           this.hideSpinner();
         },
         (error) => {
-          console.error('[NewEmployeeMonthlyAdvance] Error in forkJoin:', error);
           this.handleErrors(error);
         }
       );
@@ -548,7 +635,10 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
       icon: icon, // Dynamically set the icon based on the parameter
       showCloseButton: false,
       timer: 5000,
-      width: '600px'
+      width: '600px',
+      customClass: {
+        popup: 'swal-top-offset'
+      }
     });
     this.hideSpinner();
     return;

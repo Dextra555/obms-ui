@@ -73,6 +73,7 @@ import { BatchInvoiceComponent } from "../../modules/finance/batch-invoice/batch
 import { InvoiceComponent } from "../../modules/finance/invoice/invoice.component";
 import { NewAttendanceComponent } from 'src/app/modules/payroll/attendance/new-attendance/new-attendance.component';
 import { AttendanceDisplayComponent } from 'src/app/modules/payroll/attendance/attendance-display/attendance-display.component';
+import { BulkAttendanceUploadComponent } from 'src/app/modules/payroll/attendance/bulk-attendance-upload/bulk-attendance-upload.component';
 import { UtilityBillsComponent } from "../../modules/inventory/utility-bills/utility-bills.component";
 import { FinanceChequeMasterComponent } from "../../modules/finance/finance-cheque-master/finance-cheque-master.component";
 import { SalaryProcessingComponent } from 'src/app/modules/payroll/salary-processing/salary-processing.component';
@@ -243,6 +244,7 @@ const routes: Routes = [
   { path: 'payroll/misc-transactions', component: MiscTransctionsComponent, canActivate: [AuthGuard] },
   { path: 'payroll/new-misc-transactions', component: NewMiscTransactionsComponent, canActivate: [AuthGuard] },
   { path: 'payroll/new-attendance', component: NewAttendanceComponent, canActivate: [AuthGuard] },
+  { path: 'payroll/bulk-attendance-upload', component: BulkAttendanceUploadComponent, canActivate: [AuthGuard] },
   { path: 'payroll/attendance-display', component: AttendanceDisplayComponent, canActivate: [AuthGuard] },
   { path: 'payroll/salary-processing', component: SalaryProcessingComponent, canActivate: [AuthGuard] },
   { path: 'payroll/report/rbi-bank-salary-process', component: RbiBankSalaryProcessComponent, canActivate: [AuthGuard] },

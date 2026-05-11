@@ -10,11 +10,13 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./loan-voucher-report.component.css']
 })
 export class LoanVoucherReportComponent implements OnInit {
-url: string = environment.baseReportUrl;
+  url: string = environment.baseReportUrl;
   urlSafe: SafeResourceUrl | undefined;
   currentUser: string = "";
   ID!: number;
   currentUrl: string = "PayRoll/LoanVoucherReport.aspx?"
+  showLoadingSpinner: boolean = false;
+
   constructor(private _dataService: DatasharingService, public sanitizer: DomSanitizer, private _activatedRoute: ActivatedRoute,
     private router: Router,
   ) { }
@@ -40,7 +42,14 @@ url: string = environment.baseReportUrl;
     this.url += this.currentUrl;
     localURL += "LoginID=" + this.currentUser
     localURL += "&ID=" + this.ID
+    this.showLoadingSpinner = true;
     this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url + localURL);
+  }
+
+  onReportLoad() {
+    setTimeout(() => {
+      this.showLoadingSpinner = false;
+    }, 2000); // small delay for smooth UX
   }
 
 }

@@ -387,7 +387,8 @@
                                         </td>
                                         <td *ngIf="dynamicEditable == 'set' && employeeSelectedType == 'Guard'">
                                             <mat-form-field appearance="outline">
-                                                <input matInput [value]="getClientShortname(control.get('Client')?.value)"
+                                                <input matInput
+                                                    [value]="getClientShortname(control.get('Client')?.value)"
                                                     readonly="true">
                                             </mat-form-field>
                                         </td>
@@ -430,7 +431,8 @@
                                         </td>
                                         <td *ngIf="dynamicEditable == 'set' && employeeSelectedType == 'Guard'">
                                             <mat-form-field appearance="outline">
-                                                <input matInput [value]="getClientShortname(control.get('OTClient')?.value)"
+                                                <input matInput
+                                                    [value]="getClientShortname(control.get('OTClient')?.value)"
                                                     readonly="true">
                                             </mat-form-field>
                                         </td>
