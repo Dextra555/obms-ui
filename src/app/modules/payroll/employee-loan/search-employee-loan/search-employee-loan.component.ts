@@ -1,25 +1,22 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MastermoduleService } from 'src/app/service/mastermodule.service';
-import { Router } from '@angular/router';
-import Swal from 'sweetalert2';
-import { DialogConfirmationComponent } from 'src/app/components/dialog-confirmation/dialog-confirmation.component';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatSort, Sort } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
-import { SalaryStructure } from 'src/app/model/salaryStructure';
+import { MatSort, Sort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { Router } from '@angular/router';
 import { EmployeeMonthlyAdvance } from 'src/app/model/employeeMonthlyAdvance';
-import { PayrollModuleService } from 'src/app/service/payrollmodule.service';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { DatasharingService } from 'src/app/service/datasharing.service';
+import { MastermoduleService } from 'src/app/service/mastermodule.service';
+import { PayrollModuleService } from 'src/app/service/payrollmodule.service';
 
 @Component({
-  selector: 'app-employeemonthlyadvance',
-  templateUrl: './employeemonthlyadvance.component.html',
-  styleUrls: ['./employeemonthlyadvance.component.css']
+  selector: 'app-search-employee-loan',
+  templateUrl: './search-employee-loan.component.html',
+  styleUrls: ['./search-employee-loan.component.css']
 })
-export class EmployeemonthlyadvanceComponent implements OnInit {
+export class SearchEmployeeLoanComponent implements OnInit {  
   @ViewChild(MatPaginator)
   paginator!: MatPaginator;
   @ViewChild(MatSort)
@@ -97,12 +94,12 @@ export class EmployeemonthlyadvanceComponent implements OnInit {
 
           if (this.userAccessModel.readAccess === true || this.currentUser == 'superadmin') {
             this.warningMessage = '';
-            this.getSalaryMasterList(1);
+            this.getSalaryMasterList(3);
           } else {
             this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
-                      You do not have permissions to view this page. <br>
-                      If you feel you should have access to this page, Please contact administrator. <br>
-                      Thank you`;
+                       You do not have permissions to view this page. <br>
+                       If you feel you should have access to this page, Please contact administrator. <br>
+                       Thank you`;
             this.hideSpinner();
           }
         }
@@ -140,7 +137,7 @@ export class EmployeemonthlyadvanceComponent implements OnInit {
     );
   }
   onEditClick(data: any): void {
-    this._router.navigate(['/payroll/new-employee-monthly-advance'], { queryParams: { empid: data.EMP_ID, id: data.ID }, queryParamsHandling: 'merge' });
+    this._router.navigate(['/payroll/new-employee-loan'], { queryParams: { id: data.ID }, queryParamsHandling: 'merge' });
   }
 
   handleErrors(error: string) {

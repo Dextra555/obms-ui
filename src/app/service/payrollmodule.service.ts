@@ -46,12 +46,11 @@ export class PayrollModuleService {
 
   }
 
-  getEmployeeListBySalaryAdvance(): Observable<any> {
-
-    return this.httpClient.get<EmployeeMonthlyAdvance[]>(this.apiUrl + 'payroll/GetEmployeeListBySalaryAdvance'
-
+  getEmployeeListBySalaryAdvance(transType: number, currentUser: string): Observable<any> {
+    return this.httpClient.get<EmployeeMonthlyAdvance[]>(this.apiUrl + 'payroll/GetEmployeeListBySalaryAdvance', {
+      params: { TransType: transType, currentUser: currentUser }
+    }
     ).pipe(catchError(this.errorHandle));
-
   }
 
   getInventoryCategories(): Observable<any> {
@@ -88,9 +87,9 @@ export class PayrollModuleService {
 
   saveAndUpdateSalaryMonthlyAdvance(salaryAdvanceDetails: SalaryMonthlyAdvance): Observable<any> {
     console.log('[PayrollService] saveAndUpdateSalaryMonthlyAdvance called with:', salaryAdvanceDetails);
-    console.log('[PayrollService] API URL:', this.apiUrl + 'payroll/GetSalaryAdvanceByDateAndEmployee');
+    console.log('[PayrollService] API URL:', this.apiUrl + 'payroll/SaveAndUpdateSalaryMonthlyAdvance');
 
-    return this.httpClient.post<any[]>(this.apiUrl + 'payroll/GetSalaryAdvanceByDateAndEmployee',
+    return this.httpClient.post<any[]>(this.apiUrl + 'payroll/SaveAndUpdateSalaryMonthlyAdvance',
 
       JSON.stringify(salaryAdvanceDetails),
 
@@ -132,14 +131,10 @@ export class PayrollModuleService {
 
   }
 
-  getSalaryAdvanceById(employeeId: number): Observable<any> {
-
-    const params = { params: new HttpParams({ fromString: "?employeeId=" + employeeId }) };
-
+  getSalaryAdvanceById(employeeId: number, id: number): Observable<any> {
+    const params = { params: new HttpParams({ fromString: `?employeeId=${employeeId}&id=${id}` }) };
     return this.httpClient.get<SalaryMonthlyAdvance>(this.apiUrl + 'payroll/GetSalaryAdvanceById', params
-
     ).pipe(catchError(this.errorHandle));
-
   }
 
   getEmployeeById(employeeId: number): Observable<any> {
@@ -160,6 +155,12 @@ export class PayrollModuleService {
 
     ).pipe(catchError(this.errorHandle));
 
+  }
+
+  getEmployeeAdvanceList(advanceDate: string, branchCode: string, employeeType: number, client: string, transType: number, advanceAmount: number, race: string): Observable<any> {
+    return this.httpClient.get<SalaryMonthlyAdvance[]>(this.apiUrl + 'payroll/GetEmployeeAdvanceList',
+      { params: { advanceDate: advanceDate.toString(), branch: branchCode, employeeType: employeeType, client: client, transType: transType, advanceAmount: advanceAmount, race: race } }
+    ).pipe(catchError(this.errorHandle));
   }
 
   getPaySheetData(loginId: string, branch: string, period: string, employeeType: string, employee: string, lang: string): Observable<any> {
@@ -285,6 +286,12 @@ export class PayrollModuleService {
 
     }).pipe(catchError(this.errorHandle));
 
+  }
+
+  getClientsByBranchID(branch: string, currentUser: string): Observable<any> {
+    return this.httpClient.get<any>(this.apiUrl + 'payroll/GetClientsByBranchID', {
+      params: { branch: branch, currentUser: currentUser }
+    }).pipe(catchError(this.errorHandle));
   }
 
   getEmployeeDetails(branchCode: string, employeeNo: string): Observable<any> {
@@ -1231,6 +1238,10 @@ export class PayrollModuleService {
 
   }
 
+  getEmployeeLoanById(id: number, transType: number): Observable<any> {
+    return this.httpClient.get<any>(`${this.apiUrl}payroll/GetEmployeeLoanById?id=${id}&transType=${transType}`);
+  }
+
   getVoucherDetailsByFilter(branch: string, period: string, employeeType: string, bankCode: string, paymentType: string, voucherType: string): Observable<any[]> {
 
     let params = new HttpParams()
@@ -1353,6 +1364,69 @@ export class PayrollModuleService {
       params,
       responseType: 'blob'
     }).pipe(catchError(this.errorHandle));
+  }
+
+  // Bulk Attendance Upload Methods (Old detailed format - kept for backward compatibility)
+  downloadAttendanceTemplate(period: Date, branchCode: string): Observable<Blob> {
+    const params = new HttpParams()
+      .set('period', period.toISOString())
+      .set('branchCode', branchCode);
+    return this.httpClient.get(`${this.apiUrl}payroll/DownloadAttendanceTemplate`, {
+      params,
+      responseType: 'blob'
+    }).pipe(catchError(this.errorHandle));
+  }
+
+  uploadAttendanceExcel(formData: FormData): Observable<any> {
+    return this.httpClient.post(`${this.apiUrl}payroll/UploadAttendanceExcel`, formData)
+      .pipe(catchError(this.errorHandle));
+  }
+
+  bulkUploadAttendance(attendanceData: any[]): Observable<any> {
+    return this.httpClient.post(`${this.apiUrl}payroll/BulkUploadAttendance`, attendanceData)
+      .pipe(catchError(this.errorHandle));
+  }
+
+  // Simplified Bulk Attendance Upload Methods (PDF-style format with P, W/O, H, L, NH codes)
+  downloadSimplifiedAttendanceTemplate(period: Date, branchCode: string): Observable<Blob> {
+    const params = new HttpParams()
+      .set('period', period.toISOString())
+      .set('branchCode', branchCode);
+    return this.httpClient.post(`${this.apiUrl}payroll/GenerateSimplifiedAttendanceTemplate`, null, {
+      params,
+      responseType: 'blob'
+    }).pipe(catchError(this.errorHandle));
+  }
+
+  uploadSimplifiedAttendance(file: File, currentUser: string): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('currentUser', currentUser);
+    return this.httpClient.post(`${this.apiUrl}payroll/UploadSimplifiedAttendance`, formData)
+      .pipe(catchError(this.errorHandle));
+  }
+
+  exportAttendanceData(period: Date, branchCode: string): Observable<Blob> {
+    const params = new HttpParams()
+      .set('period', period.toISOString())
+      .set('branchCode', branchCode);
+    return this.httpClient.get(`${this.apiUrl}payroll/ExportAttendanceData`, {
+      params,
+      responseType: 'blob'
+    }).pipe(catchError(this.errorHandle));
+  }
+
+  validateAttendanceData(period: Date, branchCode: string): Observable<any> {
+    const params = new HttpParams()
+      .set('period', period.toISOString())
+      .set('branchCode', branchCode);
+    return this.httpClient.get(`${this.apiUrl}payroll/ValidateAttendanceData`, { params })
+      .pipe(catchError(this.errorHandle));
+  }
+
+  getBranchList(): Observable<any> {
+    return this.httpClient.get(`${this.apiUrl}master/GetBranchMasterAll`)
+      .pipe(catchError(this.errorHandle));
   }
 
 

@@ -2,12 +2,12 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-12 col-sm-12 col-md-6 col-lg-6">
-          <h1 class="mb-1">Employee Monthly Advance</h1>
+          <h1 class="mb-1">Employee Loan</h1>
         </div>
         <div class="col-12 col-sm-12 col-md-6 col-lg-6 my-1">
           <ol class="breadcrumb float-md-right">
-            <li class="breadcrumb-item"><a routerLink="/dashboard">Payroll</a></li>
-            <li class="breadcrumb-item active">Employee Monthly Advance</li>
+             <li class="breadcrumb-item"><a routerLink="/dashboard">Payroll</a></li>
+            <li class="breadcrumb-item active">Employee Loan</li>
           </ol>
         </div>
       </div>
@@ -27,7 +27,7 @@
         <div class="col-12 col-sm-12 col-md-8 col-lg-8 order-1 order-md-2" >
           <div class="text-right pt-2">
             <button *ngIf="this.userAccessModel.createAccess == true || currentUser == 'superadmin'" class="btn wlt-c-furg-btn-primary"
-              [routerLink]="['/payroll/new-employee-monthly-advance']"><mat-icon>add</mat-icon><span>New</span></button>
+              [routerLink]="['/payroll/new-employee-loan']"><mat-icon>add</mat-icon><span>New</span></button>
           </div>
         </div>
       </div>
@@ -75,9 +75,9 @@
               <a *ngIf="this.userAccessModel.readAccess == true || currentUser == 'superadmin'" style="cursor:pointer;" class="wlt-c-furg-text-primary mr-2" matTooltip="View">
                 <mat-icon aria-hidden="false" aria-label="edit icon" (click)="onEditClick(row)">edit</mat-icon>
               </a>
-              <a *ngIf="this.userAccessModel.deleteAccess == true || currentUser == 'superadmin'" style="cursor:pointer;" class="wlt-c-furg-text-danger" matTooltip="Delete">
+              <!-- <a *ngIf="this.userAccessModel.deleteAccess == true || currentUser == 'superadmin'" style="cursor:pointer;" class="wlt-c-furg-text-danger" matTooltip="Delete">
                 <mat-icon aria-hidden="false" aria-label="trash icon">delete_outline</mat-icon>
-              </a>
+              </a> -->
             </td>
           </ng-container>
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

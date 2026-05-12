@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import {environment} from "../../../../../environments/environment";
-import {DomSanitizer, SafeResourceUrl} from "@angular/platform-browser";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {MastermoduleService} from "../../../../service/mastermodule.service";
-import {InventoryService} from "../../../../service/inventory.service";
-import {EmployeeService} from "../../../../service/employee.service";
+import { environment } from "../../../../../environments/environment";
+import { DomSanitizer, SafeResourceUrl } from "@angular/platform-browser";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { MastermoduleService } from "../../../../service/mastermodule.service";
+import { InventoryService } from "../../../../service/inventory.service";
+import { EmployeeService } from "../../../../service/employee.service";
 import { Router, NavigationEnd } from '@angular/router';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { DatasharingService } from 'src/app/service/datasharing.service';
@@ -20,7 +20,7 @@ export class InvoiceAgeingComponent implements OnInit {
   currentUrl: string = "Finance/"
   frm!: FormGroup;
   branchList: any = [];
-  itemList: any = []; 
+  itemList: any = [];
   currentUser: string = "";
   errorMessage: string = '';
   warningMessage: string = '';
@@ -28,8 +28,8 @@ export class InvoiceAgeingComponent implements OnInit {
   userAccessModel!: UserAccessModel;
   reportPageName: string = "";
 
-  constructor(public sanitizer: DomSanitizer, private _masterService: MastermoduleService, private service: InventoryService, private empService: EmployeeService, 
-    private fb: FormBuilder,private router: Router, private _dataService: DatasharingService) {    
+  constructor(public sanitizer: DomSanitizer, private _masterService: MastermoduleService, private service: InventoryService, private empService: EmployeeService,
+    private fb: FormBuilder, private router: Router, private _dataService: DatasharingService) {
     this.frm = fb.group({
       Branch: [""],
       StartDate: ["", Validators.required],
@@ -70,7 +70,7 @@ export class InvoiceAgeingComponent implements OnInit {
           this.userAccessModel.createAccess = data.Create;
           if (this.userAccessModel.readAccess === true || this.currentUser == 'superadmin') {
             this.warningMessage = '';
-            this. _masterService.GetBranchListByUserName(this.currentUser).subscribe((d: any) => {
+            this._masterService.GetBranchListByUserName(this.currentUser).subscribe((d: any) => {
               this.branchList = d;
             });
 
@@ -101,9 +101,9 @@ export class InvoiceAgeingComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  clkBtn(number: number) {    
-    this.reportPageName = number == 1 ? "InvoiceAgeingReport.aspx?" : number == 2 ?'InvoiceCollectionTotalReportNoTax.aspx?':
-    'InvoiceAgeingAllBranchesReport.aspx?';
+  clkBtn(number: number) {
+    this.reportPageName = number == 1 ? "InvoiceAgeingReport.aspx?" : number == 2 ? 'InvoiceCollectionTotalReportNoTax.aspx?' :
+      'InvoiceAgeingAllBranchesReport.aspx?';
     this.reportPageName += "LoginID=" + this.currentUser;
   }
 
@@ -119,7 +119,7 @@ export class InvoiceAgeingComponent implements OnInit {
     localURL += "&EndDate=" + this.returnDate(this.frm.get("EndDate")?.value)
     localURL += "&Branch=" + (this.frm.get("Branch")?.value ?? 0)
 
-    this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url +  this.reportPageName + localURL);
+    this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url + this.reportPageName + localURL);
 
   }
 

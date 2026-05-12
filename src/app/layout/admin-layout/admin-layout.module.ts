@@ -18,6 +18,7 @@ import { PfStatementReportModule } from 'src/app/modules/report/payroll/pf-state
 import { ProfessionalTaxSlabModule } from 'src/app/modules/master/professional-tax-slab/professional-tax-slab.module';
 import { RbiBankSalaryProcessModule } from 'src/app/modules/payroll/rbi-bank-salary-process/rbi-bank-salary-process.module';
 import { RbiBankAdvanceSalaryProcessModule } from 'src/app/modules/payroll/rbi-bank-advance-salary-process/rbi-bank-advance-salary-process.module';
+import { BulkAttendanceUploadModule } from 'src/app/modules/payroll/attendance/bulk-attendance-upload/bulk-attendance-upload.module';
 
 
 @NgModule({
@@ -39,7 +40,8 @@ import { RbiBankAdvanceSalaryProcessModule } from 'src/app/modules/payroll/rbi-b
     PfStatementReportModule,
     ProfessionalTaxSlabModule,
     RbiBankSalaryProcessModule,
-    RbiBankAdvanceSalaryProcessModule
+    RbiBankAdvanceSalaryProcessModule,
+    BulkAttendanceUploadModule
   ],
   providers: [CommonService, MastermoduleService],
 })

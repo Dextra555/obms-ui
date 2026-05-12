@@ -2394,4 +2394,42 @@ export class NewAttendanceComponent implements OnInit {
       this.hideloadingSpinner();
     }
   };
+
+  openBulkUploadDialog(): void {
+    // Import the bulk upload component dynamically
+    import('../bulk-attendance-upload/bulk-attendance-upload.component').then(({ BulkAttendanceUploadComponent }) => {
+      // For now, we'll use Swal to open a simple dialog
+      // In a full implementation, you would use MatDialog or a routing approach
+      Swal.fire({
+        title: 'Bulk Attendance Upload',
+        html: `
+          <div style="text-align: left;">
+            <p><strong>Features:</strong></p>
+            <ul>
+              <li>Upload attendance for multiple employees at once</li>
+              <li>Download pre-formatted Excel templates</li>
+              <li>Validate data before processing</li>
+              <li>Export existing attendance data</li>
+            </ul>
+            <p><strong>To access bulk upload:</strong></p>
+            <ol>
+              <li>Navigate to the Attendance module</li>
+              <li>Click on "Bulk Upload Attendance" in the menu</li>
+              <li>Or access directly via: <code>/payroll/bulk-attendance-upload</code></li>
+            </ol>
+          </div>
+        `,
+        icon: 'info',
+        width: '600px',
+        confirmButtonText: 'Go to Bulk Upload',
+        showCancelButton: true,
+        cancelButtonText: 'Close'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Navigate to bulk upload page
+          this._router.navigate(['/payroll/bulk-attendance-upload']);
+        }
+      });
+    });
+  }
 }

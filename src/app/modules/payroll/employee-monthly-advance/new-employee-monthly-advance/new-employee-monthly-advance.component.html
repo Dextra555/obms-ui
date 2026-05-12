@@ -4,18 +4,18 @@
             <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                 <h1 class="md-1">{{employeeAdvanceTitleStatus == 'new'?'New Employee Monthly Advance': 'Edit Employee
                     Monthly Advance'}}</h1>
-            </div><!-- /.col -->
+            </div>
             <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
                 <ol class="breadcrumb float-md-right">
-                    <li class="breadcrumb-item"><a routerLink="/dashboard">Master</a></li>
+                    <li class="breadcrumb-item"><a routerLink="/dashboard">Payroll</a></li>
                     <li class="breadcrumb-item"><a routerLink="/payroll/employee-monthly-advance">Employee Monthly
-                            Advance</a></li>
+                            Advance List</a></li>
                     <li class="breadcrumb-item active">{{employeeAdvanceTitleStatus == 'new'?'New Employee Monthly
                         Advance': 'Edit Employee Monthly Advance'}}</li>
                 </ol>
-            </div><!-- /.col -->
-        </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
+            </div>
+        </div>
+    </div>
 </div>
 <mat-card>
     <mat-card-content>
@@ -33,13 +33,27 @@
                         <mat-datepicker #picker></mat-datepicker>
                     </mat-form-field>
                 </div>
-                <div class="col-12 col-sm-12 col-md-12 col-lg-4">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-3">
                     <mat-form-field appearance="outline">
                         <mat-label>Branch Code</mat-label>
-                        <mat-select formControlName="BranchCode" (selectionChange)="onBranchSelectionChange()">
+                        <mat-select formControlName="BranchCode"
+                            (keydown)="onKeyDropdown($event, 'branchSearchString', 'branchModel', 'filteredBranchList', 'Code', branchSearchSubject)"
+                            (selectionChange)="onBranchSelectionChange($event)" [panelClass]="'custom-dropdown-panel'">
+                            <mat-option [value]="" class="highlight-option"></mat-option>
                             <mat-option *ngFor="let branch of branchModel" [value]="branch.Code">
                                 {{ branch.Code }}
                             </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Client</mat-label>
+                        <mat-select formControlName="Client"
+                            (keydown)="onKeyDropdown($event, 'clientSearchString', 'clientList', 'filteredClientList', 'Name', clientSearchSubject)"
+                            (selectionChange)="onClientChange($event.value)" [panelClass]="'custom-dropdown-panel'">
+                            <mat-option [value]="0" class="highlight-option"></mat-option>
+                            <mat-option *ngFor="let d of clientList" value="{{d.Code}}">{{d.Name}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </div>
@@ -63,14 +77,22 @@
             </div>
             <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                 <div class="row">
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-4">
-                        <mat-form-field appearance="outline">
-                            <mat-label>Religion</mat-label>
-                            <mat-select formControlName="Race" (selectionChange)="radioButtonRaceSelectionChange($event)">
-                                <mat-option *ngFor="let religion of religionsWithAll" [value]="religion">{{religion}}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-8">
+                        <mat-label class="mr-3"><strong>Race</strong></mat-label>
+                        <br />
+                        <mat-radio-group aria-label="Select a Race" formControlName="Race"
+                            (change)="radioButtonRaceSelectionChange($event)">
+                            <mat-radio-button value="Chinese">Chinese</mat-radio-button>
+                            <mat-radio-button value="Indian">Indian</mat-radio-button>
+                            <mat-radio-button value="Malay">Malay</mat-radio-button>
+                            <mat-radio-button value="Others">Others</mat-radio-button>
+                            <mat-radio-button value="All">All</mat-radio-button>
+                        </mat-radio-group>
                     </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
+                <div class="row">
                     <div class="col-12 col-sm-12 col-md-4 col-lg-2">
                         <mat-form-field appearance="outline">
                             <mat-label>Amount </mat-label>
@@ -81,7 +103,7 @@
                     <div class="col-12 col-sm-12 col-md-4 col-lg-1" class="set-button">
                         <button class="btn wlt-c-furg-btn-primary" (click)="setButtonClick()"> Set</button>
                     </div>
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-5" class="set-button-error">
+                    <div class="col-12 col-sm-12 col-md-4 col-lg-6" class="set-button-error">
                         <mat-error *ngIf="employeeAdvanceForm.controls['Amount'].hasError('pattern')">
                             Only numbers with up to two decimal places are allowed.
                         </mat-error>
@@ -92,6 +114,7 @@
                             <input type="text" formControlName="Particulars" matInput placeholder="" autocomplete="off">
                         </mat-form-field>
                     </div>
+
                 </div>
             </div>
             <br />
@@ -103,7 +126,7 @@
                                 <thead>
                                     <tr>
                                         <th>Employee Name</th>
-                                        <th>Aadhar No</th>
+                                        <th>IC No</th>
                                         <th>Bank</th>
                                         <th>Account No</th>
                                         <th>Amount</th>
@@ -113,7 +136,7 @@
                                 </thead>
                                 <tbody formArrayName="formArray">
                                     <tr *ngFor="let control of formArray; let i = index" [formGroupName]="i"
-                                    [ngClass]="{'row-alternate': i % 2 !== 0}">                                       
+                                        [ngClass]="{'row-alternate': i % 2 !== 0}">
                                         <td class="custom-row">
                                             <mat-form-field appearance="outline" class="small-padding">
                                                 <input matInput formControlName="EMP_NAME" readonly="true">
@@ -159,7 +182,7 @@
                                                             (click)="clearEmployeeAdvanceDetails()"> Cancel</button>
                                                         <button
                                                             *ngIf="(this.userAccessModel.updateAccess == true || this.userAccessModel.createAccess == true || currentUser == 'superadmin')"
-                                                            class="btn wlt-c-furg-btn-primary"                                                           
+                                                            class="btn wlt-c-furg-btn-primary"
                                                             (click)="savebuttonClick()">
                                                             {{isEmployeeIdValid() === false ? 'Save' :
                                                             'Update' }}</button>
