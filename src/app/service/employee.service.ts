@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {catchError, Observable, throwError} from "rxjs";
-import {HttpClient, HttpErrorResponse, HttpParams} from "@angular/common/http";
-import {environment} from "../../environments/environment";
+import { Injectable } from '@angular/core';
+import { catchError, Observable, throwError } from "rxjs";
+import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
+import { environment } from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -12,32 +12,32 @@ export class EmployeeService {
   constructor(private httpClient: HttpClient) {
   }
 
-  getEmployees(name: string="none") {
-    const params = {params: new HttpParams({fromString: "?name=" + name})};
+  getEmployees(name: string = "none") {
+    const params = { params: new HttpParams({ fromString: "?name=" + name }) };
     return this.httpClient.get<any>(this.apiUrl + 'Employee/Employees', params
     ).pipe(catchError(this.errorHandle));
   }
 
   getEmployeeMaster(userId: string): Observable<any> {
-    const params = {params: new HttpParams({fromString: "?userID=" + userId})};
+    const params = { params: new HttpParams({ fromString: "?userID=" + userId }) };
     return this.httpClient.get<any>(this.apiUrl + 'Employee/GetEmployeeMaster', params
     ).pipe(catchError(this.errorHandle));
   }
 
   getEmployeeById(empId: any) {
-    const params = {params: new HttpParams({fromString: "?employeeId=" + empId})};
+    const params = { params: new HttpParams({ fromString: "?employeeId=" + empId }) };
     return this.httpClient.get<any>(this.apiUrl + 'Employee/EmployeeById', params
     ).pipe(catchError(this.errorHandle));
   }
 
   getClientsFromBranchId(branchId: any, empType: any) {
-    const params = {params: new HttpParams({fromString: "?branchId=" + branchId + "&empType=" + empType})};
+    const params = { params: new HttpParams({ fromString: "?branchId=" + branchId + "&empType=" + empType }) };
     return this.httpClient.get<any>(this.apiUrl + 'Employee/GetClientsFromBranchId', params
     ).pipe(catchError(this.errorHandle));
   }
 
   getEmployeesByBranchId(branchId: any) {
-    const params = {params: new HttpParams({fromString: "?branchId=" + branchId })};
+    const params = { params: new HttpParams({ fromString: "?branchId=" + branchId }) };
     return this.httpClient.get<any>(this.apiUrl + 'Employee/EmployeesByBranchId', params
     ).pipe(catchError(this.errorHandle));
   }
@@ -52,7 +52,7 @@ export class EmployeeService {
   }
 
   checkEmployeeInfo(from: any, data: any) {
-    const params = {params: new HttpParams({fromString: "?from=" + from + "&data=" + data})};
+    const params = { params: new HttpParams({ fromString: "?from=" + from + "&data=" + data }) };
     return this.httpClient.get<any>(this.apiUrl + 'Employee/CheckEmployeeInfo', params
     ).pipe(catchError(this.errorHandle));
   }

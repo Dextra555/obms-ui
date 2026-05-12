@@ -104,4 +104,9 @@ export class DashboardComponent implements OnInit {
       this.showLoadingSpinner = false
     }
   }
+
+  onIframeLoad(event: any) {
+    console.log('Payment Due List iframe loaded successfully');
+    this.showLoadingSpinner = false;
+  }
 }
