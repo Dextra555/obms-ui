@@ -239,9 +239,13 @@ export class DashboardComponent implements OnInit {
       this.showLoadingSpinner = false
     }
   }
-
-  onIframeLoad(event: any) {
-    console.log('Payment Due List iframe loaded successfully');
-    this.showLoadingSpinner = false;
+  
+  
+  getEnvironmentStatus(): string {
+    return this.websiteDetails.production ? 'Production' : 'Development';
+  }
+  
+  getEnvironmentColor(): string {
+    return this.websiteDetails.production ? 'success' : 'warning';
   }
 }
