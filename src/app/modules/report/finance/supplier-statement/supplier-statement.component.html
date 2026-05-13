@@ -34,7 +34,7 @@
           <mat-form-field appearance="outline">
             <mat-label>Supplier</mat-label>
             <mat-select formControlName="Supplier" (selectionChange)="onSupplierSelectionChange($event)"
-            [panelClass]="'custom-dropdown-panel'">
+              [panelClass]="'custom-dropdown-panel'">
               <mat-option [value]="0"></mat-option>
               <mat-option *ngFor="let s of supplierList" value="{{s.Code}}">{{s.Name}}</mat-option>
             </mat-select>

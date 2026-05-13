@@ -1,11 +1,11 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator} from '@angular/material/paginator';
-import {MatTableDataSource} from '@angular/material/table';
-import {MatSort, Sort} from '@angular/material/sort';
-import {LiveAnnouncer} from '@angular/cdk/a11y';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {FormBuilder, FormGroup, Validators} from '@angular/forms';
-import {EmployeeService} from "../../../../service/employee.service";
+import { AfterViewInit, Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatSort, Sort } from '@angular/material/sort';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { EmployeeService } from "../../../../service/employee.service";
 
 @Component({
   selector: 'app-search-employee',
@@ -17,14 +17,14 @@ export class SearchEmployeeComponent implements OnInit {
   employees: IEmployee[] = [];
   dataSource!: MatTableDataSource<IEmployee>;
   displayedColumns: string[] = ['EMP_CODE', 'EMP_NAME', 'EMP_SEX', 'EMP_IC_NEW', 'EMP_IC_OLD', 'EMP_PASSPORT_NO', 'EMP_TOWN', 'action'];
-  branchList: any = [];  
+  branchList: any = [];
   constructor(private fb: FormBuilder, private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, public service: EmployeeService, @Inject(MAT_DIALOG_DATA) public info: any, public dialogRef: MatDialogRef<SearchEmployeeComponent>) {
     console.log(info);
 
     this.frm = fb.group({
       BRANCH_ID: []
     });
-    service.getEmployees(sessionStorage.getItem('username')!).subscribe((d: any) => {       
+    service.getEmployees(sessionStorage.getItem('username')!).subscribe((d: any) => {
       // this.dataSource = new MatTableDataSource(d['employees']);
       // this.dataSource.sort = this.sort;
       // this.dataSource.paginator = this.paginator;
@@ -102,5 +102,5 @@ export interface IEmployee {
   EMP_TOWN: string;
   EMPPAY_DATE_JOINED: Date;
   EMPPAY_CATEGORY: string;
-  EMP_ROLE:string;
+  EMP_ROLE: string;
 }
