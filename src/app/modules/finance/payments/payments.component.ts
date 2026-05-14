@@ -182,16 +182,11 @@ export class PaymentsComponent implements AfterViewInit {
 
   }
   getPaymentData(id: number) {
-    console.log('getPaymentData called with id:', id, 'currentUser:', this.currentUser);
     forkJoin({
-      branchPayment: this._financeService.getBranchPayment(id),
-      branchDetails: this._financeService.getBranchPaymentList(this.currentUser, id)
+      branchPayment: this._financeService.getBranchPayment(id)
     }).subscribe({
       next: (results) => {
-        console.log('forkJoin results:', results);
         const branchPayment = results.branchPayment;
-        const branchDetails = results.branchDetails;
-
         this.frm.patchValue({
           ID: branchPayment.ID,
           PaymentDate: branchPayment.PaymentDate,
@@ -229,34 +224,10 @@ export class PaymentsComponent implements AfterViewInit {
         this.existingPaymentType = branchPayment.PaymentType?.toString();
         this.existingChequeNo = branchPayment.ChequeNo;
 
-        // Load branch payment details
-        console.log('Branch payment details loaded:', branchDetails);
-        if (branchDetails && branchDetails.length > 0) {
-          console.log('Processing', branchDetails.length, 'branch details');
-          // Clear existing rows and add loaded data
-          this.rows.clear();
-          branchDetails.forEach((detail: any) => {
-            console.log('Adding branch detail:', detail);
-            this.addBranchAmount({
-              ID: detail.ID || 0,
-              PaymentID: detail.PaymentID || 0,
-              Code: detail.Code || '',
-              Name: detail.Name || '',
-              BName: detail.BName || '',
-              Amount: detail.Amount || 0
-            });
-          });
-          this.showDataSourceTable = true;
-          console.log('Branch rows after adding:', this.rows.length);
-        } else {
-          console.log('No branch details found or empty array');
-        }
-
         this.hideSpinner(); // Stop loading spinner after all updates
       },
       error: (err) => {
-        console.error('forkJoin error:', err);
-        this.showMessage(`Error loading payment data: ${err}`, 'error', 'Error Message');
+        this.showMessage(`Error loading data: ${err}`, 'error', 'Error Message');
         this.hideSpinner();
       }
     });
@@ -682,7 +653,7 @@ export class PaymentsComponent implements AfterViewInit {
     let apiCall$;
 
     if (paymentId > 0) {
-      apiCall$ = this._financeService.getCreditorInvoicePaymentList(this.currentUser, paymentId);
+       apiCall$ = this._financeService.getCreditorInvoicePaymentList(this.currentUser, paymentId);
       //apiCall$ = this._financeService.getCreditorInvoicePaymentListBySupplier(this.currentUser, paymentId, value);
     } else {
       // this._financeService.GetPaymentSupplierInvoices(value, this.currentUser).subscribe((d: any) => {

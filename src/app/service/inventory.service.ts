@@ -146,7 +146,7 @@ export class InventoryService {
 
   DeleteUtilityDetailById(id: string): Observable<any> {
     const params = { params: new HttpParams({ fromString: "?Id=" + id }) };
-    return this.httpClient.delete(this.apiUrl + 'Inventory/DeleteUtilityDetailById', params
+    return this.httpClient.post(this.apiUrl + 'Inventory/DeleteUtilityDetailById', params
     ).pipe(catchError(this.errorHandle));
   }
 
@@ -194,25 +194,91 @@ export class InventoryService {
     ).pipe(catchError(this.errorHandle));
   }
 
+  // deleteItem(id: number, currentUser: string): Observable<any> {
+  //   return this.httpClient.post<any>(`${this.apiUrl}Inventory/DeleteItem/${id}?currentUser=${currentUser}`);
+  // }
+
+  // deleteAssetType(id: number): Observable<any> {
+  //   return this.httpClient.post(`${this.apiUrl}Inventory/DeleteAsset/${id}`);
+  // }
+
+  // deleteRecipientType(id: number): Observable<any> {
+  //   return this.httpClient.post(`${this.apiUrl}Inventory/DeleteRecipient/${id}`);
+  // }
+
+  // deleteCategory(id: number, currentUser: string): Observable<any> {
+  //   return this.httpClient.post<any>(`${this.apiUrl}Inventory/DeleteCategory/${id}?currentUser=${currentUser}`);
+  // }
+
+  // deleteSupplierType(id: number): Observable<any> {
+  //   return this.httpClient.post(`${this.apiUrl}Inventory/DeleteSupplier/${id}`);
+  // }
+
   deleteItem(id: number, currentUser: string): Observable<any> {
-    return this.httpClient.delete<any>(`${this.apiUrl}Inventory/DeleteItem/${id}?currentUser=${currentUser}`);
+    return this.httpClient.post<any>(
+      `${this.apiUrl}Inventory/DeleteItem/${id}?currentUser=${encodeURIComponent(currentUser)}`,
+      null
+    );
   }
 
   deleteAssetType(id: number): Observable<any> {
-    return this.httpClient.delete(`${this.apiUrl}Inventory/DeleteAsset/${id}`);
+    return this.httpClient.post<any>(
+      `${this.apiUrl}Inventory/DeleteAsset/${id}`,
+      null
+    );
   }
 
   deleteRecipientType(id: number): Observable<any> {
-    return this.httpClient.delete(`${this.apiUrl}Inventory/DeleteRecipient/${id}`);
+    return this.httpClient.post<any>(
+      `${this.apiUrl}Inventory/DeleteRecipient/${id}`,
+      null
+    );
   }
 
-   deleteCategory(id: number, currentUser: string): Observable<any> {
-    return this.httpClient.delete<any>(`${this.apiUrl}Inventory/DeleteCategory/${id}?currentUser=${currentUser}`);
+  deleteCategory(id: number, currentUser: string): Observable<any> {
+    return this.httpClient.post<any>(
+      `${this.apiUrl}Inventory/DeleteCategory/${id}?currentUser=${encodeURIComponent(currentUser)}`,
+      null
+    );
   }
-  
-   deleteSupplierType(id: number): Observable<any> {
-    return this.httpClient.delete(`${this.apiUrl}Inventory/DeleteSupplier/${id}`);
+
+  deleteSupplierType(id: number): Observable<any> {
+    return this.httpClient.post<any>(
+      `${this.apiUrl}Inventory/DeleteSupplier/${id}`,
+      null
+    );
   }
+
+  isCreditorInvoice(invoiceID: number): Observable<boolean> {
+    return this.httpClient.get<boolean>(`${this.apiUrl}Inventory/CreditorInvoice_CheckOnBranchPayments/${invoiceID}`);
+  }
+
+  deleteExpensesById(id: number, currentUser: string): Observable<boolean> {
+    const params = new HttpParams()
+      .set('currentUser', currentUser);
+
+    return this.httpClient.get<boolean>(
+      `${this.apiUrl}Inventory/DeleteExpensesByID/${id}`,
+      { params }
+    );
+  }
+
+  getUtilitySearchList(payload: any) {
+    return this.httpClient.get<any[]>(
+      `${this.apiUrl}Inventory/GetUtilityBillSearchList`,
+      {
+        params: {
+          branch: payload.branch,
+          supplier: payload.supplier,
+          invoiceType: 'U',
+          invoiceNo: payload.invoiceNo || '',
+          invoiceDate: payload.invoiceDate || '',
+          paymentDate: payload.paymentDate || ''
+        }
+      }
+    );
+  }
+
   private errorHandle(error: HttpErrorResponse) {
     let errorMessage: string = '';
     if (error.error instanceof ErrorEvent) {

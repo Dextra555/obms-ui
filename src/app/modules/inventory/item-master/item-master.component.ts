@@ -40,14 +40,18 @@ export class ItemMasterComponent implements AfterViewInit {
   data: any = [];
   displayedColumns: string[] = ['CategoryName', 'ItemName', 'Quantity', 'Price', 'SellPrice', 'Remarks', 'action'];
   dataSource = new MatTableDataSource<IItem>();
+  pageSizeOptions: number[] = [];
 
-  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private service: InventoryService,private route: Router,
+  constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private service: InventoryService, private route: Router,
     private _dataService: DatasharingService, private _masterService: MastermoduleService) {
     this.userAccessModel = {
       readAccess: false,
       updateAccess: false,
       deleteAccess: false,
       createAccess: false,
+    }
+    for (let i = 10; i <= 50; i += 10) {
+      this.pageSizeOptions.push(i);
     }
   }
 
@@ -77,6 +81,14 @@ export class ItemMasterComponent implements AfterViewInit {
               this.data = d;
               if (d.length > 0) {
                 this.dataSource = new MatTableDataSource(d);
+                this.pageSizeOptions = [];
+                const totalRows = d.length;
+                for (let i = 10; i <= totalRows && i <= 1000; i += 10) {
+                  this.pageSizeOptions.push(i);
+                }
+                if (totalRows > 0 && totalRows < 10) {
+                  this.pageSizeOptions.push(totalRows);
+                }
                 this.dataSource.sort = this.sort;
               } else {
                 this.errorMessage = `No data available for <span style="color: black;">${this.currentUser}</span>. Please try again later.`;
@@ -126,13 +138,13 @@ export class ItemMasterComponent implements AfterViewInit {
         data: `Are you sure you want to delete this Item?`
       })
       .afterClosed()
-      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {       
+      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {
         if (result.confirmDialog) {
 
           this.service.deleteItem(id, this.currentUser).subscribe({
             next: res => {
               this.showMessage(`Item deleted successfully.`, 'success', 'Success Message');
-               this.route.navigateByUrl('/dummy', { skipLocationChange: true }).then(() => {
+              this.route.navigateByUrl('/dummy', { skipLocationChange: true }).then(() => {
                 this.route.navigate(['/inventory/item-master']);
               });
             },
@@ -158,7 +170,10 @@ export class ItemMasterComponent implements AfterViewInit {
       icon: icon, // Dynamically set the icon based on the parameter
       showCloseButton: false,
       timer: 5000,
-      width: '600px'
+      width: '600px',
+      customClass: {
+        popup: 'swal-top-offset'
+      }
     });
     this.hideLoadingSpinner();
     return;

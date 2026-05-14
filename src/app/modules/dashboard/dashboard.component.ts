@@ -109,13 +109,27 @@ export class DashboardComponent implements OnInit {
       }
     );
     
-    // Get pending payments count
-    this._masterService.getMonthlyInvoices('', '').subscribe(
+    // Get pending payments count (current month)
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    const invoiceStartPeriod = this.formatDateForApi(startOfMonth);
+    const invoiceEndPeriod = this.formatDateForApi(endOfMonth);
+    
+    this._masterService.getMonthlyInvoices(invoiceStartPeriod, invoiceEndPeriod).subscribe(
       (data) => {
         this.websiteDetails.systemStats.pendingPayments = data?.length || 0;
+        console.log('Pending payments loaded:', this.websiteDetails.systemStats.pendingPayments);
       },
       (error) => {
         console.error('Error loading pending payments:', error);
+        // Set default value on error instead of showing broken state
+        this.websiteDetails.systemStats.pendingPayments = 0;
+        // Optionally show error message to user
+        if (error?.error?.message) {
+          console.warn('Server error:', error.error.message);
+        }
       }
     );
 
@@ -240,6 +254,15 @@ export class DashboardComponent implements OnInit {
     }
   }
   
+  /**
+   * Format date for API requests in ISO format (YYYY-MM-DD)
+   */
+  private formatDateForApi(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
   
   getEnvironmentStatus(): string {
     return this.websiteDetails.production ? 'Production' : 'Development';

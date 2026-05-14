@@ -16,6 +16,8 @@ import { DatasharingService } from "../../../service/datasharing.service";
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { forkJoin } from 'rxjs';
+import { DialogConfirmationComponent } from 'src/app/components/dialog-confirmation/dialog-confirmation.component';
 
 export interface IItemDetails {
   ID: number,
@@ -39,6 +41,10 @@ export interface IItemDetails {
   styleUrls: ['./utility-bills.component.css']
 })
 export class UtilityBillsComponent implements AfterViewInit {
+  @ViewChild(MatPaginator)
+  paginator!: MatPaginator;
+  @ViewChild(MatSort)
+  sort!: MatSort;
   displayedColumns: string[] = ['InvoicePeriodFrom', 'InvoicePeriodTo', 'Amount', 'Note', 'action'];
   // dataSource = new MatTableDataSource(ELEMENT_DATA);
   frm!: FormGroup
@@ -58,8 +64,10 @@ export class UtilityBillsComponent implements AfterViewInit {
   warningMessage: string = '';
   errorMessage: string = '';
   showLoadingSpinner: boolean = false;
+  invoiceID = 0;
 
-  constructor(private fb: FormBuilder, public dialog: MatDialog, private _liveAnnouncer: LiveAnnouncer, commonService: CommonService, private service: InventoryService, private route: Router,
+  constructor(private fb: FormBuilder, public dialog: MatDialog, private _liveAnnouncer: LiveAnnouncer,
+    commonService: CommonService, private service: InventoryService, private route: Router,
     private _dataService: DatasharingService, private _masterService: MastermoduleService) {
     this.userAccessModel = {
       readAccess: false,
@@ -99,28 +107,39 @@ export class UtilityBillsComponent implements AfterViewInit {
     })
   }
 
-
-  @ViewChild(MatPaginator)
-  paginator!: MatPaginator;
-  @ViewChild(MatSort)
-  sort!: MatSort;
-
   ngAfterViewInit() {
 
   }
+
+  ngOnInit() {
+    this._dataService.getSelectedInvoice().subscribe((result: any) => {
+      if (!result || result.length === 0) return;
+
+      this.returnResult = { ...result };
+      this.invoiceID = result.ID;
+
+      this.frm.patchValue(this.returnResult);
+      this.frm.get('Supplier')?.setValue(result.Supplier.toString());
+      this.frm.get('ItemCategory')?.setValue(result.ItemCategory.toString());
+
+      this.categoryChange();
+
+    });
+  }
+
   onInvoiceDateSelected(event: any): void {
-    const selectedDate = event.value; 
+    const selectedDate = event.value;
     const invoicePeriodFromControl = this.frm.get('details.InvoicePeriodFrom');
     const invoicePeriodToControl = this.frm.get('details.InvoicePeriodTo');
     if (selectedDate) {
       // Example: Maybe check if it's before the PaymentDate
       const paymentDate = this.frm.get('PaymentDate')?.value;
 
-      if (invoicePeriodFromControl && this.returnDate(selectedDate) <= this.returnDate(paymentDate)) {       
+      if (invoicePeriodFromControl && this.returnDate(selectedDate) <= this.returnDate(paymentDate)) {
         if (invoicePeriodFromControl) {
           invoicePeriodFromControl.setValue(this.returnDate(selectedDate));
         }
-      } else if (invoicePeriodFromControl) { 
+      } else if (invoicePeriodFromControl) {
         invoicePeriodFromControl.setValue(this.returnDate(selectedDate))
         this.frm.get('PaymentDate')?.setValue(null);
         invoicePeriodToControl?.setValue("");
@@ -129,10 +148,10 @@ export class UtilityBillsComponent implements AfterViewInit {
     }
   }
   onPaymentDateSelected(event: any): void {
-    const selectedDate = event.value; 
+    const selectedDate = event.value;
     const invoicePeriodToControl = this.frm.get('details.InvoicePeriodTo');
 
-    if (selectedDate) {      
+    if (selectedDate) {
       const invoiceDate = this.frm.get('InvoiceDate')?.value;
       if (invoiceDate && this.returnDate(selectedDate) >= this.returnDate(invoiceDate)) {
         // Payment date is on or after Invoice date - This is likely the valid case
@@ -140,12 +159,13 @@ export class UtilityBillsComponent implements AfterViewInit {
           invoicePeriodToControl.setValue(this.returnDate(selectedDate));
         }
       } else if (invoiceDate) {
-        this.frm.get('PaymentDate')?.setValue(null); 
+        this.frm.get('PaymentDate')?.setValue(null);
         invoicePeriodToControl?.setValue("");
         this.showMessage(`Payment date cannot be earlier than the Invoice date.`, 'warning', 'Warning Message');
       }
     }
   }
+
   getUserAccessRights(userName: string, screenName: string) {
     this._masterService.getUserAccessRights(userName, screenName).subscribe(
       (data) => {
@@ -179,22 +199,11 @@ export class UtilityBillsComponent implements AfterViewInit {
       }
     );
   }
-  searchinvoice() {
-    const dialogRef = this.dialog.open(SearchUtilityBillsComponent, {
-      disableClose: true,
-      panelClass: ['wlt-c-lg-admin-dialog', 'animate__animated', 'animate__slideInDown'],
-      width: '900px',
-      //  position: { right: '0'}
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      this.returnResult = result
-      this.frm.patchValue(result);
-      this.frm.get("Supplier")?.setValue(result['Supplier'].toString());
-      this.frm.get("ItemCategory")?.setValue(result['ItemCategory'].toString());
 
-      this.categoryChange();
-    });
+  searchinvoice() {
+    this.route.navigate(['/finance/utility-search']);
   }
+
 
   categoryChange() {
     this.service.GetPaytoByCategory(this.frm.get('ItemCategory')?.value).subscribe((d: any) => {
@@ -206,7 +215,6 @@ export class UtilityBillsComponent implements AfterViewInit {
         this.isEdit = true;
         this.frm.get("RecID")?.setValue(this.returnResult['RecID'].toString());
         this.service.GetUtilityDetailsByID(id).subscribe((d: any) => {
-          console.log(d);
           d.map((d: any) => {
             d['InvoicePeriodFrom'] = this.returnDate(d['InvoicePeriodFrom']);
             d['InvoicePeriodTo'] = this.returnDate(d['InvoicePeriodTo']);
@@ -225,7 +233,7 @@ export class UtilityBillsComponent implements AfterViewInit {
   }
 
   addItemDetails(action: string) {
-
+    this.errorDescription = '';
     let frmData = this.frm.getRawValue();
     let details = frmData['details'];
 
@@ -275,15 +283,17 @@ export class UtilityBillsComponent implements AfterViewInit {
   deleteRow(row: IItemDetails, index: any) {
     if (row.ID != 0) {
       this.service.DeleteUtilityDetailById(row.ID + "").subscribe((d: any) => {
-        console.log(d);
       })
     }
     this.details.splice(index, 1);
     this.detailDataSource();
   }
 
+  supplierChange(event: any) {
+    this.frm.get('RecID')?.setValue(event.value);
+  }
+
   returnDate(date?: any) {
-    console.log(date);
     let currentDate = new Date();
     if (date) {
       currentDate = new Date(date);
@@ -313,7 +323,8 @@ export class UtilityBillsComponent implements AfterViewInit {
     this.details.forEach((d: any, index) => {
       d['SerialNo'] = index + 1;
       d['LastUpdatedBy'] = this.currentUser;
-      total += parseInt(d['Amount']);
+      const amount = d['Amount'] != null ? Number(d['Amount']) : 0;
+      total += amount;
     });
 
 
@@ -325,35 +336,72 @@ export class UtilityBillsComponent implements AfterViewInit {
     data['PaymentDate'] = this.returnDate(this.frm.get('PaymentDate')?.value);
     data['LastUpdatedBy'] = this.currentUser;
 
-    console.log(data);
     let msg = "";
     this.service.saveUtility(data).subscribe((d: any) => {
+      this._dataService.setSelectedInvoice([]);
       if (this.isEdit) {
-        msg = 'Successfully Updated Utility Details';
+        msg = 'Successfully Updated Expenses Details';
       } else {
-        msg = 'Successfully Saved Utility Details';
+        msg = 'Successfully Saved Expenses Details';
       }
-      Swal.fire({
-        toast: true,
-        position: 'top',
-        showConfirmButton: false,
-        title: 'Success',
-        text: msg,
-        icon: 'success',
-        showCloseButton: false,
-        timer: 3000,
-      });
-      this.route.navigate(['/inventory/utility-bills']);
+      this.showMessage(msg, 'success', 'Success Message')
       this.frm.reset();
       this.details = [];
       this.detailDataSource();
+      this.route.navigate(['/inventory/utility-bills']);     
     })
   }
 
-  supplierChange(event: any) {
-    this.frm.get('RecID')?.setValue(event.value);
+  deleteButtonClick() {
+    this.showLoadingSpinner = true;
+    this.dialog
+      .open(DialogConfirmationComponent, {
+        data: `Are you sure want to delete this expense?`
+      })
+      .afterClosed()
+      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {
+        if (result.confirmDialog) {
+          if (this.invoiceID > 0) {
+            this.service.isCreditorInvoice(this.invoiceID).subscribe({
+              next: (isAvailable: boolean) => {
+                if (isAvailable) {
+                  // If invoice available, then get final invoice date
+                  forkJoin({
+                    finalInvoiceDate: this.service.deleteExpensesById(this.invoiceID, this.currentUser)
+                  }).subscribe({
+                    next: (results: any) => {
+                      if (results) {
+                        this._dataService.setSelectedInvoice([]);
+                        this.route.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+                          this.route.navigate(['/inventory/utility-bills']);
+                        });
+                        this.showMessage(`Expenses Bill details are deleted successfully.`, 'success', 'Success Message');
+                      }
+                    },
+                    error: (err: any) => {
+                      console.error('Error getting Utility Bill details date', err);
+                    }
+                  });
+                } else {
+                  this.showMessage(`Expenses Bill Payment Exist.Please Check.`, 'warning', 'Warning Message');
+                }
+              },
+              error: (err: any) => {
+                console.error('Error checking invoice availability', err);
+              }
+            });
+          }
+          else {
+            this.hideLoadingSpinner();
+          }
+
+        } else {
+          this.hideLoadingSpinner();
+        }
+      })
   }
-private showMessage(message: string, icon: 'success' | 'warning' | 'info' | 'error' = 'info',
+
+  private showMessage(message: string, icon: 'success' | 'warning' | 'info' | 'error' = 'info',
     title: 'Success Message' | 'Warning Message' | 'Error Message'): void {
     Swal.fire({
       toast: true,
@@ -364,7 +412,10 @@ private showMessage(message: string, icon: 'success' | 'warning' | 'info' | 'err
       icon: icon, // Dynamically set the icon based on the parameter
       showCloseButton: false,
       timer: 5000,
-      width: '600px'
+      width: '600px',
+      customClass: {
+        popup: 'swal-top-offset'
+      }
     });
     this.hideLoadingSpinner();
     return;

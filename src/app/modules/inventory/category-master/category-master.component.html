@@ -3,15 +3,15 @@
     <div class="row mb-2">
       <div class="col-12 col-sm-12 col-md-6 col-lg-6">
         <h1 class="mb-1">Category Master</h1>
-      </div><!-- /.col -->
+      </div>
       <div class="col-12 col-sm-12 col-md-6 col-lg-6 my-1">
         <ol class="breadcrumb float-md-right">
-          <li class="breadcrumb-item"><a class="breadcrumb-item">Finance</a></li>
+          <li class="breadcrumb-item"><a routerLink="/dashboard">Finance</a></li>
           <li class="breadcrumb-item active">Category Master</li>
         </ol>
-      </div><!-- /.col -->
-    </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
+      </div>
+    </div>
+  </div>
 </div>
 <mat-card>
   <mat-card-content>
@@ -65,8 +65,8 @@
             </a>
             <!-- <a style="cursor:pointer;" class="wlt-c-furg-text-success mr-2" matTooltip="View"><mat-icon aria-hidden="false" aria-label="view icon">visibility</mat-icon></a> -->
             <a *ngIf="this.userAccessModel.deleteAccess == true || currentUser == 'superadmin'" style="cursor:pointer;"
-              class="wlt-c-furg-text-danger" (click)="deleteClickButton(element.ID)"  matTooltip="Delete"><mat-icon aria-hidden="false"
-                aria-label="trash icon">delete_outline</mat-icon></a>
+              class="wlt-c-furg-text-danger" (click)="deleteClickButton(element.ID)" matTooltip="Delete"><mat-icon
+                aria-hidden="false" aria-label="trash icon">delete_outline</mat-icon></a>
           </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -79,7 +79,8 @@
     <div *ngIf="errorMessage !==''">
       <mat-label style="color:red" [innerHTML]="errorMessage"></mat-label>
     </div>
-    <mat-paginator [pageSizeOptions]="[10, 20, 30]" showFirstLastButtons aria-label="Select page of periodic elements">
+    <mat-paginator [pageSizeOptions]="pageSizeOptions" showFirstLastButtons
+      aria-label="Select page of periodic elements">
     </mat-paginator>
 
 
