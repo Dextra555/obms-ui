@@ -1,17 +1,17 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {MatDialog} from '@angular/material/dialog';
-import {MatTableDataSource} from '@angular/material/table';
-import {LiveAnnouncer} from '@angular/cdk/a11y';
-import {SearchInvoiceComponent} from '../../finance/invoice/search-invoice/search-invoice.component';
-import {InventoryService} from "../../../service/inventory.service";
-import {DatasharingService} from "../../../service/datasharing.service";
-import {IItemDetails} from "../purchase-bills/purchase-bills.component";
-import {MatPaginator} from "@angular/material/paginator";
-import {MatSort} from "@angular/material/sort";
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { SearchInvoiceComponent } from '../../finance/invoice/search-invoice/search-invoice.component';
+import { InventoryService } from "../../../service/inventory.service";
+import { DatasharingService } from "../../../service/datasharing.service";
+import { IItemDetails } from "../purchase-bills/purchase-bills.component";
+import { MatPaginator } from "@angular/material/paginator";
+import { MatSort } from "@angular/material/sort";
 import Swal from "sweetalert2";
-import {Router} from "@angular/router";
-import {SearchMaterialIssueComponent} from "./search-material-issue/search-material-issue.component";
+import { Router } from "@angular/router";
+import { SearchMaterialIssueComponent } from "./search-material-issue/search-material-issue.component";
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
 
@@ -24,7 +24,7 @@ export interface PeriodicElement {
 }
 
 const ELEMENT_DATA: PeriodicElement[] = [
-  {item: 'Test', price: '10', unit: '3', total: '30'},
+  { item: 'Test', price: '10', unit: '3', total: '30' },
 ];
 
 @Component({
@@ -46,16 +46,16 @@ export class MaterialIssueComponent implements AfterViewInit {
   isEdit: boolean = false;
   _row: any = null;
   returnResult: any;
-  userAccessModel!: UserAccessModel; 
+  userAccessModel!: UserAccessModel;
   warningMessage: string = '';
   errorMessage: string = '';
   showLoadingSpinner: boolean = false;
-  constructor(private fb: FormBuilder, public dialog: MatDialog, private _liveAnnouncer: LiveAnnouncer, private service: InventoryService, private _dataService: DatasharingService, private route: Router,private _masterService: MastermoduleService) {
+  constructor(private fb: FormBuilder, public dialog: MatDialog, private _liveAnnouncer: LiveAnnouncer, private service: InventoryService, private _dataService: DatasharingService, private route: Router, private _masterService: MastermoduleService) {
     this.userAccessModel = {
       readAccess: false,
-      updateAccess:false,
-      deleteAccess:false,
-      createAccess:false,
+      updateAccess: false,
+      deleteAccess: false,
+      createAccess: false,
     }
     this.currentUser = sessionStorage.getItem('username')!;
     if (this.currentUser == 'null' || this.currentUser == undefined) {
@@ -64,9 +64,9 @@ export class MaterialIssueComponent implements AfterViewInit {
       });
     }
     this.getUserAccessRights(this.currentUser, 'Material Issue');
-    
+
     this.frm = this.fb.group({
-      ID:[0],
+      ID: [0],
       Branch: [''],
       InvoiceNo: [''],
       InvoiceDate: [''],
@@ -89,15 +89,15 @@ export class MaterialIssueComponent implements AfterViewInit {
       }),
     });
 
-    this.frm.get('details.CostPerUnit')?.disable({onlySelf: true});
-    this.frm.get('details.Amount')?.disable({onlySelf: true});
+    this.frm.get('details.CostPerUnit')?.disable({ onlySelf: true });
+    this.frm.get('details.Amount')?.disable({ onlySelf: true });
   }
 
 
   ngAfterViewInit() {
 
   }
-  getUserAccessRights(userName: string, screenName: string) {   
+  getUserAccessRights(userName: string, screenName: string) {
     this._masterService.getUserAccessRights(userName, screenName).subscribe(
       (data) => {
         if (data != null) {
@@ -109,7 +109,7 @@ export class MaterialIssueComponent implements AfterViewInit {
 
           if (this.userAccessModel.readAccess === true || this.currentUser == 'superadmin') {
             this.warningMessage = '';
-            this.service.GetMaterialMasterList(this.currentUser).subscribe((d: any) => {             
+            this.service.GetMaterialMasterList(this.currentUser).subscribe((d: any) => {
               this.branchList = d['branchList'];
               this.categoryList = d['categoryList'];
             })
@@ -119,7 +119,7 @@ export class MaterialIssueComponent implements AfterViewInit {
                       You do not have permissions to view this page. <br>
                       If you feel you should have access to this page, Please contact administrator. <br>
                       Thank you`;
-                      this.hideLoadingSpinner();
+            this.hideLoadingSpinner();
           }
         }
 
@@ -151,7 +151,7 @@ export class MaterialIssueComponent implements AfterViewInit {
       this.service.GetMaterialDetailListByInvoiceId(id).subscribe((d: any) => {
         console.log(d);
         this.details = [...d];
-        this.details.map( (d:any)=> d.Amount = d?.NoOfUnits * d?.CostPerUnit)
+        this.details.map((d: any) => d.Amount = d?.NoOfUnits * d?.CostPerUnit)
         this.detailDataSource();
       })
     }
@@ -322,6 +322,10 @@ export class MaterialIssueComponent implements AfterViewInit {
         icon: 'success',
         showCloseButton: false,
         timer: 3000,
+        width: '600px',
+        customClass: {
+          popup: 'swal-top-offset'
+        }
       });
       this.route.navigate(['/inventory/material-issue']);
       this.frm.reset();
@@ -335,7 +339,7 @@ export class MaterialIssueComponent implements AfterViewInit {
       this.hideLoadingSpinner();
     }
   }
-  hideLoadingSpinner(){
+  hideLoadingSpinner() {
     this.showLoadingSpinner = false
   }
 }

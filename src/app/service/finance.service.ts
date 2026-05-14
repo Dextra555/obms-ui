@@ -470,7 +470,7 @@ export class FinanceService {
 
 
 
-  getPaymentListByCategory(categoryId: string, startDate: string, endDate: string): Observable<any> {
+  getPaymentListByCategory(categoryId: string, startDate: string, endDate: string): Observable<{ data: any[] }> {
 
     const params = new HttpParams()
 
@@ -480,15 +480,13 @@ export class FinanceService {
 
       .set('endDate', endDate);
 
-    return this.httpClient.get<any>(`${this.apiUrl}Finance/PaymentListByCategory`, { params })
-
-      .pipe(catchError(this.errorHandle));
+    return this.httpClient.get<{ data: any[] }>(`${this.apiUrl}Finance/GetPaymentListByCategory`, { params });
 
   }
 
 
 
-  getBranchPaymentsTotalAmountByCategory(categoryId: string, startDate: string, endDate: string): Observable<any> {
+  getBranchPaymentsTotalAmountByCategory(categoryId: string, startDate: string, endDate: string): Observable<number> {
 
     const params = new HttpParams()
 
@@ -498,9 +496,7 @@ export class FinanceService {
 
       .set('endDate', endDate);
 
-    return this.httpClient.get<any>(`${this.apiUrl}Finance/BranchPaymentsTotalAmountByCategory`, { params })
-
-      .pipe(catchError(this.errorHandle));
+    return this.httpClient.get<number>(`${this.apiUrl}Finance/GetBranchPaymentsTotalAmountByCategory`, { params });
 
   }
 

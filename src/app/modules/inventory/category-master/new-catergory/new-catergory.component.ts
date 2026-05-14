@@ -106,7 +106,10 @@ export class NewCatergoryComponent implements OnInit {
       icon: icon, // Dynamically set the icon based on the parameter
       showCloseButton: false,
       timer: 5000,
-      width: '600px'
+      width: '600px', 
+      customClass: {
+        popup: 'swal-top-offset'
+      }
     });
     this.hideLoadingSpinner();
     return;

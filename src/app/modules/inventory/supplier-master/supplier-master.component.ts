@@ -35,8 +35,9 @@ export class SupplierMasterComponent implements AfterViewInit {
   warningMessage: string = '';
   errorMessage: string = '';
   showLoadingSpinner: boolean = false;
-  displayedColumns: string[] = ['Code', 'Name', 'Address', 'ContactPerson', 'action']; 
+  displayedColumns: string[] = ['Code', 'Name', 'Address', 'ContactPerson', 'action'];
   dataSource = new MatTableDataSource<PeriodicElement>();
+  pageSizeOptions: number[] = [];
 
   constructor(private _liveAnnouncer: LiveAnnouncer, public dialog: MatDialog, private service: InventoryService, private route: Router,
     private _dataService: DatasharingService, private _masterService: MastermoduleService) {
@@ -46,7 +47,9 @@ export class SupplierMasterComponent implements AfterViewInit {
       deleteAccess: false,
       createAccess: false,
     }
-
+    for (let i = 10; i <= 50; i += 10) {
+      this.pageSizeOptions.push(i);
+    }
   }
   ngOnInit(): void {
     this.currentUser = sessionStorage.getItem('username')!;
@@ -73,6 +76,14 @@ export class SupplierMasterComponent implements AfterViewInit {
               if (d.length > 0) {
                 d.map((d: any) => d['Address'] = d['Address1'] + ", " + d['Address2'])
                 this.dataSource = new MatTableDataSource(d);
+                this.pageSizeOptions = [];
+                const totalRows = d.length;
+                for (let i = 10; i <= totalRows && i <= 1000; i += 10) {
+                  this.pageSizeOptions.push(i);
+                }
+                if (totalRows > 0 && totalRows < 10) {
+                  this.pageSizeOptions.push(totalRows);
+                }
                 this.dataSource.sort = this.sort;
                 this.dataSource.paginator = this.paginator;
               } else {
@@ -121,7 +132,7 @@ export class SupplierMasterComponent implements AfterViewInit {
         data: `Are you sure you want to delete this Item?`
       })
       .afterClosed()
-      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {       
+      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {
         if (result.confirmDialog) {
 
           this.service.deleteSupplierType(id).subscribe({
@@ -153,7 +164,10 @@ export class SupplierMasterComponent implements AfterViewInit {
       icon: icon, // Dynamically set the icon based on the parameter
       showCloseButton: false,
       timer: 5000,
-      width: '600px'
+      width: '600px',
+      customClass: {
+        popup: 'swal-top-offset'
+      }
     });
     this.hideLoadingSpinner();
     return;

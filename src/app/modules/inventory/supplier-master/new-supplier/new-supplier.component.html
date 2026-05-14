@@ -3,16 +3,16 @@
         <div class="row mb-2">
             <div class="col-12 col-sm-12 col-md-4 col-lg-4">
                 <h1 class="mb-1">{{isEdit ? 'Edit' : 'Add'}} Supplier</h1>
-            </div><!-- /.col -->
+            </div>
             <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
                 <ol class="breadcrumb float-md-right">
-                    <li class="breadcrumb-item"><a class="breadcrumb-item">Finance</a></li>
-                    <li class="breadcrumb-item"><a routerLink="/inventory/supplier-master">Supplier Master</a></li>
+                    <li class="breadcrumb-item"><a routerLink="/dashboard">Finance</a></li>
+                    <li class="breadcrumb-item"><a routerLink="/inventory/supplier-master">Supplier Master List</a></li>
                     <li class="breadcrumb-item active">{{isEdit ? 'Update' : 'New'}} Supplier</li>
                 </ol>
-            </div><!-- /.col -->
-        </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
+            </div>
+        </div>
+    </div>
 </div>
 <mat-card>
     <mat-card-content>
@@ -63,7 +63,7 @@
                     <mat-form-field appearance="outline">
                         <mat-label>State</mat-label>
                         <mat-select formControlName="State">
-                          <mat-option *ngFor="let d of stateList" value="{{d}}">{{d}}</mat-option>
+                            <mat-option *ngFor="let d of stateList" value="{{d}}">{{d}}</mat-option>
                         </mat-select>
                     </mat-form-field>
                 </div>
@@ -103,10 +103,10 @@
                         <mat-label>Category</mat-label>
                         <mat-select formControlName="Category">
                             <mat-option value="U">
-                              Utility
+                                Expenses
                             </mat-option>
                             <mat-option value="P">
-                              Purchase
+                                Purchase
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -123,9 +123,11 @@
             <div class="row">
                 <div class="col-12">
                     <div class="text-right">
-                        <button class="btn wlt-c-furg-btn-gray mr-3"  (click)="onCancelClick()" mat-dialog-close> Cancel</button>
-                        <button *ngIf="this.userAccessModel.createAccess == true|| this.userAccessModel.updateAccess == true  || currentUser == 'superadmin'"
-                        class="btn wlt-c-furg-btn-primary">  {{isEdit ? 'Update' : 'Save'}}</button>
+                        <button class="btn wlt-c-furg-btn-gray mr-3" (click)="onCancelClick()" mat-dialog-close>
+                            Cancel</button>
+                        <button
+                            *ngIf="this.userAccessModel.createAccess == true|| this.userAccessModel.updateAccess == true  || currentUser == 'superadmin'"
+                            class="btn wlt-c-furg-btn-primary"> {{isEdit ? 'Update' : 'Save'}}</button>
                     </div>
                 </div>
             </div>
@@ -135,9 +137,9 @@
 
 <!-- model pop up for logic started -->
 <div [style.display]="showLoadingSpinner ? 'block' : 'none'"
-  style="margin-top: -20.5rem; display: block; margin-left: -6.5rem;">
-  <div class="d-flex justify-content-center">
-    <span class="loader"></span>
-  </div>
+    style="margin-top: -20.5rem; display: block; margin-left: -6.5rem;">
+    <div class="d-flex justify-content-center">
+        <span class="loader"></span>
+    </div>
 </div>
 <!-- model pop up for logic ended -->

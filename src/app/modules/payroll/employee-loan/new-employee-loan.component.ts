@@ -240,6 +240,18 @@ export class NewEmployeeLoanComponent implements OnInit {
     }
 
   }
+
+  radioButtonTypeSelectionChange(event: any) {
+    const advanceDate = this.formatDate(this.employeeLoanForm.get('AdvanceDate')?.value);
+    const branchCode = this.employeeLoanForm.get('BranchCode')?.value;
+    if (advanceDate != null && advanceDate != 'NaN-NaN-NaN' && branchCode != '' && branchCode != null) {
+      this.errorMessage = '';
+      this.employeeListModel = [];
+      this.EmployeeID = 0;
+      this.employeeLoanForm.patchValue({ EmployeeID: '', Amount: '', NoOfInstallments: '', MonthlyRepayment: '' });
+      this.getEmployeeListByEmployeeType(advanceDate, branchCode, event.value, 3, 0, 'All');
+    }
+  }
   onEmployeeSelectionChange(event: any) {
     const selectedId = event.value; // This is employee.ID (DB key)
     if (this.isEdit == true) {

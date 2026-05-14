@@ -22,6 +22,7 @@ export class DashboardComponent implements OnInit {
   userAccessModel!: UserAccessModel;
   menuName: string = '';
   currentDate: Date = new Date();
+  isAdminOrSuperAdmin: boolean = false;
 
   // Simple dashboard data
   websiteDetails = {
@@ -54,10 +55,12 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = sessionStorage.getItem('username')!;
+    const userRole = sessionStorage.getItem('userrole');
+    this.isAdminOrSuperAdmin = (userRole === '1' || userRole === '2' || userRole === 'true' || this.currentUser === 'superadmin');
     if (this.currentUser == null) {
       this._dataService.getUsername().subscribe((username) => {
         this.currentUser = username;
-      });
+      }); 
     }
     this._dataService.getMenuName().subscribe(menu => {
       this.menuName = menu;
@@ -109,13 +112,27 @@ export class DashboardComponent implements OnInit {
       }
     );
     
-    // Get pending payments count
-    this._masterService.getMonthlyInvoices('', '').subscribe(
+    // Get pending payments count (current month)
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    
+    const invoiceStartPeriod = this.formatDateForApi(startOfMonth);
+    const invoiceEndPeriod = this.formatDateForApi(endOfMonth);
+    
+    this._masterService.getMonthlyInvoices(invoiceStartPeriod, invoiceEndPeriod).subscribe(
       (data) => {
         this.websiteDetails.systemStats.pendingPayments = data?.length || 0;
+        console.log('Pending payments loaded:', this.websiteDetails.systemStats.pendingPayments);
       },
       (error) => {
         console.error('Error loading pending payments:', error);
+        // Set default value on error instead of showing broken state
+        this.websiteDetails.systemStats.pendingPayments = 0;
+        // Optionally show error message to user
+        if (error?.error?.message) {
+          console.warn('Server error:', error.error.message);
+        }
       }
     );
 
@@ -239,9 +256,22 @@ export class DashboardComponent implements OnInit {
       this.showLoadingSpinner = false
     }
   }
-
-  onIframeLoad(event: any) {
-    console.log('Payment Due List iframe loaded successfully');
-    this.showLoadingSpinner = false;
+  
+  /**
+   * Format date for API requests in ISO format (YYYY-MM-DD)
+   */
+  private formatDateForApi(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  
+  getEnvironmentStatus(): string {
+    return this.websiteDetails.production ? 'Production' : 'Development';
+  }
+  
+  getEnvironmentColor(): string {
+    return this.websiteDetails.production ? 'success' : 'warning';
   }
 }

@@ -1,18 +1,18 @@
-import {AfterViewInit, Component, ViewChild} from '@angular/core';
-import {FormBuilder, FormGroup} from '@angular/forms';
-import {MatDialog} from '@angular/material/dialog';
-import {MatTableDataSource} from '@angular/material/table';
-import {LiveAnnouncer} from '@angular/cdk/a11y';
-import {SearchInvoiceComponent} from '../../finance/invoice/search-invoice/search-invoice.component';
-import {CommonService} from "../../../service/common.service";
-import {InventoryService} from "../../../service/inventory.service";
-import {Router} from "@angular/router";
-import {UserRegistration} from "../../../model/userregistration";
-import {MatPaginator} from "@angular/material/paginator";
-import {MatSort} from "@angular/material/sort";
-import {SearchPurchaseBillsComponent} from "./search-purchase-bills/search-purchase-bills.component";
+import { AfterViewInit, Component, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { SearchInvoiceComponent } from '../../finance/invoice/search-invoice/search-invoice.component';
+import { CommonService } from "../../../service/common.service";
+import { InventoryService } from "../../../service/inventory.service";
+import { Router } from "@angular/router";
+import { UserRegistration } from "../../../model/userregistration";
+import { MatPaginator } from "@angular/material/paginator";
+import { MatSort } from "@angular/material/sort";
+import { SearchPurchaseBillsComponent } from "./search-purchase-bills/search-purchase-bills.component";
 import Swal from "sweetalert2";
-import {DatasharingService} from "../../../service/datasharing.service";
+import { DatasharingService } from "../../../service/datasharing.service";
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
 
@@ -61,12 +61,12 @@ export class PurchaseBillsComponent implements AfterViewInit {
   errorMessage: string = '';
   showLoadingSpinner: boolean = false;
 
-  constructor(private fb: FormBuilder, public dialog: MatDialog, private _liveAnnouncer: LiveAnnouncer, commonService: CommonService, private service: InventoryService, private route: Router, private _dataService: DatasharingService,private _masterService: MastermoduleService) {
+  constructor(private fb: FormBuilder, public dialog: MatDialog, private _liveAnnouncer: LiveAnnouncer, commonService: CommonService, private service: InventoryService, private route: Router, private _dataService: DatasharingService, private _masterService: MastermoduleService) {
     this.userAccessModel = {
       readAccess: false,
-      updateAccess:false,
-      deleteAccess:false,
-      createAccess:false,
+      updateAccess: false,
+      deleteAccess: false,
+      createAccess: false,
     }
     this.user = commonService.getLocalUser();
     this.currentUser = sessionStorage.getItem('username')!;
@@ -75,8 +75,8 @@ export class PurchaseBillsComponent implements AfterViewInit {
         this.currentUser = username;
       });
     }
-    this.getUserAccessRights(this.currentUser, 'Purchase Bills'); 
-    
+    this.getUserAccessRights(this.currentUser, 'Purchase Bills');
+
     this.frm = this.fb.group({
       ID: [0],
       Branch: [''],
@@ -101,8 +101,8 @@ export class PurchaseBillsComponent implements AfterViewInit {
       })
     });
 
-    this.frm.get('details.CostPerUnit')?.disable({onlySelf: true});
-    this.frm.get('details.Amount')?.disable({onlySelf: true});
+    this.frm.get('details.CostPerUnit')?.disable({ onlySelf: true });
+    this.frm.get('details.Amount')?.disable({ onlySelf: true });
 
   }
 
@@ -114,7 +114,7 @@ export class PurchaseBillsComponent implements AfterViewInit {
   ngAfterViewInit() {
 
   }
-  getUserAccessRights(userName: string, screenName: string) {   
+  getUserAccessRights(userName: string, screenName: string) {
     this._masterService.getUserAccessRights(userName, screenName).subscribe(
       (data) => {
         if (data != null) {
@@ -129,7 +129,7 @@ export class PurchaseBillsComponent implements AfterViewInit {
             this.service.getUtilityMaster("P", "P", this.currentUser).subscribe((d: any) => {
               this.branchList = d['branchList'];
               this.supplierList = d['supplierList'];
-              this.categoryList = d['categoryList'];        
+              this.categoryList = d['categoryList'];
             })
             this.hideLoadingSpinner();
           } else {
@@ -137,7 +137,7 @@ export class PurchaseBillsComponent implements AfterViewInit {
                       You do not have permissions to view this page. <br>
                       If you feel you should have access to this page, Please contact administrator. <br>
                       Thank you`;
-                      this.hideLoadingSpinner();
+            this.hideLoadingSpinner();
           }
         }
 
@@ -332,6 +332,10 @@ export class PurchaseBillsComponent implements AfterViewInit {
         icon: 'success',
         showCloseButton: false,
         timer: 3000,
+        width: '600px',
+        customClass: {
+          popup: 'swal-top-offset'
+        }
       });
       this.route.navigate(['/inventory/purchase-bills']);
       this.frm.reset();
@@ -345,7 +349,7 @@ export class PurchaseBillsComponent implements AfterViewInit {
       this.hideLoadingSpinner();
     }
   }
-  hideLoadingSpinner(){
+  hideLoadingSpinner() {
     this.showLoadingSpinner = false
   }
 }

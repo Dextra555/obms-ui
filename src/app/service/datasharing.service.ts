@@ -8,6 +8,7 @@ export class DatasharingService {
   private renderer: Renderer2;
   private username$: BehaviorSubject<any> = new BehaviorSubject(null);
   private menuname$: BehaviorSubject<any> = new BehaviorSubject(null);
+  private selectedInvoice$: BehaviorSubject<any> = new BehaviorSubject(null);
   constructor(rendererFactory: RendererFactory2) {
     this.renderer = rendererFactory.createRenderer(null, null);
    }
@@ -29,5 +30,17 @@ export class DatasharingService {
   }
   setMenuName(menuName: string) {
     this.menuname$.next(menuName);
+  }
+
+  setSelectedInvoice(data: any) {
+    this.selectedInvoice$.next(data);
+  }
+
+  getSelectedInvoice(): Observable<any> {
+    return this.selectedInvoice$.asObservable();
+  }
+
+  clearSelectedInvoice() {
+    this.selectedInvoice$.next(null);
   }
 }

@@ -3,16 +3,16 @@
     <div class="row mb-2">
       <div class="col-12 col-sm-12 col-md-4 col-lg-4">
         <h1 class="mb-1">{{isEdit ? 'Edit' : 'Add'}} Asset</h1>
-      </div><!-- /.col -->
+      </div>
       <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
         <ol class="breadcrumb float-md-right">
-          <li class="breadcrumb-item"><a class="breadcrumb-item">Inventory</a></li>
-          <li class="breadcrumb-item"><a routerLink="/inventory/asset-master">Asset Master</a></li>
+          <li class="breadcrumb-item"><a routerLink="/dashboard">Inventory</a></li>
+          <li class="breadcrumb-item"><a routerLink="/inventory/asset-master">Asset Master List</a></li>
           <li class="breadcrumb-item active">{{isEdit ? 'Update' : 'New'}} Asset</li>
         </ol>
-      </div><!-- /.col -->
-    </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
+      </div>
+    </div>
+  </div>
 </div>
 <mat-card>
   <mat-card-content>
@@ -22,7 +22,7 @@
           <mat-form-field appearance="outline">
             <mat-label>Branch</mat-label>
             <mat-select formControlName="Branch">
-              <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Name}}</mat-option>
+              <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Code}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
@@ -60,7 +60,8 @@
         <div class="col-12 col-sm-12 col-md-4 col-lg-4">
           <mat-form-field appearance="outline">
             <mat-label>Purchase Date</mat-label>
-            <input type="text" formControlName="PurchaseDate" matInput [matDatepicker]="picker1" placeholder="" autocomplete="off">
+            <input type="text" formControlName="PurchaseDate" matInput [matDatepicker]="picker1" placeholder=""
+              autocomplete="off">
             <mat-datepicker-toggle matSuffix [for]="picker1">
             </mat-datepicker-toggle>
             <mat-datepicker #picker1></mat-datepicker>
@@ -70,9 +71,10 @@
       <div class="row">
         <div class="col-12">
           <div class="text-right">
-            <button class="btn wlt-c-furg-btn-gray mr-3"  (click)="onCancelClick()" mat-dialog-close> Cancel</button>
-            <button *ngIf="this.userAccessModel.createAccess == true || this.userAccessModel.updateAccess == true || currentUser == 'superadmin'" 
-            class="btn wlt-c-furg-btn-primary">  {{isEdit ? 'Update' : 'Save'}}</button>
+            <button class="btn wlt-c-furg-btn-gray mr-3" (click)="onCancelClick()" mat-dialog-close> Cancel</button>
+            <button
+              *ngIf="this.userAccessModel.createAccess == true || this.userAccessModel.updateAccess == true || currentUser == 'superadmin'"
+              class="btn wlt-c-furg-btn-primary"> {{isEdit ? 'Update' : 'Save'}}</button>
           </div>
         </div>
       </div>

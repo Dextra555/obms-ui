@@ -1395,15 +1395,14 @@ export class PayrollModuleService {
     return this.httpClient.post(`${this.apiUrl}payroll/GenerateSimplifiedAttendanceTemplate`, null, {
       params,
       responseType: 'blob'
-    }).pipe(catchError(this.errorHandle));
+    });
   }
 
   uploadSimplifiedAttendance(file: File, currentUser: string): Observable<any> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('currentUser', currentUser);
-    return this.httpClient.post(`${this.apiUrl}payroll/UploadSimplifiedAttendance`, formData)
-      .pipe(catchError(this.errorHandle));
+    return this.httpClient.post(`${this.apiUrl}payroll/UploadSimplifiedAttendance`, formData);
   }
 
   exportAttendanceData(period: Date, branchCode: string): Observable<Blob> {
