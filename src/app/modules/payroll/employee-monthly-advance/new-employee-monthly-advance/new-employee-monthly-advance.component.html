@@ -62,8 +62,8 @@
                 </div>
             </div>
             <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                <div class="row">
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-8">
+                <div class="row align-items-end" style="gap: 0;">
+                    <div class="col-12 col-sm-12 col-md-3 col-lg-3" style="padding-bottom: 1.25rem;">
                         <mat-label class="mr-3"><strong>Type</strong></mat-label>
                         <br />
                         <mat-radio-group aria-label="Select a Type" formControlName="EmployeeType"
@@ -73,40 +73,34 @@
                             <mat-radio-button value="None">None</mat-radio-button>
                         </mat-radio-group>
                     </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                <div class="row">
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-8">
-                        <mat-label class="mr-3"><strong>Race</strong></mat-label>
-                        <br />
-                        <mat-radio-group aria-label="Select a Race" formControlName="Race"
-                            (change)="radioButtonRaceSelectionChange($event)">
-                            <mat-radio-button value="Chinese">Chinese</mat-radio-button>
-                            <mat-radio-button value="Indian">Indian</mat-radio-button>
-                            <mat-radio-button value="Malay">Malay</mat-radio-button>
-                            <mat-radio-button value="Others">Others</mat-radio-button>
-                            <mat-radio-button value="All">All</mat-radio-button>
-                        </mat-radio-group>
-                    </div>
-                </div>
-            </div>
-            <div class="col-12 col-sm-12 col-md-12 col-lg-12">
-                <div class="row">
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-2">
+                    <div class="col-12 col-sm-12 col-md-2 col-lg-2">
                         <mat-form-field appearance="outline">
-                            <mat-label>Amount </mat-label>
+                            <mat-label>Religion</mat-label>
+                            <mat-select formControlName="Race"
+                                (selectionChange)="radioButtonRaceSelectionChange($event)">
+                                <mat-option value="All">All</mat-option>
+                                <mat-option value="Hindu">Hindu</mat-option>
+                                <mat-option value="Muslim">Muslim</mat-option>
+                                <mat-option value="Christian">Christian</mat-option>
+                                <mat-option value="Sikh">Sikh</mat-option>
+                                <mat-option value="Buddhist">Buddhist</mat-option>
+                                <mat-option value="Jain">Jain</mat-option>
+                                <mat-option value="Other">Other</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-12 col-sm-12 col-md-2 col-lg-2">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Amount</mat-label>
                             <input type="text" formControlName="Amount" matInput placeholder="" autocomplete="off"
                                 pattern="^\d+(\.\d{1,2})?$">
                         </mat-form-field>
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-1" class="set-button">
-                        <button class="btn wlt-c-furg-btn-primary" (click)="setButtonClick()"> Set</button>
-                    </div>
-                    <div class="col-12 col-sm-12 col-md-4 col-lg-6" class="set-button-error">
                         <mat-error *ngIf="employeeAdvanceForm.controls['Amount'].hasError('pattern')">
                             Only numbers with up to two decimal places are allowed.
                         </mat-error>
+                    </div>
+                    <div class="col-auto" style="padding-bottom: 1.25rem;">
+                        <button class="btn wlt-c-furg-btn-primary" (click)="setButtonClick()">Set</button>
                     </div>
                     <div class="col-12 col-sm-12 col-md-4 col-lg-3" hidden>
                         <mat-form-field appearance="outline">
@@ -114,7 +108,6 @@
                             <input type="text" formControlName="Particulars" matInput placeholder="" autocomplete="off">
                         </mat-form-field>
                     </div>
-
                 </div>
             </div>
             <br />
@@ -126,7 +119,7 @@
                                 <thead>
                                     <tr>
                                         <th>Employee Name</th>
-                                        <th>IC No</th>
+                                        <th>Aadhaar No</th>
                                         <th>Bank</th>
                                         <th>Account No</th>
                                         <th>Amount</th>

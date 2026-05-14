@@ -62,8 +62,8 @@
 <!-- DASHBOARD CONTENT -->
 <!-- ===================== -->
 <div class="container-fluid mb-4" *ngIf="menuName != 'finance'">
-  <!-- Quick Stats Cards -->
-  <div class="row mb-4">
+  <!-- Quick Stats Cards (Admin/Super Admin only) -->
+  <div class="row mb-4" *ngIf="isAdminOrSuperAdmin">
     <div class="col-md-3 col-sm-6 mb-3">
       <div class="quick-stat-card guards">
         <div class="stat-icon-bg">
@@ -110,8 +110,8 @@
     </div>
   </div>
 
-  <!-- Alerts & Info -->
-  <div class="row">
+  <!-- Alerts & Info (Admin/Super Admin only) -->
+  <div class="row" *ngIf="isAdminOrSuperAdmin">
     <!-- System Alerts -->
     <div class="col-md-8 mb-4">
       <mat-card class="shadow-sm">
