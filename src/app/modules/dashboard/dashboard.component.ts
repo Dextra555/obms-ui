@@ -56,7 +56,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.currentUser = sessionStorage.getItem('username')!;
     const userRole = sessionStorage.getItem('userrole');
-    this.isAdminOrSuperAdmin = (userRole === '1' || userRole === '2' || this.currentUser === 'superadmin');
+    this.isAdminOrSuperAdmin = (userRole === '1' || userRole === '2' || userRole === 'true' || this.currentUser === 'superadmin');
     if (this.currentUser == null) {
       this._dataService.getUsername().subscribe((username) => {
         this.currentUser = username;
