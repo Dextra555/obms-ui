@@ -10,6 +10,7 @@ import Swal from 'sweetalert2';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { DatasharingService } from 'src/app/service/datasharing.service';
 import { ServiceTypeService } from 'src/app/service/service-type.service';
+import { MastermoduleService } from 'src/app/service/mastermodule.service';
 import { ServiceType } from 'src/app/model/service-type.model';
 
 @Component({
@@ -34,12 +35,15 @@ export class ServiceTypeComponent implements AfterViewInit {
     createAccess: false,
   };
 
+  warningMessage: string = '';
+
   constructor(
     private _serviceTypeService: ServiceTypeService,
     private _datasharingService: DatasharingService,
     private _dialog: MatDialog,
     private _router: Router,
-    private _liveAnnouncer: LiveAnnouncer
+    private _liveAnnouncer: LiveAnnouncer,
+    private _masterService: MastermoduleService
   ) {
     this._datasharingService.getUsername().subscribe((username: string) => {
       this.currentUser = username || '';
@@ -49,6 +53,12 @@ export class ServiceTypeComponent implements AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.currentUser = sessionStorage.getItem('username')!;
+    if (this.currentUser == null) {
+      this._datasharingService.getUsername().subscribe((username: string) => {
+        this.currentUser = username;
+      });
+    }
     if (this.currentUser == 'admin' || this.currentUser == 'superadmin') {
       this.getServiceTypeList();
     } else {
@@ -58,8 +68,31 @@ export class ServiceTypeComponent implements AfterViewInit {
 
   getUserAccessRights(userName: string, screenName: string) {
     this.showLoadingSpinner = true;
-    // This would need to be implemented in the backend
-    this.getServiceTypeList();
+    this._masterService.getUserAccessRights(userName, screenName).subscribe(
+      (data) => {
+        if (data != null) {
+          this.userAccessModel.readAccess = data.Read;
+          this.userAccessModel.createAccess = data.Create;
+          this.userAccessModel.updateAccess = data.Update;
+          this.userAccessModel.deleteAccess = data.Delete;
+
+          if (this.userAccessModel.readAccess === true) {
+            this.warningMessage = '';
+            this.getServiceTypeList();
+          } else {
+            this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
+              You do not have permissions to view this page. <br>
+              If you feel you should have access to this page, Please contact administrator. <br>
+              Thank you`;
+            this.showLoadingSpinner = false;
+          }
+        }
+      },
+      (error) => {
+        this.errorMessage = error;
+        this.showLoadingSpinner = false;
+      }
+    );
   }
 
   getServiceTypeList(): void {

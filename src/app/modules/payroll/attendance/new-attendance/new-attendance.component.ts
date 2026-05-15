@@ -741,15 +741,24 @@ export class NewAttendanceComponent implements OnInit {
   }
 
   getClients(advanceDate: string, branchCode: string): void {
+    console.log('getClients called with:', { advanceDate, branchCode });
     this._payrollService.getClients(advanceDate, branchCode).subscribe(
       (data) => {
+        console.log('getClients API response:', data);
+        // Handle both wrapped (data.Value) and direct array responses
+        const clients = data?.Value || data || [];
+        console.log('Processed clients:', clients);
         // Prepend an empty option to the list
-        this.employeeModel = [{ Name: '' }, ...data.Value];
+        this.employeeModel = [{ Name: '' }, ...clients];
+        console.log('employeeModel after update:', this.employeeModel);
         setTimeout(() => {
           this.hideloadingSpinner();
         }, 2000);
       },
-      (error) => this.handleErrors(error)
+      (error) => {
+        console.error('getClients API error:', error);
+        this.handleErrors(error?.message || error?.error || 'Failed to load clients');
+      }
     );
   }
   getEmployeeListByEmployeeType(branchCode: string, employeeType: string, startPeriod: string, endPeriod: string, status: string): void {

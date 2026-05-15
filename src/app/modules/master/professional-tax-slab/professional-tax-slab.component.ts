@@ -11,6 +11,7 @@ import { ProfessionalTaxModel } from 'src/app/model/professionalTaxModel';
 import { DialogConfirmationComponent } from 'src/app/components/dialog-confirmation/dialog-confirmation.component';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { DatasharingService } from 'src/app/service/datasharing.service';
+import { MastermoduleService } from 'src/app/service/mastermodule.service';
 import { NewProfessionalTaxSlabComponent } from './new-professional-tax-slab/new-professional-tax-slab.component';
 import { ProfessionalTaxCalculatorComponent } from './professional-tax-calculator/professional-tax-calculator.component';
 
@@ -29,19 +30,21 @@ export class ProfessionalTaxSlabComponent implements OnInit, AfterViewInit {
   currentUser: string = '';
   warningMessage: string = '';
   userAccessModel!: UserAccessModel;
-  
+
   constructor(
     private _statutoryService: IndianStatutoryService,
     private _liveAnnouncer: LiveAnnouncer,
     private _dialog: MatDialog,
     private _router: Router,
-    private cdr: ChangeDetectorRef
-  ) { 
+    private cdr: ChangeDetectorRef,
+    private _masterService: MastermoduleService,
+    private _dataService: DatasharingService
+  ) {
     this.userAccessModel = {
       readAccess: false,
-      updateAccess:false,
-      deleteAccess:false,
-      createAccess:false,
+      updateAccess: false,
+      deleteAccess: false,
+      createAccess: false,
     }
   }
 
@@ -56,7 +59,46 @@ export class ProfessionalTaxSlabComponent implements OnInit, AfterViewInit {
   sort!: MatSort;
 
   ngOnInit() {
-    this.getProfessionalTaxData();
+    this.currentUser = sessionStorage.getItem('username')!;
+    if (this.currentUser == null) {
+      this._dataService.getUsername().subscribe((username: string) => {
+        this.currentUser = username;
+      });
+    }
+    if (this.currentUser == 'admin' || this.currentUser == 'superadmin') {
+      this.getProfessionalTaxData();
+    } else {
+      this.getUserAccessRights(this.currentUser, 'Professional Tax Slab');
+    }
+  }
+
+  getUserAccessRights(userName: string, screenName: string) {
+    this.showLoadingSpinner = true;
+    this._masterService.getUserAccessRights(userName, screenName).subscribe(
+      (data) => {
+        if (data != null) {
+          this.userAccessModel.readAccess = data.Read;
+          this.userAccessModel.createAccess = data.Create;
+          this.userAccessModel.updateAccess = data.Update;
+          this.userAccessModel.deleteAccess = data.Delete;
+
+          if (this.userAccessModel.readAccess === true) {
+            this.warningMessage = '';
+            this.getProfessionalTaxData();
+          } else {
+            this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
+              You do not have permissions to view this page. <br>
+              If you feel you should have access to this page, Please contact administrator. <br>
+              Thank you`;
+            this.showLoadingSpinner = false;
+          }
+        }
+      },
+      (error) => {
+        this.errorMessage = error;
+        this.showLoadingSpinner = false;
+      }
+    );
   }
 
   ngAfterViewInit() {
@@ -70,7 +112,7 @@ export class ProfessionalTaxSlabComponent implements OnInit, AfterViewInit {
   getProfessionalTaxData() {
     this.showLoadingSpinner = true;
     this.cdr.detectChanges(); // Ensure change detection runs
-    
+
     this._statutoryService.getPTConfiguration().subscribe({
       next: (data) => {
         this.professionalTax = data;

@@ -28,9 +28,9 @@ export class EsiSlabComponent implements AfterViewInit {
   userAccessModel!: UserAccessModel;
 
   constructor(
-    private _liveAnnouncer: LiveAnnouncer, 
+    private _liveAnnouncer: LiveAnnouncer,
     public dialog: MatDialog,
-    private _masterService: MastermoduleService, 
+    private _masterService: MastermoduleService,
     private _router: Router,
     private _dataService: DatasharingService
   ) {
@@ -85,8 +85,31 @@ export class EsiSlabComponent implements AfterViewInit {
 
   getUserAccessRights(userName: string, screenName: string) {
     this.showLoadingSpinner = true;
-    // This would need to be implemented in the backend
-    this.getESIConfigurationList();
+    this._masterService.getUserAccessRights(userName, screenName).subscribe(
+      (data) => {
+        if (data != null) {
+          this.userAccessModel.readAccess = data.Read;
+          this.userAccessModel.createAccess = data.Create;
+          this.userAccessModel.updateAccess = data.Update;
+          this.userAccessModel.deleteAccess = data.Delete;
+
+          if (this.userAccessModel.readAccess === true) {
+            this.warningMessage = '';
+            this.getESIConfigurationList();
+          } else {
+            this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
+              You do not have permissions to view this page. <br>
+              If you feel you should have access to this page, Please contact administrator. <br>
+              Thank you`;
+            this.showLoadingSpinner = false;
+          }
+        }
+      },
+      (error) => {
+        this.errorMessage = error;
+        this.showLoadingSpinner = false;
+      }
+    );
   }
 
   getESIConfigurationList(): void {
@@ -129,7 +152,7 @@ export class EsiSlabComponent implements AfterViewInit {
         data: `Are you sure want to delete this ESI configuration?`
       })
       .afterClosed()
-      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {       
+      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {
         if (result.confirmDialog) {
           // This would need to be implemented in the backend
           Swal.fire({

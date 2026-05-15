@@ -9,7 +9,8 @@
                     <li class="breadcrumb-item"><a routerLink="/dashboard">Master</a></li>
                     <li class="breadcrumb-item"><a routerLink="/administration/user-access-rights">User Access
                             Rights</a></li>
-                    <li class="breadcrumb-item active">{{userAccessTitle == 'new'?'New User Access Rights': 'Edit User Access Rights'}}</li>
+                    <li class="breadcrumb-item active">{{userAccessTitle == 'new'?'New User Access Rights': 'Edit User
+                        Access Rights'}}</li>
                 </ol>
             </div><!-- /.col -->
         </div><!-- /.row -->
@@ -30,12 +31,17 @@
                     </mat-form-field>
                 </div>
                 <div class="col-12 col-sm-12 col-md-12 col-lg-6 button-group">
-                    <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('View')"> View</button>
-                    <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('new')"> New</button>
-                    <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('update')"> Update</button>
-                    <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('delete')"> Delete</button>
-                    <button *ngIf="selectedCategory === 'Payroll'" class="btn wlt-c-furg-btn-success" mat-dialog-actions (click)="addRbiBankAdvanceScreen()"> Add RBI Advance Screen</button>
-                </div>                                
+                    <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('View')">
+                        View</button>
+                    <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('new')">
+                        New</button>
+                    <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('update')">
+                        Update</button>
+                    <button class="btn wlt-c-furg-btn-primary" mat-dialog-actions (click)="handleButtonClick('delete')">
+                        Delete</button>
+                    <button *ngIf="selectedCategory === 'Payroll'" class="btn wlt-c-furg-btn-success" mat-dialog-actions
+                        (click)="addRbiBankAdvanceScreen()"> Add RBI Advance Screen</button>
+                </div>
 
             </div>
             <div class="col-12 col-sm-12 col-md-12 col-lg-12">
@@ -48,16 +54,16 @@
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-4">
                                             <mat-form-field>
                                                 <input type="text" matInput formControlName="ScreenName"
-                                                    readonly="true"/>
+                                                    readonly="true" />
                                             </mat-form-field>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-8">
                                             <ng-container *ngFor="let item of [i]">
                                                 <mat-checkbox formControlName="Read" [disabled]="isReadEditable"
                                                     style="margin-right: 10px;">View</mat-checkbox>
-                                                <mat-checkbox  formControlName="Create" [disabled]="isCreateEditable"
+                                                <mat-checkbox formControlName="Create" [disabled]="isCreateEditable"
                                                     style="margin-right: 10px;">New</mat-checkbox>
-                                                <mat-checkbox  formControlName="Update" [disabled]="isUpdateEditable"
+                                                <mat-checkbox formControlName="Update" [disabled]="isUpdateEditable"
                                                     style="margin-right: 10px;">Update</mat-checkbox>
                                                 <mat-checkbox formControlName="Delete" [disabled]="isDeleteEditable"
                                                     style="margin-right: 10px;">Delete</mat-checkbox>
@@ -75,8 +81,9 @@
                     <div class="text-right">
                         <button class="btn wlt-c-furg-btn-gray mr-3" mat-dialog-close
                             (click)="clearUserAccesstDetails()"> Cancel</button>
-                        <button *ngIf="(this.userAccessModel.updateAccess == true || this.userAccessModel.createAccess == true || currentUser == 'superadmin')"  
-                                class="btn wlt-c-furg-btn-primary" [disabled]="userAccessForm.invalid"
+                        <button
+                            *ngIf="(this.userAccessModel.updateAccess == true || this.userAccessModel.createAccess == true || currentUser == 'superadmin' || currentUser == 'admin')"
+                            class="btn wlt-c-furg-btn-primary" [disabled]="userAccessForm.invalid"
                             (click)="savebuttonClick()"> Save</button>
                     </div>
                 </div>

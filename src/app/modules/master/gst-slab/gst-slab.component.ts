@@ -59,8 +59,31 @@ export class GstSlabComponent implements AfterViewInit {
 
   getUserAccessRights(userName: string, screenName: string) {
     this.showLoadingSpinner = true;
-    // This would need to be implemented in the backend
-    this.getGSTConfigurationList();
+    this._masterService.getUserAccessRights(userName, screenName).subscribe(
+      (data) => {
+        if (data != null) {
+          this.userAccessModel.readAccess = data.Read;
+          this.userAccessModel.createAccess = data.Create;
+          this.userAccessModel.updateAccess = data.Update;
+          this.userAccessModel.deleteAccess = data.Delete;
+
+          if (this.userAccessModel.readAccess === true) {
+            this.warningMessage = '';
+            this.getGSTConfigurationList();
+          } else {
+            this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
+              You do not have permissions to view this page. <br>
+              If you feel you should have access to this page, Please contact administrator. <br>
+              Thank you`;
+            this.showLoadingSpinner = false;
+          }
+        }
+      },
+      (error) => {
+        this.errorMessage = error;
+        this.showLoadingSpinner = false;
+      }
+    );
   }
 
   getGSTConfigurationList(): void {
