@@ -122,11 +122,12 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
       this._dataService.getUsername().subscribe((username) => {
         this.currentUser = username;
         this.getBranchMasterListByUser(this.currentUser);
+        this.getUserAccessRights(this.currentUser, 'Monthly Salary Advance');
       });
     } else {
       this.getBranchMasterListByUser(this.currentUser);
+      this.getUserAccessRights(this.currentUser, 'Monthly Salary Advance');
     }
-    this.getUserAccessRights(this.currentUser, 'Monthly Salary Advance');
     this.getEmployeeMasterList();
     this._activatedRoute.queryParams.subscribe((params) => {
       if (params['id'] != undefined) {
@@ -367,12 +368,16 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
       const formArray = this.dynamicForm.get('formArray') as FormArray;
       formArray.clear();
       this.clientList = [];
+      this.employeeAdvanceForm.patchValue({ Client: '' });
       return;
     }
 
     this.branchCode = branch;
+    this.employeeAdvanceForm.patchValue({ Client: '' });
+    const formArray = this.dynamicForm.get('formArray') as FormArray;
+    formArray.clear();
 
-    // Load clients for selected branch
+    // Load clients for selected branch — employees load only after client is selected
     this.service.getClientsByBranchID(branch).subscribe({
       next: (clientData: any) => {
         this.clientList = clientData['clients'];
@@ -381,7 +386,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
       error: (err) => console.error('Error loading clients:', err)
     });
 
-    this.loadEmployeeData(true); // Branch affects voucher
+    this.getAdvanceVoucherNo(branch, '1');
   }
   onClientChange(clientCode: any) {
     this.employeeAdvanceForm.patchValue({ Client: clientCode });
@@ -393,7 +398,8 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
     this.loadEmployeeData(false);
   }
   radioButtonRaceSelectionChange(event: any) {
-    this.employeeAdvanceForm.patchValue({ Race: event.value });
+    const value = event.value ?? event;
+    this.employeeAdvanceForm.patchValue({ Race: value });
     this.loadEmployeeData(false);
   }
 
@@ -446,22 +452,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
     const advanceDate = this.formatDate(advanceDateRaw);
     this.dtAdvanceDate = advanceDate;
 
-    if (client && client !== 0) {
-      forkJoin({
-        employeeList: this._payrollService.getEmployeeAdvanceList(advanceDate, branchCode, employeeType, client, 1, 0, race)
-      }).subscribe(
-        ({ employeeList }) => {
-          this.addFormFieldsdata(employeeList);
-          this.hideSpinner();
-        },
-        (error) => {
-          this.handleErrors(error);
-          this.hideSpinner();
-        }
-      );
-    } else {
-      this.getEmployeeListByEmployeeType(advanceDate, branchCode, employeeType, 1, 0, race);
-    }
+    this.getEmployeeListByEmployeeType(advanceDate, branchCode, employeeType, 1, 0, race);
 
     // Voucher reload only when date or branch changes
     if (triggerVoucher) {

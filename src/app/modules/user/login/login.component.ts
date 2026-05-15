@@ -113,6 +113,7 @@ export class LoginComponent implements OnInit {
     this.userName = response.Users.Name;
     this._dataSharingService.setUsername(response.Users.Name);
     sessionStorage.setItem('username', response.Users.Name);
+    sessionStorage.setItem('userrole', response.Users.IsAdmin);
     this.register = response.Users;
     let data = this.register
     data['Password'] = "";

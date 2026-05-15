@@ -22,6 +22,7 @@ export class DashboardComponent implements OnInit {
   userAccessModel!: UserAccessModel;
   menuName: string = '';
   currentDate: Date = new Date();
+  isAdminOrSuperAdmin: boolean = false;
 
   // Simple dashboard data
   websiteDetails = {
@@ -54,10 +55,12 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUser = sessionStorage.getItem('username')!;
+    const userRole = sessionStorage.getItem('userrole');
+    this.isAdminOrSuperAdmin = (userRole === '1' || userRole === '2' || userRole === 'true' || this.currentUser === 'superadmin');
     if (this.currentUser == null) {
       this._dataService.getUsername().subscribe((username) => {
         this.currentUser = username;
-      });
+      }); 
     }
     this._dataService.getMenuName().subscribe(menu => {
       this.menuName = menu;
