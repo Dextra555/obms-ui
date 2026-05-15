@@ -35,7 +35,7 @@ export class NewSupplierComponent implements OnInit {
       deleteAccess: false,
       createAccess: false,
     }
-    
+
     this.frm = this.fb.group({
       Id: [0],
       Code: [''],
@@ -48,11 +48,13 @@ export class NewSupplierComponent implements OnInit {
       Phone: ['', Validators.required],
       Fax: [''],
       ContactPerson: ['', Validators.required],
-      CreditLimit: [''],
+      CreditLimit: [0],
       Category: [''],
       Status: ['A'],
+      LastUpdatedBy: [''],
+      LASTUPDATE: [new Date()]
     });
-    
+
   }
 
   ngOnInit(): void {
@@ -104,9 +106,10 @@ export class NewSupplierComponent implements OnInit {
   onSubmit() {
     if (this.frm.invalid) {
       return;
-
     }
     let data = this.frm.getRawValue();
+    data.LastUpdatedBy = this.currentUser;
+    data.LASTUPDATE = new Date();
     this.service.saveSupplier(data).subscribe((d: any) => {
       this.showMessage("Supplier Saved/Updated Successfully", 'success', 'Success Message');
       this.frm.reset();
@@ -134,7 +137,7 @@ export class NewSupplierComponent implements OnInit {
       icon: icon, // Dynamically set the icon based on the parameter
       showCloseButton: false,
       timer: 5000,
-      width: '600px', 
+      width: '600px',
       customClass: {
         popup: 'swal-top-offset'
       }

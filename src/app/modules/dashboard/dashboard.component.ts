@@ -68,14 +68,14 @@ export class DashboardComponent implements OnInit {
         this.getUserAccessRights(this.currentUser, 'Payment Due List Report');
       }
     });
-    
+
     // Load real dashboard data
     this.loadDashboardData();
-    
+
     // Load supported banks
     this.loadSupportedBanks();
   }
-  
+
   loadSupportedBanks(): void {
     // Get bank list from API
     this._masterService.GetBankListByUserName(this.currentUser || 'admin').subscribe(
@@ -85,7 +85,7 @@ export class DashboardComponent implements OnInit {
           const bankNames = data
             .filter((bank: any) => bank.Name || bank.BankName || bank.name)
             .map((bank: any) => bank.Name || bank.BankName || bank.name);
-          
+
           // Remove duplicates and sort
           this.websiteDetails.supportedBanks = [...new Set(bankNames)].sort();
         }
@@ -97,11 +97,11 @@ export class DashboardComponent implements OnInit {
       }
     );
   }
-  
+
   loadDashboardData(): void {
     // Get employee stats (Guards + Staff)
     this.loadEmployeeStats();
-    
+
     // Get active clients count
     this._masterService.getClientMsterListByStatus('Active').subscribe(
       (data) => {
@@ -111,15 +111,15 @@ export class DashboardComponent implements OnInit {
         console.error('Error loading client data:', error);
       }
     );
-    
+
     // Get pending payments count (current month)
     const today = new Date();
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    
+
     const invoiceStartPeriod = this.formatDateForApi(startOfMonth);
     const invoiceEndPeriod = this.formatDateForApi(endOfMonth);
-    
+
     this._masterService.getMonthlyInvoices(invoiceStartPeriod, invoiceEndPeriod).subscribe(
       (data) => {
         this.websiteDetails.systemStats.pendingPayments = data?.length || 0;
@@ -146,29 +146,29 @@ export class DashboardComponent implements OnInit {
       }
     );
   }
-  
+
   loadEmployeeStats(): void {
     // Load all employees and categorize by type
     this._masterService.getAllEmployees().subscribe(
       (response: any) => {
         const employees = response?.employees || [];
-        
+
         // Categorize by EMP_ROLE or EMPPAY_CATEGORY
-        this.websiteDetails.systemStats.totalGuards = employees.filter((emp: any) => 
-          emp.EMP_ROLE === 'Guard' || 
+        this.websiteDetails.systemStats.totalGuards = employees.filter((emp: any) =>
+          emp.EMP_ROLE === 'Guard' ||
           emp.EMPPAY_CATEGORY === 'Guard' ||
           emp.EMP_ROLE === 'SECURITY' ||
           emp.EMP_ROLE === 'SG'
         ).length;
-        
-        this.websiteDetails.systemStats.totalStaff = employees.filter((emp: any) => 
-          emp.EMP_ROLE === 'Staff' || 
-          emp.EMPPAY_CATEGORY === 'Office' || 
+
+        this.websiteDetails.systemStats.totalStaff = employees.filter((emp: any) =>
+          emp.EMP_ROLE === 'Staff' ||
+          emp.EMPPAY_CATEGORY === 'Office' ||
           emp.EMP_ROLE === 'Admin' ||
           emp.EMP_ROLE === 'Manager' ||
           emp.EMP_ROLE === 'Officer'
         ).length;
-        
+
         console.log('Employee counts loaded:', {
           guards: this.websiteDetails.systemStats.totalGuards,
           staff: this.websiteDetails.systemStats.totalStaff,
@@ -182,7 +182,7 @@ export class DashboardComponent implements OnInit {
       }
     );
   }
-  
+
   loadEmployeeStatsAlternative(): void {
     // Alternative: Get from branch master and estimate
     this._masterService.getBranchMasterList().subscribe(
@@ -192,7 +192,7 @@ export class DashboardComponent implements OnInit {
           const totalEmployees = data.reduce((total, branch) => {
             return total + (branch.employeeCount || branch.totalEmployees || 0);
           }, 0);
-          
+
           this.websiteDetails.systemStats.totalGuards = Math.floor(totalEmployees * 0.8);
           this.websiteDetails.systemStats.totalStaff = Math.floor(totalEmployees * 0.2);
         }
@@ -256,7 +256,7 @@ export class DashboardComponent implements OnInit {
       this.showLoadingSpinner = false
     }
   }
-  
+
   /**
    * Format date for API requests in ISO format (YYYY-MM-DD)
    */
@@ -266,11 +266,11 @@ export class DashboardComponent implements OnInit {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
-  
+
   getEnvironmentStatus(): string {
     return this.websiteDetails.production ? 'Production' : 'Development';
   }
-  
+
   getEnvironmentColor(): string {
     return this.websiteDetails.production ? 'success' : 'warning';
   }

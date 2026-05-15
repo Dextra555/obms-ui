@@ -28,7 +28,7 @@ export class NewUserAccessRightsComponent implements OnInit {
   obmsPermissions: OBMSPermissions[] = [new OBMSPermissions()];
   permissions!: OBMSPermissions[];
   dynamicForm!: FormGroup;
-  userName!:string;
+  userName!: string;
   currentUser: string = '';
   isReadEditable: boolean = false;
   isCreateEditable: boolean = false;
@@ -48,16 +48,16 @@ export class NewUserAccessRightsComponent implements OnInit {
 
 
   constructor(private fb: FormBuilder, public dialog: MatDialog,
-    private _router: Router, private _activatedRoute: ActivatedRoute,private _masterService: MastermoduleService,
-    private _commonService: CommonService,private _dataService: DatasharingService) {
+    private _router: Router, private _activatedRoute: ActivatedRoute, private _masterService: MastermoduleService,
+    private _commonService: CommonService, private _dataService: DatasharingService) {
     this.userAccessForm = this.fb.group({
-      
+
     });
     this.userAccessModel = {
       readAccess: false,
-      updateAccess:false,
-      deleteAccess:false,
-      createAccess:false,
+      updateAccess: false,
+      deleteAccess: false,
+      createAccess: false,
     }
   }
 
@@ -74,18 +74,18 @@ export class NewUserAccessRightsComponent implements OnInit {
       if (params['name'] != undefined) {
         this.userAccessTitle = 'edit';
         this.userName = params['name'];
-        if(this.currentUser == 'admin' || this.currentUser == 'superadmin'){
+        if (this.currentUser == 'admin' || this.currentUser == 'superadmin') {
           this.isReadEditable = false;
           this.isCreateEditable = false;
           this.isUpdateEditable = false;
           this.isDeleteEditable = false;
-        }else{
+        } else {
           this.isReadEditable = true;
           this.isCreateEditable = true;
           this.isUpdateEditable = true;
           this.isDeleteEditable = true;
         }
-        this.getScreensByCategoryandUsername('Master',params['name']);
+        this.getScreensByCategoryandUsername('Master', params['name']);
       } else {
         // Load screens for default category when in new mode
         this.getScreensByCategory(this.selectedCategory);
@@ -108,7 +108,7 @@ export class NewUserAccessRightsComponent implements OnInit {
           this.userAccessModel.readAccess = data.Read
           this.userAccessModel.deleteAccess = data.Delete;
           this.userAccessModel.updateAccess = data.Update;
-          this.userAccessModel.createAccess = data.Create;  
+          this.userAccessModel.createAccess = data.Create;
         }
       },
       (error) => {
@@ -133,30 +133,30 @@ export class NewUserAccessRightsComponent implements OnInit {
     }
   }
 
-  handleButtonClick(action: string){
+  handleButtonClick(action: string) {
     const formArray = this.dynamicForm.get('formArray') as FormArray;
-          for (let i = 0; i < formArray.length; i++) {
-            if(action == 'View'){
-            const control = formArray.at(i) as FormGroup;
-            const isChecked = control.value;
-            control.get('Read')?.patchValue(isChecked.Read === false ? true : false, { emitEvent: false });        
-          }  
-          if(action == 'new'){
-            const control = formArray.at(i) as FormGroup;
-            const isChecked = control.value;
-            control.get('Create')?.patchValue(isChecked.Create === false ? true : false, { emitEvent: false });        
-          }   
-          if(action == 'update'){
-            const control = formArray.at(i) as FormGroup;
-            const isChecked = control.value;
-            control.get('Update')?.patchValue(isChecked.Update === false ? true : false, { emitEvent: false });        
-          }     
-          if(action == 'delete'){
-            const control = formArray.at(i) as FormGroup;
-            const isChecked = control.value;
-            control.get('Delete')?.patchValue(isChecked.Delete === false ? true : false, { emitEvent: false });        
-          }   
-        } 
+    for (let i = 0; i < formArray.length; i++) {
+      if (action == 'View') {
+        const control = formArray.at(i) as FormGroup;
+        const isChecked = control.value;
+        control.get('Read')?.patchValue(isChecked.Read === false ? true : false, { emitEvent: false });
+      }
+      if (action == 'new') {
+        const control = formArray.at(i) as FormGroup;
+        const isChecked = control.value;
+        control.get('Create')?.patchValue(isChecked.Create === false ? true : false, { emitEvent: false });
+      }
+      if (action == 'update') {
+        const control = formArray.at(i) as FormGroup;
+        const isChecked = control.value;
+        control.get('Update')?.patchValue(isChecked.Update === false ? true : false, { emitEvent: false });
+      }
+      if (action == 'delete') {
+        const control = formArray.at(i) as FormGroup;
+        const isChecked = control.value;
+        control.get('Delete')?.patchValue(isChecked.Delete === false ? true : false, { emitEvent: false });
+      }
+    }
   }
   onCategoryChange() {
     // If editing (userName exists), get permissions with screens. Otherwise, just get screens by category.
@@ -167,22 +167,22 @@ export class NewUserAccessRightsComponent implements OnInit {
     }
   }
 
-  getScreensByCategory(categoryName: string): void {   
+  getScreensByCategory(categoryName: string): void {
     this.showLoadingSpinner = true;
     this._commonService.getScreensByCategory(categoryName).subscribe(
-      (data) => {       
+      (data) => {
         this.updateFormFields(data);
         const formArray = this.dynamicForm.get('formArray') as FormArray;
         data.forEach((item: any, index: any) => {
-            const control = formArray.at(index) as FormGroup;
-            control.get('ID')?.patchValue(0, { emitEvent: false });
-            control.get('Name')?.patchValue(this.userName, { emitEvent: false });
-            control.get('ScreenName')?.patchValue(item.ScreenName, { emitEvent: false });
-            control.get('Create')?.patchValue(false, { emitEvent: false });
-            control.get('Read')?.patchValue(false, { emitEvent: false });
-            control.get('Update')?.patchValue(false, { emitEvent: false });
-            control.get('Delete')?.patchValue(false, { emitEvent: false });
-            control.get('LastUpdatedBy')?.patchValue(this.userName, { emitEvent: false });
+          const control = formArray.at(index) as FormGroup;
+          control.get('ID')?.patchValue(0, { emitEvent: false });
+          control.get('Name')?.patchValue(this.userName, { emitEvent: false });
+          control.get('ScreenName')?.patchValue(item.ScreenName, { emitEvent: false });
+          control.get('Create')?.patchValue(false, { emitEvent: false });
+          control.get('Read')?.patchValue(false, { emitEvent: false });
+          control.get('Update')?.patchValue(false, { emitEvent: false });
+          control.get('Delete')?.patchValue(false, { emitEvent: false });
+          control.get('LastUpdatedBy')?.patchValue(this.userName, { emitEvent: false });
         });
         this.showLoadingSpinner = false;
       },
@@ -190,29 +190,54 @@ export class NewUserAccessRightsComponent implements OnInit {
     );
   }
 
-  getScreensByCategoryandUsername(screenName: string,userName:string): void {
+  getScreensByCategoryandUsername(screenName: string, userName: string): void {
     this.showLoadingSpinner = true;
-    this._commonService.getPermissionsWithScreens(screenName,userName).subscribe(
-      (data) => {
-        if(data.length > 0 && data !== undefined){  
-          this.updateFormFields(data);    
+
+    // First, get ALL screens for this category
+    this._commonService.getScreensByCategory(screenName).subscribe(
+      (allScreens) => {
+        // Create form fields for ALL screens
+        this.updateFormFields(allScreens);
         const formArray = this.dynamicForm.get('formArray') as FormArray;
-       
-        data.forEach((item: any, index: any) => {    
-            const control = formArray.at(index) as FormGroup;
-            control.get('ID')?.patchValue(item.ID, { emitEvent: false });
-            control.get('Name')?.patchValue(item.Name, { emitEvent: false });
-            control.get('ScreenName')?.patchValue(item.ScreenName, { emitEvent: false });
-            control.get('Create')?.patchValue(item.Create === true ? true : false, { emitEvent: false });
-            control.get('Read')?.patchValue(item.Read === true ? true : false, { emitEvent: false });
-            control.get('Update')?.patchValue(item.Update === true ? true : false, { emitEvent: false });
-            control.get('Delete')?.patchValue(item.Delete === true ? true : false, { emitEvent: false }); 
-            control.get('LastUpdatedBy')?.patchValue(this.userName, { emitEvent: false });
+
+        // Initialize all permissions to false
+        allScreens.forEach((item: any, index: any) => {
+          const control = formArray.at(index) as FormGroup;
+          control.get('ID')?.patchValue(0, { emitEvent: false });
+          control.get('Name')?.patchValue(userName, { emitEvent: false });
+          control.get('ScreenName')?.patchValue(item.ScreenName, { emitEvent: false });
+          control.get('Create')?.patchValue(false, { emitEvent: false });
+          control.get('Read')?.patchValue(false, { emitEvent: false });
+          control.get('Update')?.patchValue(false, { emitEvent: false });
+          control.get('Delete')?.patchValue(false, { emitEvent: false });
+          control.get('LastUpdatedBy')?.patchValue(userName, { emitEvent: false });
         });
-        this.showLoadingSpinner = false;
-      }else{
-        this.getScreensByCategory(screenName)
-      }
+
+        // Then, load existing permissions if any
+        this._commonService.getPermissionsWithScreens(screenName, userName).subscribe(
+          (permissions) => {
+            if (permissions && permissions.length > 0) {
+              // Map permissions to the screens
+              permissions.forEach((perm: any) => {
+                // Find the index of this screen in the form array
+                const index = allScreens.findIndex((s: any) => s.ScreenName === perm.ScreenName);
+                if (index >= 0 && index < formArray.length) {
+                  const control = formArray.at(index) as FormGroup;
+                  control.get('ID')?.patchValue(perm.ID || 0, { emitEvent: false });
+                  control.get('Read')?.patchValue(perm.Read === true, { emitEvent: false });
+                  control.get('Create')?.patchValue(perm.Create === true, { emitEvent: false });
+                  control.get('Update')?.patchValue(perm.Update === true, { emitEvent: false });
+                  control.get('Delete')?.patchValue(perm.Delete === true, { emitEvent: false });
+                }
+              });
+            }
+            this.showLoadingSpinner = false;
+          },
+          (error) => {
+            // If error loading permissions, at least we have all screens shown
+            this.showLoadingSpinner = false;
+          }
+        );
       },
       (error) => this.handleErrors(error)
     );
@@ -221,7 +246,7 @@ export class NewUserAccessRightsComponent implements OnInit {
   savebuttonClick(): void {
     this.showLoadingSpinner = true;
     const formArray = this.dynamicForm.get('formArray') as FormArray;
-    this.obmsPermissions = formArray.value;   
+    this.obmsPermissions = formArray.value;
     this._commonService.saveAndUpdateObmsPermissions(this.obmsPermissions)
       .subscribe(response => {
         if (response.Success == 'Success') {

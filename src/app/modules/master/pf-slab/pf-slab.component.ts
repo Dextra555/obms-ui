@@ -11,6 +11,7 @@ import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { DatasharingService } from 'src/app/service/datasharing.service';
 import { IndianStatutoryService } from 'src/app/service/indian-statutory.service';
 import { PFConfiguration } from 'src/app/model/indian-compliance.model';
+import { MastermoduleService } from 'src/app/service/mastermodule.service';
 
 @Component({
   selector: 'app-pf-slab',
@@ -28,11 +29,12 @@ export class PfSlabComponent implements AfterViewInit {
   userAccessModel!: UserAccessModel;
 
   constructor(
-    private _liveAnnouncer: LiveAnnouncer, 
+    private _liveAnnouncer: LiveAnnouncer,
     public dialog: MatDialog,
-    private _statutoryService: IndianStatutoryService, 
+    private _statutoryService: IndianStatutoryService,
     private _router: Router,
-    private _dataService: DatasharingService
+    private _dataService: DatasharingService,
+    private _masterService: MastermoduleService
   ) {
     this.userAccessModel = {
       readAccess: false,
@@ -85,8 +87,30 @@ export class PfSlabComponent implements AfterViewInit {
 
   getUserAccessRights(userName: string, screenName: string) {
     this.showLoadingSpinner = true;
-    // This would need to be implemented in the backend
-    this.getPFConfigurationList();
+    this._masterService.getUserAccessRights(userName, screenName).subscribe(
+      (data) => {
+        if (data != null) {
+          this.userAccessModel.readAccess = data.Read;
+          this.userAccessModel.createAccess = data.Create;
+          this.userAccessModel.updateAccess = data.Update;
+          this.userAccessModel.deleteAccess = data.Delete;
+
+          if (this.userAccessModel.readAccess === true) {
+            this.warningMessage = '';
+            this.getPFConfigurationList();
+          } else {
+            this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
+              You do not have permissions to view this page. <br>
+              If you feel you should have access to this page, Please contact administrator. <br>
+              Thank you`;
+            this.showLoadingSpinner = false;
+          }
+        }
+      },
+      (error) => {
+        this.handleErrors(error);
+      }
+    );
   }
 
   getPFConfigurationList(): void {

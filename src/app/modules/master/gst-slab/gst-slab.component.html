@@ -15,56 +15,69 @@
 </div>
 <mat-card>
   <mat-card-content>
-    <!-- GST Slab Configuration -->
-    <div class="row mb-3">
+    <div class="row" *ngIf="warningMessage ===''">
       <div class="col-12">
-        <div class="table-responsive" *ngIf="!showLoadingSpinner && !errorMessage">
-          <table mat-table [dataSource]="gstSlabData" class="wlt-table table-striped">
-            <!-- Supply Type Column -->
-            <ng-container matColumnDef="supplyType">
-              <th mat-header-cell *matHeaderCellDef>Supply Type</th>
-              <td mat-cell *matCellDef="let row">
-                <span class="badge" [ngClass]="row.supplyType === 'Intrastate' ? 'badge-success' : 'badge-info'">
-                  {{ row.supplyType }}
-                </span>
-              </td>
-            </ng-container>
-
-            <!-- From State Column -->
-            <ng-container matColumnDef="fromState">
-              <th mat-header-cell *matHeaderCellDef>From State</th>
-              <td mat-cell *matCellDef="let row">{{ row.fromState }}</td>
-            </ng-container>
-
-            <!-- To State Column -->
-            <ng-container matColumnDef="toState">
-              <th mat-header-cell *matHeaderCellDef>To State</th>
-              <td mat-cell *matCellDef="let row">{{ row.toState }}</td>
-            </ng-container>
-
-            <!-- Tax Applied Column -->
-            <ng-container matColumnDef="taxApplied">
-              <th mat-header-cell *matHeaderCellDef>Tax Applied</th>
-              <td mat-cell *matCellDef="let row">
-                <span class="badge badge-primary">{{ row.taxApplied }}</span>
-              </td>
-            </ng-container>
-
-            <!-- Tax Split Column -->
-            <ng-container matColumnDef="taxSplit">
-              <th mat-header-cell *matHeaderCellDef>Tax Split</th>
-              <td mat-cell *matCellDef="let row">
-                <small class="text-muted">{{ row.taxSplit }}</small>
-              </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="['supplyType', 'fromState', 'toState', 'taxApplied', 'taxSplit']"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['supplyType', 'fromState', 'toState', 'taxApplied', 'taxSplit'];"></tr>
-          </table>
+        <div class="text-right pt-2 mb-3">
+          <button
+            *ngIf="this.userAccessModel.createAccess == true || (currentUser == 'admin' || currentUser == 'superadmin')"
+            class="btn wlt-c-furg-btn-primary" (click)="addNewGSTSlab()">
+            <mat-icon>add</mat-icon>
+            <span>New GST Slab</span>
+          </button>
         </div>
       </div>
     </div>
-    
+
+    <div class="table-responsive"
+      *ngIf="errorMessage =='' && gstSlabData && gstSlabData.length > 0 && warningMessage ===''">
+      <table mat-table [dataSource]="gstSlabData" class="wlt-table table-striped">
+        <!-- Supply Type Column -->
+        <ng-container matColumnDef="supplyType">
+          <th mat-header-cell *matHeaderCellDef>Supply Type</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge" [ngClass]="row.supplyType === 'Intrastate' ? 'badge-success' : 'badge-info'">
+              {{ row.supplyType }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- From State Column -->
+        <ng-container matColumnDef="fromState">
+          <th mat-header-cell *matHeaderCellDef>From State</th>
+          <td mat-cell *matCellDef="let row">{{ row.fromState }}</td>
+        </ng-container>
+
+        <!-- To State Column -->
+        <ng-container matColumnDef="toState">
+          <th mat-header-cell *matHeaderCellDef>To State</th>
+          <td mat-cell *matCellDef="let row">{{ row.toState }}</td>
+        </ng-container>
+
+        <!-- Tax Applied Column -->
+        <ng-container matColumnDef="taxApplied">
+          <th mat-header-cell *matHeaderCellDef>Tax Applied</th>
+          <td mat-cell *matCellDef="let row">
+            <span class="badge badge-primary">{{ row.taxApplied }}</span>
+          </td>
+        </ng-container>
+
+        <!-- Tax Split Column -->
+        <ng-container matColumnDef="taxSplit">
+          <th mat-header-cell *matHeaderCellDef>Tax Split</th>
+          <td mat-cell *matCellDef="let row">
+            <small class="text-muted">{{ row.taxSplit }}</small>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="['supplyType', 'fromState', 'toState', 'taxApplied', 'taxSplit']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['supplyType', 'fromState', 'toState', 'taxApplied', 'taxSplit'];">
+        </tr>
+      </table>
+    </div>
+
+    <div *ngIf="warningMessage !==''">
+      <mat-label style="color:red" [innerHTML]="warningMessage"></mat-label>
+    </div>
     <div *ngIf="errorMessage !==''">
       <mat-label style="color:red" [innerHTML]="errorMessage"></mat-label>
     </div>
