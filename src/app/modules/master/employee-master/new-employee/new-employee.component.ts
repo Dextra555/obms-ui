@@ -904,6 +904,14 @@ export class NewEmployeeComponent implements OnInit {
 
           this.frm.patchValue(salaryDetail);
 
+          // Explicitly set EMPFL_ID to ensure proper update
+          if (salaryDetail.EMPFL_ID && salaryDetail.EMPFL_ID > 0) {
+            this.frm.get('EMPFL_ID')?.setValue(salaryDetail.EMPFL_ID);
+          }
+
+          // Explicitly set EPFDETECT to match radio button string values
+          this.frm.get('EPFDETECT')?.setValue(salaryDetail?.EPFDETECT === true ? "Yes" : (salaryDetail?.EPFDETECT === false ? "No" : ""));
+
 
 
         }
@@ -1006,7 +1014,7 @@ export class NewEmployeeComponent implements OnInit {
 
 
 
-        this.frm.get('EPFDETECT')?.setValue(salaryDetail?.EPFDETECT == true ? "Yes" : "No");
+        this.frm.get('EPFDETECT')?.setValue(salaryDetail?.EPFDETECT === true ? "Yes" : (salaryDetail?.EPFDETECT === false ? "No" : ""));
 
 
 
@@ -1017,8 +1025,10 @@ export class NewEmployeeComponent implements OnInit {
 
 
         // Initialize field states based on loaded values
-
-        this.isTemporaryEmployeeChange(this.frm.get('TMPGUARD')?.value);
+        // Only call isTemporaryEmployeeChange for new employees, not when editing
+        // if (!this.isEdit) {
+        //   this.isTemporaryEmployeeChange(this.frm.get('TMPGUARD')?.value);
+        // }
 
         this.onIncomeTaxDeductionChange(this.frm.get('INCOMETAXDETECT')?.value);
 
@@ -2494,7 +2504,7 @@ export class NewEmployeeComponent implements OnInit {
 
 
 
-    data['EPFDETECT'] = this.frm.get('EPFDETECT')?.value == 'Yes';
+    data['EPFDETECT'] = this.frm.get('EPFDETECT')?.value === 'Yes';
 
 
 
