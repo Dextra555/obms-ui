@@ -40,20 +40,27 @@ export class TdsSlabComponent implements AfterViewInit {
     private _router: Router,
     private _liveAnnouncer: LiveAnnouncer
   ) {
-    this._datasharingService.getUsername().subscribe((username: string) => {
-      this.currentUser = username || '';
-    });
     this.warningMessage = '';
     this.errorMessage = '';
     this.showLoadingSpinner = false;
   }
 
   ngOnInit(): void {
-    if (this.currentUser == 'admin' || this.currentUser == 'superadmin') {
-      this.getTDSConfigurationList();
-    } else {
-      this.getUserAccessRights(this.currentUser, 'TDS Slab');
-    }
+    this.currentUser = sessionStorage.getItem('username') || '';
+    this._datasharingService.getUsername().subscribe((username: string) => {
+      if (username) {
+        this.currentUser = username;
+      }
+      if (this.currentUser == 'admin' || this.currentUser == 'superadmin') {
+        this.userAccessModel.readAccess = true;
+        this.userAccessModel.createAccess = true;
+        this.userAccessModel.updateAccess = true;
+        this.userAccessModel.deleteAccess = true;
+        this.getTDSConfigurationList();
+      } else {
+        this.getUserAccessRights(this.currentUser, 'TDS Slab');
+      }
+    });
   }
 
   getUserAccessRights(userName: string, screenName: string) {
