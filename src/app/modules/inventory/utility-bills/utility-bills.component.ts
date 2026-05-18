@@ -348,7 +348,7 @@ export class UtilityBillsComponent implements AfterViewInit {
       this.frm.reset();
       this.details = [];
       this.detailDataSource();
-      this.route.navigate(['/inventory/utility-bills']);     
+      this.route.navigate(['/inventory/utility-bills']);
     })
   }
 

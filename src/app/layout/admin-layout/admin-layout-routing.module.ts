@@ -137,6 +137,7 @@ import { BankReconciliationReportComponent } from 'src/app/modules/report/accoun
 import { GeneralLedgerReportComponent } from 'src/app/modules/report/accounting/general-ledger-report/general-ledger-report.component';
 import { ClientComplianceReportComponent } from 'src/app/modules/report/payroll/client-compliance-report/client-compliance-report.component';
 import { EsiStatementReportComponent } from 'src/app/modules/report/payroll/esi-statement-report/esi-statement-report.component';
+import { SearchUtilityBillsComponent } from 'src/app/modules/inventory/utility-bills/search-utility-bills/search-utility-bills.component';
 import { ProfessionalTaxStatementReportComponent } from 'src/app/modules/report/payroll/professional-tax-statement-report/professional-tax-statement-report.component';
 import { NonComplianceReportComponent } from 'src/app/modules/report/payroll/non-compliance-report/non-compliance-report.component';
 import { PfStatementReportComponent } from 'src/app/modules/report/payroll/pf-statement-report/pf-statement-report.component';
@@ -281,6 +282,7 @@ const routes: Routes = [
   { path: 'finance/legal-demand-action/new-legal-demand-action', component: NewLegalDemandActionComponent, canActivate: [AuthGuard] },
   { path: 'finance/legal-demand-action/new-legal-demand-action/:ID', component: NewLegalDemandActionComponent, canActivate: [AuthGuard] },
   { path: 'finance/invoice/print-invoice', component: PrintInvoiceComponent, canActivate: [AuthGuard] },
+  { path: 'finance/utility-search', component: SearchUtilityBillsComponent, canActivate: [AuthGuard] },
 
 
   //Master Report
