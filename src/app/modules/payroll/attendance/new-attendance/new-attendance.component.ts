@@ -384,6 +384,24 @@ export class NewAttendanceComponent implements OnInit {
                 ? new Date(this.attendanceForm.value.ResignedDate)
                 : null;
 
+              // Validate: Attendance period cannot be before employee's join date
+              if (joinDate) {
+                const attendanceMonthStart = new Date(advanceDate.getFullYear(), advanceDate.getMonth(), 1);
+                const joinMonthStart = new Date(joinDate.getFullYear(), joinDate.getMonth(), 1);
+
+                if (attendanceMonthStart < joinMonthStart) {
+                  this.showMessage(
+                    `Attendance not allowed before join date. Employee joined on ${joinDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`,
+                    'warning',
+                    'Warning Message'
+                  );
+                  this.getEmployeeListByEmployeeType(this.branchCode, this.attendanceForm.value.EmployeeType, this.StartPeriod, this.EndPeriod, 'Active');
+                  this.clearFormFields();
+                  this.hideloadingSpinner();
+                  return;
+                }
+              }
+
               // Check if the AdvanceDate is in the current month and year
               if (advanceDate.getMonth() === today.getMonth() && advanceDate.getFullYear() === today.getFullYear()) {
                 iNoOfDays = advanceDate.getDate();
@@ -391,16 +409,24 @@ export class NewAttendanceComponent implements OnInit {
                 iNoOfDays = this.getDaysInMonth(advanceDate.toString()); // Use utility function to get days in month
               }
               const attendanceDate = new Date(advanceDate.getFullYear(), advanceDate.getMonth(), 1);
+
               // Check if the employee has a resignation date
               if (resignDate) {
-                if (attendanceDate > resignDate) {
-                  this.showMessage(`Employee has resigned on ${resignDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`, 'warning', 'Warning Message');
+                const resignMonthStart = new Date(resignDate.getFullYear(), resignDate.getMonth(), 1);
+
+                // Validate: Attendance period cannot be after employee's resignation month
+                if (attendanceDate > resignMonthStart) {
+                  this.showMessage(
+                    `Attendance not allowed after resignation date. Employee resigned on ${resignDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}`,
+                    'warning',
+                    'Warning Message'
+                  );
                   this.getEmployeeListByEmployeeType(this.branchCode, this.attendanceForm.value.EmployeeType, this.StartPeriod, this.EndPeriod, 'Active');
-                  this.clearFormFields()
+                  this.clearFormFields();
                   this.hideloadingSpinner();
                   return;
                 } else if (this.dtAttendanceDate.getMonth() === resignDate.getMonth() && this.dtAttendanceDate.getFullYear() === resignDate.getFullYear()) {
-                  this.dtAttendanceDate = resignDate
+                  // Same month as resignation - limit days to resignation date
                   iNoOfDays = resignDate.getDate();
                 }
               }

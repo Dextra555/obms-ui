@@ -24,7 +24,7 @@
         </mat-form-field>
       </div>
       <div class="col-6 col-sm-6 col-md-6 col-lg-6 text-right">
-        <button *ngIf="userAccessModel.createAccess == true || currentUser == 'admin' || currentUser == 'superadmin'"
+        <button *ngIf="userAccessModel.createAccess == true || (currentUser == 'admin' || currentUser == 'superadmin')"
           class="btn wlt-c-furg-btn-primary" (click)="onNew()">
           <mat-icon>add</mat-icon>
           <span>New Department</span>
@@ -56,11 +56,11 @@
         <ng-container matColumnDef="action" stickyEnd>
           <th mat-header-cell *matHeaderCellDef style="text-align:center; width: 120px;"> Action </th>
           <td mat-cell *matCellDef="let element" style="text-align:center;">
-            <a *ngIf="userAccessModel.updateAccess == true || (currentUser == 'superadmin')" style="cursor:pointer;"
+            <a *ngIf="userAccessModel.updateAccess == true || (currentUser == 'admin' || currentUser == 'superadmin')" style="cursor:pointer;"
               class="wlt-c-furg-text-primary mr-2" matTooltip="Edit" (click)="onEdit(element)">
               <mat-icon>edit</mat-icon>
             </a>
-            <a *ngIf="userAccessModel.deleteAccess == true || (currentUser == 'superadmin')" style="cursor:pointer;"
+            <a *ngIf="userAccessModel.deleteAccess == true || (currentUser == 'admin' || currentUser == 'superadmin')" style="cursor:pointer;"
               class="wlt-c-furg-text-danger" matTooltip="Delete" (click)="onDelete(element)">
               <mat-icon>delete_outline</mat-icon>
             </a>

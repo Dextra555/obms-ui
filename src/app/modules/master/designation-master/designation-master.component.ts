@@ -5,6 +5,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
 import { DesignationService, Designation } from '../../../service/designation.service';
 import { DepartmentService, Department } from '../../../service/department.service';
+import { UserAccessModel } from 'src/app/model/userAccesModel';
+import { DatasharingService } from 'src/app/service/datasharing.service';
+import { MastermoduleService } from 'src/app/service/mastermodule.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -25,20 +28,69 @@ export class DesignationMasterComponent implements OnInit {
   departments: Department[] = [];
   selectedDepartmentId: number | null = null;
 
+  currentUser: string = '';
+  warningMessage: string = '';
+  errorMessage: string = '';
+  userAccessModel: UserAccessModel = {
+    readAccess: false,
+    updateAccess: false,
+    deleteAccess: false,
+    createAccess: false,
+  };
+
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private designationService: DesignationService,
     private departmentService: DepartmentService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private _dataService: DatasharingService,
+    private _masterService: MastermoduleService
   ) {
     this.initializeForm();
   }
 
   ngOnInit(): void {
-    this.loadDepartments();
-    this.loadDesignations();
+    this.currentUser = sessionStorage.getItem('username')!;
+    if (this.currentUser == null) {
+      this._dataService.getUsername().subscribe((username: string) => {
+        this.currentUser = username;
+      });
+    }
+    if (this.currentUser == 'admin' || this.currentUser == 'superadmin') {
+      this.loadDepartments();
+      this.loadDesignations();
+    } else {
+      this.getUserAccessRights(this.currentUser, 'Designation Master');
+    }
+  }
+
+  getUserAccessRights(userName: string, screenName: string) {
+    this._masterService.getUserAccessRights(userName, screenName).subscribe(
+      (data) => {
+        if (data != null) {
+          this.userAccessModel.readAccess = data.Read;
+          this.userAccessModel.createAccess = data.Create;
+          this.userAccessModel.updateAccess = data.Update;
+          this.userAccessModel.deleteAccess = data.Delete;
+
+          if (this.userAccessModel.readAccess === true) {
+            this.warningMessage = '';
+            this.loadDepartments();
+            this.loadDesignations();
+          } else {
+            this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
+              You do not have permissions to view this page. <br>
+              If you feel you should have access to this page, Please contact administrator. <br>
+              Thank you`;
+          }
+        }
+      },
+      (error) => {
+        this.errorMessage = error;
+      }
+    );
   }
 
   initializeForm(): void {

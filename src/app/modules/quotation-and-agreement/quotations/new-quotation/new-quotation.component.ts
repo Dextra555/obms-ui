@@ -1,4 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+
+import { forkJoin, Observable, of } from 'rxjs';
+
+import { catchError, map } from 'rxjs/operators';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -66,9 +70,54 @@ export interface IQuotation {
 
 })
 
-export class NewQuotationComponent {
+export class NewQuotationComponent implements OnInit, AfterViewInit {
 
-  displayedColumns: string[] = ['SNo', 'ServiceType', 'Description', 'NoOfGuards', 'PerMonth', 'PerDay', 'Rate', 'NoOfHours', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
+  ngOnInit() {
+    // 1. Synchronized Loading of Master Data first
+    this.showLoadingSpinner = true;
+
+    forkJoin({
+      master: this.service.getQuotationMaster(this.currentUser),
+      serviceTypes: this.serviceTypeService.getAllServiceTypes(),
+      gstConfig: this._masterService.getGSTConfigurationList()
+    }).pipe(
+      catchError(err => {
+        this.handleErrors(err);
+        return of({ master: {}, serviceTypes: [], gstConfig: [] });
+      })
+    ).subscribe((results: any) => {
+      console.log('ForkJoin results:', results);
+      // Set Master Data
+      this.data = results.master;
+      this.branchList = results.master['branchList'];
+      this.clientList = results.master['clientList'];
+      this.serviceTypes = results.serviceTypes || [];
+      this.gstConfigList = results.gstConfig || [];
+
+      // 2. Handle Edit Mode
+      if (this.ID != 0 && this.ID != undefined) {
+        this.loadQuotationForEdit(this.ID);
+      } else {
+        this.hideLoadingSpinner();
+      }
+    });
+  }
+
+
+
+  ngAfterViewInit() {
+
+    if (this.dataSource) {
+
+      this.dataSource.paginator = this.paginator;
+
+      this.dataSource.sort = this.sort;
+
+    }
+
+  }
+
+  displayedColumns: string[] = ['ServiceType', 'Description', 'NoOfGuards', 'PerMonth', 'PerDay', 'Rate', 'NoOfDays', 'FollowCalender', 'MonthTotal', 'YearTotal', 'HasDiscount', 'DiscountAmount', 'DiscountHour', 'IsTaxable', 'TaxAmount', 'total', 'Category', 'Reason', 'action'];
 
   dataSource!: MatTableDataSource<IQuotationDetail>;
 
@@ -176,8 +225,6 @@ export class NewQuotationComponent {
 
     this.sixMonthsAgo.setMonth(this.today.getMonth() - 6);
 
-
-
     this.ID = this.activatedRoute.snapshot.params['ID'];
 
     this.frm = this.fb.group({
@@ -185,6 +232,8 @@ export class NewQuotationComponent {
       ID: [0],
 
       QuotationDate: [new Date(), Validators.required],
+
+      QuotationEndDate: [new Date()],
 
       Branch: ['', Validators.required],
 
@@ -244,19 +293,57 @@ export class NewQuotationComponent {
 
         Leaves: [0],
 
+        LeavesPercentage: [0],
+
         Allowance: [0],
 
         Bonus: [0],
+
+        BonusPercentage: [0],
 
         NFH: [0],
 
         PF: [0],
 
+        PFPercentage: [0],
+
         ESI: [0],
+
+        ESIPercentage: [0],
 
         Uniform: [0],
 
         ServiceFee: [0],
+
+        HRA: [0],
+
+        HRAPercentage: [0],
+
+        ProfessionalTax: [0],
+
+        RelieverCharges: [0],
+
+        RelieverChargesPercentage: [0],
+
+        Others: [0],
+
+        OthersPercentage: [0],
+
+        AdministrationCharges: [0],
+
+        AdministrationChargesPercentage: [0],
+
+        ManagementFee: [0],
+
+        ManagementFeePercentage: [0],
+
+        SubTotal: [0],
+
+        TotalPlusStatutory: [0],
+
+        TotalDirectCost: [0],
+
+        MonthlyChargedCost: [0],
 
         CommercialBreakdown: [null]
 
@@ -265,154 +352,6 @@ export class NewQuotationComponent {
       Note: ['-'],
 
     });
-
-
-
-    service.getQuotationMaster(this.currentUser).subscribe((data: any) => {
-
-      this.data = data;
-
-      this.branchList = data['branchList'];
-
-      this.clientList = data['clientList'];
-
-    });
-
-
-
-    this.loadServiceTypes();
-
-
-
-    this._masterService.getGSTConfigurationList().subscribe(data => {
-
-      this.gstConfigList = data || [];
-
-    });
-
-
-
-    if (this.ID != 0 && this.ID != undefined) {
-
-      this.isEdit = true;
-
-      service.getQuotationByID(this.ID).subscribe((d: any) => {
-
-        let result = d['Result'] || d;
-
-        let quotation = result['quotation'] || result;
-
-        let quotationDetails = result['quotationDetails'] || result['details'] || [];
-
-
-
-        this.frm.patchValue(quotation);
-
-
-
-        quotationDetails.forEach((d: any) => {
-
-          d['YearTotal'] = Math.round(d['MonthTotal'] * 12);
-
-
-
-          let vDiscount = parseFloat(d['Discount'] || d['DiscountAmount'] || 0);
-
-          if (!d['HasDiscount']) {
-
-            vDiscount = 0;
-
-          }
-
-
-
-          let t = (parseFloat(d['MonthTotal']) - vDiscount);
-
-          if (d['IsTaxable']) {
-
-            d['total'] = this.formatCurrency((t * (108 / 100)));
-
-          } else {
-
-            d['total'] = this.formatCurrency(t);
-
-          }
-
-
-
-          // Reconstruct commercial breakdown data from individual columns
-
-          d['CommercialBreakdown'] = {
-
-            Basic: d['Basic'] || 0,
-
-            DA: d['DA'] || 0,
-
-            MinimumWages: (d['Basic'] || 0) + (d['DA'] || 0),
-
-            HRA: d['HRA'] || 0,
-
-            HRAPercentage: d['HRAPercentage'] || 0,
-
-            Leaves: d['Leaves'] || 0,
-
-            LeavesPercentage: d['LeavesPercentage'] || 0,
-
-            ProfessionalTax: d['ProfessionalTax'] || 0,
-
-            Bonus: d['Bonus'] || 0,
-
-            BonusPercentage: d['BonusPercentage'] || 0,
-
-            RelieverCharges: d['RelieverCharges'] || 0,
-
-            RelieverChargesPercentage: d['RelieverChargesPercentage'] || 0,
-
-            PF: d['PF'] || 0,
-
-            PFPercentage: d['PFPercentage'] || 0,
-
-            ESI: d['ESI'] || 0,
-
-            ESIPercentage: d['ESIPercentage'] || 0,
-
-            UniformCost: d['Uniform'] || d['UniformCost'] || 0,
-
-            Others: d['Others'] || 0,
-
-            OthersPercentage: d['OthersPercentage'] || 0,
-
-            AdministrationCharges: d['AdministrationCharges'] || 0,
-
-            AdministrationChargesPercentage: d['AdministrationChargesPercentage'] || 0,
-
-            ManagementFee: d['ManagementFee'] || 0,
-
-            ManagementFeePercentage: d['ManagementFeePercentage'] || 0,
-
-            SubTotal: d['SubTotal'] || 0,
-
-            TotalPlusStatutory: d['TotalPlusStatutory'] || 0,
-
-            TotalDirectCost: d['TotalDirectCost'] || 0,
-
-            MonthlyChargedCost: d['MonthlyChargedCost'] || 0
-
-          };
-
-
-
-          this.details.push(d);
-
-        });
-
-
-
-        this.detailDataSource();
-
-      });
-
-    }
 
   }
 
@@ -624,21 +563,27 @@ export class NewQuotationComponent {
 
 
 
-  loadServiceTypes(): void {
+  // Load service types for selection
 
-    this.serviceTypeService.getAllServiceTypes().subscribe(
+  loadServiceTypes(): Observable<ServiceType[]> {
 
-      (data: ServiceType[]) => {
+    return this.serviceTypeService.getAllServiceTypes().pipe(
+
+      map((data: ServiceType[]) => {
 
         this.serviceTypes = data;
 
-      },
+        return data;
 
-      () => {
+      }),
 
-        // Silently fail - service types are optional
+      catchError(() => {
 
-      }
+        this.serviceTypes = [];
+
+        return of([]);
+
+      })
 
     );
 
@@ -716,13 +661,91 @@ export class NewQuotationComponent {
 
     let data = this.frm.getRawValue();
 
-    // Sync PerDay and PerMonth values from form to details array
+
+
+    // Extract commercial breakdown data from each detail and merge into main detail object for database storage
+
     this.details.forEach((detail: any) => {
-      detail.PerDay = parseFloat(detail.PerDay) || 0;
-      detail.PerMonth = parseFloat(detail.PerMonth) || 0;
+
+      if (detail.CommercialBreakdown) {
+
+        const cb = detail.CommercialBreakdown;
+
+        detail.Basic = cb.Basic || 0;
+
+        detail.DA = cb.DA || 0;
+
+        detail.HRA = cb.HRA || 0;
+
+        detail.HRAPercentage = cb.HRAPercentage || 0;
+
+        detail.Leaves = cb.Leaves || 0;
+
+        detail.LeavesPercentage = cb.LeavesPercentage || 0;
+
+        detail.ProfessionalTax = cb.ProfessionalTax || 0;
+
+        detail.Bonus = cb.Bonus || 0;
+
+        detail.BonusPercentage = cb.BonusPercentage || 0;
+
+        detail.RelieverCharges = cb.RelieverCharges || 0;
+
+        detail.RelieverChargesPercentage = cb.RelieverChargesPercentage || 0;
+
+        detail.PF = cb.PF || 0;
+
+        detail.PFPercentage = cb.PFPercentage || 0;
+
+        detail.ESI = cb.ESI || 0;
+
+        detail.ESIPercentage = cb.ESIPercentage || 0;
+
+        detail.Uniform = cb.UniformCost || cb.Uniform || 0;
+
+        detail.Others = cb.Others || 0;
+
+        detail.OthersPercentage = cb.OthersPercentage || 0;
+
+        detail.AdministrationCharges = cb.AdministrationCharges || 0;
+
+        detail.AdministrationChargesPercentage = cb.AdministrationChargesPercentage || 0;
+
+        detail.ManagementFee = cb.ManagementFee || 0;
+
+        detail.ManagementFeePercentage = cb.ManagementFeePercentage || 0;
+
+        detail.SubTotal = cb.SubTotal || 0;
+
+        detail.TotalPlusStatutory = cb.TotalPlusStatutory || 0;
+
+        detail.TotalDirectCost = cb.TotalDirectCost || 0;
+
+        detail.MonthlyChargedCost = cb.MonthlyChargedCost || 0;
+
+      }
+
     });
 
-    data['details'] = this.details;
+
+
+    // Sync PerDay and PerMonth values from form to details array
+
+    this.details.forEach((detail: any) => {
+
+      detail.PerDay = parseFloat(detail.PerDay) || 0;
+
+      detail.PerMonth = parseFloat(detail.PerMonth) || 0;
+
+    });
+
+
+
+    // Rename nested form group 'details' to 'quotationDetails' as expected by backend
+
+    data['quotationDetails'] = this.details;
+
+    delete data['details'];
 
 
 
@@ -734,37 +757,25 @@ export class NewQuotationComponent {
 
     data['QuotationDate'] = this.returnDate(this.frm.get('QuotationDate')?.value);
 
+    console.log('isEdit:', this.isEdit, 'ID:', this.ID, 'QuotationDate:', data['QuotationDate']);
+
+
+
     let msg = "";
 
-    
+    this.service.saveAndUpdateQuotation(data).subscribe({
 
-    if (this.isEdit) {
+      next: (d: any) => {
 
-      msg = 'Successfully Updated Quotation Details';
+        if (this.isEdit) {
 
-    } else {
+          msg = 'Successfully Updated Quotation Details';
 
-      msg = 'Successfully Saved Quotation Details';
+        } else {
 
-    }
+          msg = 'Successfully Saved Quotation Details';
 
-    
-
-    this.service.saveAndUpdateQuotation(data).subscribe((d: any) => {
-
-      console.log('Quotation save response:', d);
-
-      const quotationId = d['QuotationID'] || d['quotation']?.ID || d['quotation']?.id || d['ID'] || d['id'] || 0;
-
-      
-
-      console.log('Extracted quotationId:', quotationId);
-
-      
-
-      if (quotationId === 0) {
-
-        console.error('Failed to get valid QuotationID from response:', d);
+        }
 
         Swal.fire({
 
@@ -774,249 +785,31 @@ export class NewQuotationComponent {
 
           showConfirmButton: false,
 
-          title: 'Error',
+          title: 'Success',
 
-          text: 'Failed to save quotation. Please try again.',
+          text: msg,
 
-          icon: 'error',
+          icon: 'success',
 
           showCloseButton: false,
 
           timer: 3000,
 
+        }).then(() => {
+
+          this.route.navigate(['/quotation-and-agreement/quotations']);
+
         });
 
-        return;
+      },
+
+      error: (err: any) => {
+
+        this.handleErrors(err);
+
+        Swal.fire('Error', 'Failed to save quotation details', 'error');
 
       }
-
-
-
-      // Save each quotation detail
-
-      if (this.details && this.details.length > 0) {
-
-        const detailSavePromises = this.details.map((detail: any) => {
-
-          detail.QuotationID = quotationId;
-
-          detail.Client = this.frm.get('Client')?.value || '';
-
-          detail.Branch = this.frm.get('Branch')?.value || '';
-
-          detail.QuotationDate = data['QuotationDate'];
-
-          
-
-          // Ensure all required fields have proper values
-
-          detail.Description = detail.Description || '';
-
-          detail.NoOfGuards = parseInt(detail.NoOfGuards) || 0;
-
-          detail.Rate = parseFloat(detail.Rate) || 0;
-
-          detail.NoOfHours = parseFloat(detail.NoOfHours) || 0;
-
-          detail.NoOfDays = parseFloat(detail.NoOfDays) || 0;
-
-          detail.FollowCalender = detail.FollowCalender || false;
-
-          detail.HasDiscount = detail.HasDiscount || false;
-
-          detail.DiscountAmount = parseFloat(detail.DiscountAmount) || 0;
-
-          detail.DiscountHour = parseInt(detail.DiscountHour) || 0;
-
-          detail.IsTaxable = detail.IsTaxable || false;
-
-          detail.TaxAmount = parseFloat(detail.TaxAmount) || 0;
-
-          detail.MonthTotal = parseFloat(detail.MonthTotal) || 0;
-
-          detail.LASTUPDATE = new Date();
-
-          detail.Category = detail.Category || '';
-
-          detail.Reason = detail.Reason || '';
-
-
-
-          // Extract commercial breakdown data and merge into main detail object for database storage
-
-          if (detail.CommercialBreakdown) {
-
-            const cb = detail.CommercialBreakdown;
-
-            detail.Basic = cb.Basic || 0;
-
-            detail.DA = cb.DA || 0;
-
-            detail.HRA = cb.HRA || 0;
-
-            detail.HRAPercentage = cb.HRAPercentage || 0;
-
-            detail.Leaves = cb.Leaves || 0;
-
-            detail.LeavesPercentage = cb.LeavesPercentage || 0;
-
-            detail.ProfessionalTax = cb.ProfessionalTax || 0;
-
-            detail.Bonus = cb.Bonus || 0;
-
-            detail.BonusPercentage = cb.BonusPercentage || 0;
-
-            detail.RelieverCharges = cb.RelieverCharges || 0;
-
-            detail.RelieverChargesPercentage = cb.RelieverChargesPercentage || 0;
-
-            detail.PF = cb.PF || 0;
-
-            detail.PFPercentage = cb.PFPercentage || 0;
-
-            detail.ESI = cb.ESI || 0;
-
-            detail.ESIPercentage = cb.ESIPercentage || 0;
-
-            detail.Uniform = cb.UniformCost || cb.Uniform || 0;
-
-            detail.Others = cb.Others || 0;
-
-            detail.OthersPercentage = cb.OthersPercentage || 0;
-
-            detail.AdministrationCharges = cb.AdministrationCharges || 0;
-
-            detail.AdministrationChargesPercentage = cb.AdministrationChargesPercentage || 0;
-
-            detail.ManagementFee = cb.ManagementFee || 0;
-
-            detail.ManagementFeePercentage = cb.ManagementFeePercentage || 0;
-
-            detail.SubTotal = cb.SubTotal || 0;
-
-            detail.TotalPlusStatutory = cb.TotalPlusStatutory || 0;
-
-            detail.TotalDirectCost = cb.TotalDirectCost || 0;
-
-            detail.MonthlyChargedCost = cb.MonthlyChargedCost || 0;
-
-          } else {
-
-            // Set default values for commercial breakdown fields if not present
-
-            detail.Basic = detail.Basic || 0;
-
-            detail.DA = detail.DA || 0;
-
-            detail.Leaves = detail.Leaves || 0;
-
-            detail.Allowance = detail.Allowance || 0;
-
-            detail.Bonus = detail.Bonus || 0;
-
-            detail.NFH = detail.NFH || 0;
-
-            detail.PF = detail.PF || 0;
-
-            detail.ESI = detail.ESI || 0;
-
-            detail.Uniform = detail.Uniform || 0;
-
-            detail.ServiceFee = detail.ServiceFee || 0;
-
-            detail.HRA = detail.HRA || 0;
-
-            detail.HRAPercentage = detail.HRAPercentage || 0;
-
-            detail.ProfessionalTax = detail.ProfessionalTax || 0;
-
-            detail.RelieverCharges = detail.RelieverCharges || 0;
-
-            detail.RelieverChargesPercentage = detail.RelieverChargesPercentage || 0;
-
-            detail.Others = detail.Others || 0;
-
-            detail.OthersPercentage = detail.OthersPercentage || 0;
-
-            detail.AdministrationCharges = detail.AdministrationCharges || 0;
-
-            detail.AdministrationChargesPercentage = detail.AdministrationChargesPercentage || 0;
-
-            detail.ManagementFee = detail.ManagementFee || 0;
-
-            detail.ManagementFeePercentage = detail.ManagementFeePercentage || 0;
-
-            detail.SubTotal = detail.SubTotal || 0;
-
-            detail.TotalPlusStatutory = detail.TotalPlusStatutory || 0;
-
-            detail.TotalDirectCost = detail.TotalDirectCost || 0;
-
-            detail.MonthlyChargedCost = detail.MonthlyChargedCost || 0;
-
-          }
-
-
-
-          console.log('Saving detail:', detail);
-
-          return this.service.saveAndUpdateQuotationDetails(detail).toPromise();
-
-        });
-
-
-
-        // Wait for all details to be saved before proceeding
-
-        Promise.all(detailSavePromises).then(() => {
-
-          this.showSuccessMessageAndNavigate(msg);
-
-        }).catch((err) => {
-
-          console.error('Error saving some details:', err);
-
-          // Still show success message even if some details fail to save
-
-          this.showSuccessMessageAndNavigate(msg);
-
-        });
-
-      } else {
-
-        this.showSuccessMessageAndNavigate(msg);
-
-      }
-
-    })
-
-  }
-
-
-
-  private showSuccessMessageAndNavigate(msg: string) {
-
-    Swal.fire({
-
-      toast: true,
-
-      position: 'top',
-
-      showConfirmButton: false,
-
-      title: 'Success',
-
-      text: msg,
-
-      icon: 'success',
-
-      showCloseButton: false,
-
-      timer: 3000,
-
-    }).then(() => {
-
-      this.route.navigate(['/quotation-and-agreement/quotations']);
 
     });
 
@@ -1110,9 +903,193 @@ export class NewQuotationComponent {
 
     this.dataSource = new MatTableDataSource(this.details);
 
-    this.dataSource.sort = this.sort;
+    setTimeout(() => {
 
-    this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+
+      this.dataSource.paginator = this.paginator;
+
+    });
+
+  }
+
+
+
+  loadQuotationForEdit(quotationID: any) {
+    this.isEdit = true;
+    this.service.getQuotationByID(quotationID).subscribe((d: any) => {
+      console.log('Full backend response for quotation ID', quotationID, ':', d);
+      let res = d['Result'] || d;
+      console.log('Res object:', res);
+      
+      let quotation = res['quotation'] || res['Quotation'];
+      let quotationDetails = res['quotationDetails'] || res['QuotationDetails'] || res['details'] || [];
+
+      this.frm.patchValue(quotation);
+
+      if (quotation.Branch) {
+        this.getClientsByBranchID(quotation.Branch);
+      }
+
+      this.details = quotationDetails.map((row: any) => this.mapItemDetails(row));
+      this.detailDataSource();
+      this.hideLoadingSpinner();
+    });
+  }
+
+  private mapItemDetails(d: any): IQuotationDetail {
+
+    let detail: IQuotationDetail = {
+
+      ...d,
+
+      IsTaxable: !!d.IsTaxable,
+
+      YearTotal: Math.round(d.MonthTotal * 12)
+
+    };
+
+
+
+    let vDiscount = parseFloat(d.DiscountAmount || d.Discount || 0);
+
+    if (!detail.HasDiscount) {
+
+      vDiscount = 0;
+
+    }
+
+
+
+    let t = (parseFloat(d.MonthTotal) - vDiscount);
+
+    if (detail.IsTaxable) {
+
+      detail.total = parseFloat(this.formatCurrency((t * (1 + 18 / 100)))); // Default 18% for tax calc if config missing
+
+    } else {
+
+      detail.total = parseFloat(this.formatCurrency(t));
+
+    }
+
+
+
+    // Recover ServiceType by matching Description if possible
+
+    const matchedService = this.serviceTypes?.find(st => st.ServiceName === detail.Description);
+
+    if (matchedService) {
+
+      detail.ServiceTypeID = matchedService.Id;
+
+      detail.ServiceType = matchedService;
+
+      
+
+      // Re-calculate with correct GST rate if service type is matched
+
+      if (detail.IsTaxable) {
+
+        const config = this.gstConfigList.find(c => c.hsnCode === matchedService.HSNCode);
+
+        const gstRate = config?.gstRate ?? 18;
+
+        detail.total = parseFloat(this.formatCurrency((t * (1 + gstRate / 100))));
+
+      }
+
+    } else if (d.ServiceTypeID) {
+
+      const matchedById = this.serviceTypes?.find(st => st.Id === d.ServiceTypeID);
+
+      if (matchedById) {
+
+        detail.ServiceTypeID = matchedById.Id;
+
+        detail.ServiceType = matchedById;
+
+      }
+
+    }
+
+
+
+    // Reconstruct commercial breakdown data from individual columns
+
+    if (!detail.CommercialBreakdown) {
+
+      detail.CommercialBreakdown = {
+
+        Basic: d.Basic || 0,
+
+        DA: d.DA || 0,
+
+        MinimumWages: (d.Basic || 0) + (d.DA || 0),
+
+        HRA: d.HRA || 0,
+
+        HRAPercentage: d.HRAPercentage || 0,
+
+        Leaves: d.Leaves || 0,
+
+        LeavesPercentage: d.LeavesPercentage || 0,
+
+        ProfessionalTax: d.ProfessionalTax || 0,
+
+        Bonus: d.Bonus || 0,
+
+        BonusPercentage: d.BonusPercentage || 0,
+
+        RelieverCharges: d.RelieverCharges || 0,
+
+        RelieverChargesPercentage: d.RelieverChargesPercentage || 0,
+
+        PF: d.PF || 0,
+
+        PFPercentage: d.PFPercentage || 0,
+
+        ESI: d.ESI || 0,
+
+        ESIPercentage: d.ESIPercentage || 0,
+
+        UniformCost: d.Uniform || d.UniformCost || 0,
+
+        Uniform: d.Uniform || d.UniformCost || 0,
+
+        Others: d.Others || 0,
+
+        OthersPercentage: d.OthersPercentage || 0,
+
+        AdministrationCharges: d.AdministrationCharges || 0,
+
+        AdministrationChargesPercentage: d.AdministrationChargesPercentage || 0,
+
+        ManagementFee: d.ManagementFee || 0,
+
+        ManagementFeePercentage: d.ManagementFeePercentage || 0,
+
+        ServiceFee: d.ServiceFee || 0,
+
+        NFH: d.NFH || 0,
+
+        Allowance: d.Allowance || 0,
+
+        SubTotal: d.SubTotal || 0,
+
+        TotalPlusStatutory: d.TotalPlusStatutory || 0,
+
+        TotalDirectCost: d.TotalDirectCost || 0,
+
+        MonthlyChargedCost: d.MonthlyChargedCost || 0
+
+      };
+
+    }
+
+
+
+    return detail;
 
   }
 
@@ -1174,19 +1151,57 @@ export class NewQuotationComponent {
 
       Leaves: 0,
 
+      LeavesPercentage: 0,
+
       Allowance: 0,
 
       Bonus: 0,
+
+      BonusPercentage: 0,
 
       NFH: 0,
 
       PF: 0,
 
+      PFPercentage: 0,
+
       ESI: 0,
+
+      ESIPercentage: 0,
 
       Uniform: 0,
 
       ServiceFee: 0,
+
+      HRA: 0,
+
+      HRAPercentage: 0,
+
+      ProfessionalTax: 0,
+
+      RelieverCharges: 0,
+
+      RelieverChargesPercentage: 0,
+
+      Others: 0,
+
+      OthersPercentage: 0,
+
+      AdministrationCharges: 0,
+
+      AdministrationChargesPercentage: 0,
+
+      ManagementFee: 0,
+
+      ManagementFeePercentage: 0,
+
+      SubTotal: 0,
+
+      TotalPlusStatutory: 0,
+
+      TotalDirectCost: 0,
+
+      MonthlyChargedCost: 0,
 
       CommercialBreakdown: null
 
@@ -1486,6 +1501,24 @@ export class NewQuotationComponent {
 
     this.frm.get('details.Description')?.setValue("BAG::");
 
+  }
+
+  onDiscountHourChange(): void {
+    // Trigger DetailRowChange to recalculate discount based on Working Days - Discount Days
+    this.DetailRowChange();
+  }
+
+  onDiscountCheckboxChange(event: any): void {
+    if (!event.checked) {
+      // Clear discount values when checkbox is unchecked
+      this.frm.get('details.DiscountAmount')?.setValue(0);
+      this.frm.get('details.DiscountHour')?.setValue(0);
+    }
+    this.DetailRowChange();
+  }
+
+  get hasDiscount(): boolean {
+    return this.frm.get('details.HasDiscount')?.value || false;
   }
 
 
