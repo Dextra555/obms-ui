@@ -35,12 +35,11 @@ export class SupplierStatementComponent implements OnInit {
   reportPageName: string = "";
 
   constructor(public sanitizer: DomSanitizer, private _masterService: MastermoduleService, private service: InventoryService,
-    private empService: EmployeeService, private fb: FormBuilder, private router: Router, private _dataService: DatasharingService,
-    private _financeService: FinanceService) {
+    private _financeService: FinanceService, private fb: FormBuilder, private router: Router, private _dataService: DatasharingService) {
 
     this.frm = fb.group({
-      Branch: ["0"],
-      Supplier: ["0"],
+      Branch: ["0", Validators.required],
+      Supplier: ["0", Validators.required],
       ActivityType: ['A'],
       Category: [],
       payTo: [],
@@ -90,9 +89,9 @@ export class SupplierStatementComponent implements OnInit {
             }).subscribe({
               next: (result) => {
                 this.branchList = result.branchList;
-                this.supplierList = result.supplierList;
-                this.categoryList = result.categoryList;
-                this.paytoList = result.paytoList;
+                this.supplierList = result.supplierList?.filter(s => s.Id > 0);
+                this.categoryList = result.categoryList?.filter(s => s.ID > 0);
+                this.paytoList = result.paytoList?.filter(s => s.Id > 0);;
               },
               error: (err) => {
                 console.error('Error fetching data', err);
@@ -114,77 +113,118 @@ export class SupplierStatementComponent implements OnInit {
     );
   }
   onSupplierSelectionChange(event: any) {
-    console.log('Supplier: ', this.frm.get("Supplier")?.value ?? 0)
+    const selectedSupplierId = event;
+    // If no supplier selected, clear lists and return
+    if (!selectedSupplierId || selectedSupplierId === 0) {
+      this.categoryList = [];
+      this.paytoList = [];
+      return;
+    }
+
+    // Find the selected supplier
+    const selectedSupplier = this.supplierList.find((s: any) => s.Id === selectedSupplierId);
+
+    // Get category from supplier, default to null if not found
+    const categoryValue = selectedSupplier ? selectedSupplier.Category : null;
+
+    // If no supplier selected, clear lists and return
+    if (!selectedSupplierId || selectedSupplierId === 0) {
+      this.categoryList = [];
+      this.paytoList = [];
+      return;
+    }
+
+    // Fetch categories and payto list
     forkJoin({
-      categoryList: this._masterService.getInventoryCategories(event.value),
-      paytoList: this._masterService.getSuppliers(event.value)
+      categoryList: this._masterService.getInventoryCategories(categoryValue),
+      paytoList: this._masterService.getSuppliers(categoryValue)
     }).subscribe({
       next: (result) => {
-        this.categoryList = result.categoryList;
-        this.paytoList = result.paytoList;
+        this.categoryList = result.categoryList?.filter(s => s.ID > 0);
+        this.paytoList = result.paytoList?.filter(s => s.Id > 0);
       },
       error: (err) => {
         console.error('Error fetching data', err);
+        this.categoryList = [];
+        this.paytoList = [];
       }
-    });
+    });  
+
+}
+
+returnDate(date ?: any) {
+  let currentDate = new Date();
+  if (date) {
+    currentDate = new Date(date);
   }
-  returnDate(date?: any) {
-    let currentDate = new Date();
-    if (date) {
-      currentDate = new Date(date);
+
+  const year = currentDate.getFullYear();
+  const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month is zero-based
+  const day = String(currentDate.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
+}
+clkBtn(number: number) {
+  this.reportPageName = number == 1 ? "SupplierStatementReport.aspx?" : 'InvoiceCollectionTotalReportNoTax.aspx?';
+  this.reportPageName += "LoginID=" + this.currentUser;
+}
+// onSubmit() {
+//   this.url = environment.baseReportUrl;
+//   this.url += this.currentUrl;
+//   let localURL = "";
+//   if (this.frm.invalid) {
+//     return;
+//   }
+//   localURL += "&StartDate=" + this.returnDate(this.frm.get("StartDate")?.value)
+//   localURL += "&EndDate=" + this.returnDate(this.frm.get("EndDate")?.value)
+//   localURL += "&Branch=" + (this.frm.get("Branch")?.value ?? 0)
+//   localURL += "&Supplier=" + (this.frm.get("Supplier")?.value ?? 0)
+
+//   this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(this.url + this.reportPageName + localURL);
+// }
+onSubmit() {
+  if (this.frm.invalid) return;
+
+  const startDate = this.returnDate(this.frm.get("StartDate")?.value);
+  const endDate = this.returnDate(this.frm.get("EndDate")?.value);
+  const branch = this.frm.get("Branch")?.value ?? '';
+  const supplier = this.frm.get("Supplier")?.value ?? 0;
+  const payTo = this.frm.get("PayTo")?.value ?? 0;
+  const category = this.frm.get("Category")?.value ?? '';
+  const status = this.frm.get("ActivityType")?.value ?? '';
+
+  if (supplier == 0) {
+    this.frm.get("Supplier")?.setErrors({ required: true });
+    return;
+  }
+  const payload = { StartDate: startDate, EndDate: endDate, Branch: branch, Supplier: supplier, PayTo: payTo, Category: category, Status: status };
+
+  this._financeService.executeSupplierReport(payload).subscribe({
+    next: () => {
+      // Build report URL only after SP executes
+      let localURL = '';
+      localURL += `&StartDate=${startDate}`;
+      localURL += `&EndDate=${endDate}`;
+      localURL += `&Branch=${branch}`;
+      localURL += `&Supplier=${supplier}`;
+      localURL += `&Status=${status}`;
+
+      this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(
+        environment.baseReportUrl + this.currentUrl + this.reportPageName + localURL
+      );
+    },
+    error: (err) => {
+      console.error(err);
     }
+  });
+}
 
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Month is zero-based
-    const day = String(currentDate.getDate()).padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
+handleErrors(error: string) {
+  if (error != null && error != '') {
+    this.hideSpinner();
   }
-  clkBtn(number: number) {
-    this.reportPageName = number == 1 ? "SupplierStatementReport.aspx?" : 'InvoiceCollectionTotalReportNoTax.aspx?';
-    this.reportPageName += "LoginID=" + this.currentUser;
-  }
-  onSubmit() {
-    if (this.frm.invalid) return;
-
-    const startDate = this.returnDate(this.frm.get("StartDate")?.value);
-    const endDate = this.returnDate(this.frm.get("EndDate")?.value);
-    const branch = this.frm.get("Branch")?.value ?? '';
-    const supplier = this.frm.get("Supplier")?.value ?? 0;
-    const payTo = this.frm.get("payTo")?.value ?? 0;
-    const category = this.frm.get("Category")?.value ?? '';
-    const status = this.frm.get("ActivityType")?.value ?? '';
-
-    if (supplier == 0) {
-      this.frm.get("Supplier")?.setErrors({ required: true });
-      return;
-    }
-    const payload = { startDate, endDate, branch, supplier, payTo, category, status };
-
-    this._financeService.executeSupplierReport(payload).subscribe({
-      next: () => {
-        let localURL = '';
-        localURL += `&StartDate=${startDate}`;
-        localURL += `&EndDate=${endDate}`;
-        localURL += `&Branch=${branch}`;
-        localURL += `&Supplier=${supplier}`;
-
-        this.urlSafe = this.sanitizer.bypassSecurityTrustResourceUrl(
-          environment.baseReportUrl + this.currentUrl + this.reportPageName + localURL
-        );
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    });
-  }
-
-  handleErrors(error: string) {
-    if (error != null && error != '') {
-      this.hideSpinner();
-    }
-  };
-  hideSpinner() {
-    this.showLoadingSpinner = false;
-  }
+};
+hideSpinner() {
+  this.showLoadingSpinner = false;
+}
 }

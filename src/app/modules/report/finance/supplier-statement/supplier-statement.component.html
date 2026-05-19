@@ -3,19 +3,18 @@
     <div class="row mb-2">
       <div class="col-12 col-sm-12 col-md-4 col-lg-5">
         <h1 class="mb-1">Report/ Finance / Supplier Statement Report</h1>
-      </div><!-- /.col -->
+      </div>
       <div class="col-12 col-sm-12 col-md-8 col-lg-7 my-1">
         <ol class="breadcrumb float-md-right">
-          <!--          <li class="breadcrumb-item"><a href="#">Master</a></li>-->
-          <li class="breadcrumb-item"><a href="#">Report</a></li>
+          <li class="breadcrumb-item"><a routerLink="/dashboard">Report</a></li>
           <li class="breadcrumb-item active">Payment Voucher Summary</li>
         </ol>
-      </div><!-- /.col -->
-    </div><!-- /.row -->
-  </div><!-- /.container-fluid -->
+      </div>
+    </div>
+  </div>
 </div>
 
-<mat-card>
+<mat-card class="report-card">
   <mat-card-content>
 
     <form [formGroup]="frm" (ngSubmit)="onSubmit()">
@@ -24,43 +23,23 @@
           <mat-form-field appearance="outline">
             <mat-label>Branch</mat-label>
             <mat-select formControlName="Branch" [panelClass]="'custom-dropdown-panel'">
-              <mat-option [value]="0"></mat-option>
-              <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Name}}</mat-option>
+             <mat-option [value]="0" class="highlight-option"></mat-option>
+              <mat-option *ngFor="let d of branchList" value="{{d.Code}}">{{d.Code}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
-
         <div class="col-12 col-sm-12 col-md-3 col-lg-3">
           <mat-form-field appearance="outline">
             <mat-label>Supplier</mat-label>
-            <mat-select formControlName="Supplier" (selectionChange)="onSupplierSelectionChange($event)"
+            <mat-select formControlName="Supplier" (selectionChange)="onSupplierSelectionChange($event.value)"
               [panelClass]="'custom-dropdown-panel'">
-              <mat-option [value]="0"></mat-option>
-              <mat-option *ngFor="let s of supplierList" value="{{s.Code}}">{{s.Name}}</mat-option>
+              <mat-option [value]="0" class="highlight-option"></mat-option>             
+              <mat-option *ngFor="let s of supplierList" value="{{s.Id}}">{{s.Name}}</mat-option>
             </mat-select>
           </mat-form-field>
         </div>
       </div>
-      <div class="row" *ngIf="warningMessage ==''" hidden>
-        <div class="col-12 col-sm-12 col-md-3 col-lg-3">
-          <mat-form-field appearance="outline">
-            <mat-label>Category</mat-label>
-            <mat-select formControlName="Category" [panelClass]="'custom-dropdown-panel'">
-              <mat-option [value]="0"></mat-option>
-              <mat-option *ngFor="let d of categoryList" value="{{d.Code}}">{{d.Name}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div class="col-12 col-sm-12 col-md-3 col-lg-3">
-          <mat-form-field appearance="outline">
-            <mat-label>Pay To</mat-label>
-            <mat-select formControlName="payTo" [panelClass]="'custom-dropdown-panel'">
-              <mat-option [value]="0"></mat-option>
-              <mat-option *ngFor="let d of paytoList" value="{{d.Code}}">{{d.Name}}</mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
+      <div class="row" *ngIf="warningMessage ==''">
         <div class="col-12 col-sm-12 col-md-3 col-lg-3">
           <mat-label></mat-label>
           <mat-radio-group aria-label="" formControlName="ActivityType">
@@ -69,6 +48,28 @@
             <mat-radio-button value="H">Hold</mat-radio-button>
           </mat-radio-group>
         </div>
+      </div>
+      <div class="row" *ngIf="warningMessage ==''">
+        <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Category</mat-label>
+            <mat-select formControlName="Category" [panelClass]="'custom-dropdown-panel'"> 
+              <mat-option [value]="" class="highlight-option"></mat-option>           
+              <mat-option *ngFor="let d of categoryList" value="{{d.Code}}">{{d.Name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+          <mat-form-field appearance="outline">
+            <mat-label>Pay To</mat-label>
+            <mat-select formControlName="payTo" [panelClass]="'custom-dropdown-panel'"> 
+              <mat-option [value]="" class="highlight-option"></mat-option>            
+              <mat-option *ngFor="let d of paytoList" value="{{d.Id}}">{{d.Name}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
       </div>
       <div class="row" *ngIf="warningMessage ==''">
         <div class="payment-period-container" style="display: flex; align-items: center; gap: 8px;">
@@ -90,10 +91,10 @@
             <mat-datepicker #picker2></mat-datepicker>
           </mat-form-field>
         </div>
-        <div class="col-12 col-sm-12 col-md-4 col-lg-3 text-right">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-3 text-left">
           <div class="btn-group" role="group">
             <button class="btn wlt-c-furg-btn-primary m-1" (click)="clkBtn(1)"> Show</button>
-            <button class="btn wlt-c-furg-btn-primary m-1" (click)="clkBtn(2)"> Show(Total)-No Tax</button>
+            <button class="btn wlt-c-furg-btn-primary m-1" (click)="clkBtn(2)" hidden> Show(Total)-No Tax</button>
           </div>
         </div>
       </div>
