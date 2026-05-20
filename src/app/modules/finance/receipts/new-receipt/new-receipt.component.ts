@@ -193,7 +193,8 @@ export class NewReceiptComponent implements OnInit {
         this.bankSelectionChange(data.receipt.BankID);
         //this.clientChange(data.receipt.client);
 
-        if (Array.isArray(data.receipt.details)) {
+        if (Array.isArray(data.receipt.details) && data.receipt.details.length > 0) {
+          this.showInvoiceTable = true;
           this.rows.clear();
           this.rowCheckedState = [];
           data.receipt.details.forEach((d: IInvoiceAmount) => {
@@ -436,7 +437,7 @@ export class NewReceiptComponent implements OnInit {
     let total = 0;
     for (let i = 0; i < this.invoiceList.length; i++) {
       if (this.rowCheckedState[i]) {
-        total += Number(this.invoiceList[i]['InvoiceAmount']);
+        total += Number(this.invoiceList[i]['Balance']);
       }
     }
     this.frm.get("total_invoice_amount")?.setValue(total.toFixed(2));

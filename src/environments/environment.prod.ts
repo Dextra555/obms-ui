@@ -134,7 +134,7 @@ export const environment = {
 
   //Local DEV Production Server configuration
   baseUrl: '/api-dev/',
-  baseReportUrl: 'http://3.239.5.180:8080/'
+  baseReportUrl: 'http://3.239.5.180:80/'
 
 
 
