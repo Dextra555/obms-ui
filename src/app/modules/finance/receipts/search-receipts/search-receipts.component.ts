@@ -11,6 +11,8 @@ import { FinanceService } from 'src/app/service/finance.service';
 import { MastermoduleService } from 'src/app/service/mastermodule.service';
 import { UserAccessModel } from 'src/app/model/userAccesModel';
 import { forkJoin, Observable } from 'rxjs';
+import Swal from 'sweetalert2';
+import { DialogConfirmationComponent } from 'src/app/components/dialog-confirmation/dialog-confirmation.component';
 export interface PeriodicElement {
   receipt_date: string;
   type: string;
@@ -173,6 +175,99 @@ export class SearchReceiptsComponent implements OnInit {
   onEditClick(data: any): void {
     this.route.navigate(['/finance/receipts/new-receipt'], { queryParams: { id: data.ID }, queryParamsHandling: 'merge' });
   }
+
+  onPrint(data: any) {
+    this.getReceiptData(data.ID);
+  }
+
+  deleteClickButton(data: any): void {
+    this.showLoadingSpinner = true;
+
+    this.dialog
+      .open(DialogConfirmationComponent, {
+        data: `Are you sure you want to delete this Receipt?`
+      })
+      .afterClosed()
+      .subscribe((result: { confirmDialog: boolean; remarks: any }) => {
+        if (result.confirmDialog) {
+          if (data.ID > 0) {
+            this._financeService.deleteReceipt(data.ID, this.currentUser).subscribe({
+              next: res => {
+                this.showMessage(`Receipt deleted successfully.`, 'success', 'Success Message');
+                this.route.navigate(['/finance/receipts/search-receipt']);
+              },
+              error: err => {
+                this.showMessage(`Receipt Failed to delete records due to ${err}`, 'error', 'Error Message');
+              }
+            });
+          }
+
+        } else {
+          this.hideSpinner();
+        }
+      });
+
+  }
+
+  getReceiptData(id: number): void {
+    forkJoin({
+      receipt: this._financeService.getReceipt(id),
+    }).subscribe({
+      next: (data) => {
+        const calls: any = {};
+
+        if (data.receipt.BankID) {
+          calls.bank = this._financeService.getBankShortName(data.receipt.BankID);
+        }
+
+        if (Object.keys(calls).length > 0) {
+          forkJoin(calls).subscribe({
+            next: (res: any) => {
+              let accShortName = '';
+              if (res.bank) {
+                accShortName = res.bank;
+              }
+
+              this.route.navigate(
+                ['/report/finance/receipt-voucher-report'],
+                { queryParams: { id: id, ASN: accShortName }, queryParamsHandling: 'merge' }
+              );
+            },
+            error: (err) => {
+              this.showMessage(`Error loading details: ${err}`, 'error', 'Error Message');
+            }
+          });
+        } else {
+          this.hideSpinner();
+        }
+
+      },
+      error: (err) => {
+        this.handleErrors(err);
+      }
+    });
+  }
+
+  private showMessage(message: string, icon: 'success' | 'warning' | 'info' | 'error' = 'info',
+    title: 'Success Message' | 'Warning Message' | 'Error Message'): void {
+    Swal.fire({
+      toast: true,
+      position: 'top',
+      showConfirmButton: false,
+      title: title,
+      text: message,
+      icon: icon,
+      showCloseButton: false,
+      timer: 5000,
+      width: '600px',
+      customClass: {
+        popup: 'swal-top-offset'
+      }
+    });
+    this.hideSpinner();
+    return;
+  }
+
   handleErrors(error: string) {
     if (error != null && error != '') {
       this.errorMessage = error;
@@ -181,5 +276,8 @@ export class SearchReceiptsComponent implements OnInit {
   }
   hideLoadingSpinner() {
     this.showLoadingSpinner = false
+  }
+  hideSpinner() {
+    this.showLoadingSpinner = false;
   }
 }
