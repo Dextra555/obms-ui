@@ -17,11 +17,11 @@ export class TdsReportComponent implements OnInit {
   frm!: FormGroup;
   currentUser: string = '';
   branchList: any = [];
+  clientList: any = [];
   dataSource: any[] = [];
   displayedColumns: string[] = [
     'SNo', 'ReceiptDate', 'VoucherNo', 'Branch', 'PaymentFrom',
-    'ReceiptAmount', 'TaxPercentage', 'TaxAmount', 'HQPercentage',
-    'HQAmount', 'BranchCollection', 'Particulars'
+    'ReceiptAmount', 'HQPercentage', 'HQAmount', 'BranchCollection'
   ];
   userAccessModel!: UserAccessModel;
   warningMessage: string = '';
@@ -29,7 +29,6 @@ export class TdsReportComponent implements OnInit {
   showLoadingSpinner: boolean = false;
 
   totalReceiptAmount: number = 0;
-  totalTaxAmount: number = 0;
   totalHQAmount: number = 0;
   totalBranchCollection: number = 0;
 
@@ -42,6 +41,7 @@ export class TdsReportComponent implements OnInit {
   ) {
     this.frm = this.fb.group({
       Branch: [''],
+      Client: [''],
       StartDate: ['', Validators.required],
       EndDate: ['', Validators.required],
     });
@@ -111,6 +111,17 @@ export class TdsReportComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
+  branchChange(branchCode: string) {
+    this.clientList = [];
+    this.frm.patchValue({ Client: '' });
+    
+    if (branchCode) {
+      this._financeService.GetClientByBranch(branchCode).subscribe((d: any) => {
+        this.clientList = d;
+      });
+    }
+  }
+
   onSearch() {
     if (this.frm.invalid) {
       return;
@@ -120,8 +131,9 @@ export class TdsReportComponent implements OnInit {
     const startDate = this.returnDate(this.frm.get('StartDate')?.value);
     const endDate = this.returnDate(this.frm.get('EndDate')?.value);
     const branch = this.frm.get('Branch')?.value || '';
+    const client = this.frm.get('Client')?.value || '';
 
-    this._financeService.getTDSReport(startDate, endDate, branch).subscribe({
+    this._financeService.getTDSReport(startDate, endDate, branch, client).subscribe({
       next: (data: any[]) => {
         this.dataSource = data || [];
         this.calculateTotals();
@@ -135,7 +147,6 @@ export class TdsReportComponent implements OnInit {
 
   calculateTotals() {
     this.totalReceiptAmount = this.dataSource.reduce((sum, r) => sum + (Number(r.ReceiptAmount) || 0), 0);
-    this.totalTaxAmount = this.dataSource.reduce((sum, r) => sum + (Number(r.TaxAmount) || 0), 0);
     this.totalHQAmount = this.dataSource.reduce((sum, r) => sum + (Number(r.HQAmount) || 0), 0);
     this.totalBranchCollection = this.dataSource.reduce((sum, r) => sum + (Number(r.BranchCollection) || 0), 0);
   }
@@ -150,12 +161,9 @@ export class TdsReportComponent implements OnInit {
       'Branch': r.Branch,
       'Payment From': r.PaymentFrom,
       'Receipt Amount': Number(r.ReceiptAmount).toFixed(2),
-      'Tax %': r.TaxPercentage,
-      'Tax Amount (TDS)': Number(r.TaxAmount).toFixed(2),
-      'HQ %': r.HQPercentage,
-      'HQ Amount': Number(r.HQAmount).toFixed(2),
-      'Branch Collection': Number(r.BranchCollection).toFixed(2),
-      'Particulars': r.Particulars
+      'TDS %': r.HQPercentage,
+      'TDS Amount': Number(r.HQAmount).toFixed(2),
+      'Branch Collection': Number(r.BranchCollection).toFixed(2)
     }));
 
     const ws = XLSX.utils.json_to_sheet(exportData);

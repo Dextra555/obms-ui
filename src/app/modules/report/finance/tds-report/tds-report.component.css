@@ -1,3 +1,8 @@
+.s-no-column {
+  width: 50px;
+  text-align: center;
+}
+
 .summary-card {
   background: #f8f9fa;
   border: 1px solid #dee2e6;
