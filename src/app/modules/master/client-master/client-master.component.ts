@@ -35,6 +35,9 @@ export class ClientMasterComponent implements OnInit {
   currentUser: string = '';
   warningMessage: string = '';
   userAccessModel!: UserAccessModel;
+  branchList: any[] = [];
+  selectedBranch: string = '';
+  searchText: string = '';
 
   constructor(public dialog: MatDialog, private _liveAnnouncer: LiveAnnouncer,
     private _masterService: MastermoduleService, private _router: Router, 
@@ -49,8 +52,22 @@ export class ClientMasterComponent implements OnInit {
     }
 
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.searchText = (event.target as HTMLInputElement).value.trim().toLowerCase();
+    this.applyAllFilters();
+  }
+
+  onBranchFilterChange() {
+    this.applyAllFilters();
+  }
+
+  applyAllFilters() {
+    this.dataSource.filterPredicate = (data: any, filter: string) => {
+      const f = JSON.parse(filter);
+      const matchesBranch = f.branch ? data.Branch === f.branch : true;
+      const matchesText = f.text ? `${data.Code} ${data.Name} ${data.PersonIncharge}`.toLowerCase().includes(f.text) : true;
+      return matchesBranch && matchesText;
+    };
+    this.dataSource.filter = JSON.stringify({ branch: this.selectedBranch, text: this.searchText });
   }
 
 
@@ -96,6 +113,9 @@ export class ClientMasterComponent implements OnInit {
           if (this.userAccessModel.readAccess === true || this.currentUser == 'superadmin') {
             this.warningMessage = '';
             this.getClientMasterList('null','Active');
+            this._masterService.GetBranchListByUserName(this.currentUser).subscribe((d: any) => {
+              this.branchList = d;
+            });
           } else {
             this.warningMessage = `Dear <B>${this.currentUser}</B>, <br>
                       You do not have permissions to view this page. <br>

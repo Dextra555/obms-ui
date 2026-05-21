@@ -275,6 +275,52 @@ export class NewUserAccessRightsComponent implements OnInit {
 
   }
 
+  addTDSReportScreen(): void {
+    this.showLoadingSpinner = true;
+    this._commonService.addScreen('TDS Report', 'Finance').subscribe(
+      (result) => {
+        if (result) {
+          Swal.fire({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            title: 'Success',
+            text: 'TDS Report screen added successfully!',
+            icon: 'success',
+            showCloseButton: false,
+            timer: 3000,
+          });
+          this.onCategoryChange();
+        } else {
+          Swal.fire({
+            toast: true,
+            position: 'top',
+            showConfirmButton: false,
+            title: 'Info',
+            text: 'TDS Report screen already exists.',
+            icon: 'info',
+            showCloseButton: false,
+            timer: 3000,
+          });
+        }
+        this.showLoadingSpinner = false;
+      },
+      (error) => {
+        Swal.fire({
+          toast: true,
+          position: 'top',
+          showConfirmButton: false,
+          title: 'Error',
+          text: 'Failed to add screen. Please try again.',
+          icon: 'error',
+          showCloseButton: false,
+          timer: 3000,
+        });
+        this.showLoadingSpinner = false;
+      }
+    );
+  }
+
   addRbiBankAdvanceScreen(): void {
     this.showLoadingSpinner = true;
     this._commonService.addScreen('RBI Bank Advance Salary Process', 'Payroll').subscribe(

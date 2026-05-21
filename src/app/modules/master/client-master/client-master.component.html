@@ -15,26 +15,33 @@
 </div>
 <mat-card>
   <mat-card-content>
-    <div class="row" *ngIf="warningMessage ===''">
-      <div class="col-12 col-sm-12 col-md-4 col-lg-4 order-3 order-md-1">
-        <div class="text-right">
-          <mat-form-field appearance="outline">
-            <mat-label>Search</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="" #input>
-          </mat-form-field>
-        </div>
+    <div class="row align-items-center" *ngIf="warningMessage ===''">
+      <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+        <mat-form-field appearance="outline">
+          <mat-label>Search</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="" #input>
+        </mat-form-field>
       </div>
-      <div class="col-12 col-sm-12 col-md-4 col-lg-3 order-2 order-md-1">
+      <div class="col-12 col-sm-12 col-md-3 col-lg-3">
+        <mat-form-field appearance="outline">
+          <mat-label>Branch Name</mat-label>
+          <mat-select [(ngModel)]="selectedBranch" (ngModelChange)="onBranchFilterChange()" [panelClass]="'custom-dropdown-panel'">
+            <mat-option value="">All</mat-option>
+            <mat-option *ngFor="let b of branchList" [value]="b.Code">{{b.Name}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="col-12 col-sm-12 col-md-3 col-lg-3" style="margin-bottom: 16px;">
         <mat-label class="mr-3"><strong>Status</strong></mat-label><br />
-        <mat-radio-group aria-label="Select a Status" (change)="statusSelectionChanged($event)">
+        <mat-radio-group aria-label="Select a Status" (change)="statusSelectionChanged($event)" style="display: flex; gap: 12px;">
           <mat-radio-button value="Active" checked>Active</mat-radio-button>
           <mat-radio-button value="Inactive">Inactive</mat-radio-button>
         </mat-radio-group>
       </div>
-      <div class="col-12 col-sm-12 col-md-4 col-lg-5 order-1 order-md-2">
-        <div class="text-right pt-2">
-          <button *ngIf=" this.userAccessModel.createAccess == true || (currentUser== 'superadmin')"
-            class="btn wlt-c-furg-btn-primary" class="btn wlt-c-furg-btn-primary"
+      <div class="col-12 col-sm-12 col-md-3 col-lg-3" style="margin-bottom: 16px;">
+        <div class="text-right">
+          <button *ngIf="this.userAccessModel.createAccess == true || (currentUser == 'superadmin')"
+            class="btn wlt-c-furg-btn-primary"
             [routerLink]="['/master/client-master/new-client']"><mat-icon>add</mat-icon><span>New</span></button>
         </div>
       </div>

@@ -770,5 +770,21 @@ export class FinanceService {
 
   }
 
+  getTDSReport(startDate: string, endDate: string, branch: string): Observable<any[]> {
+
+    const params = new HttpParams()
+
+      .set('startDate', startDate)
+
+      .set('endDate', endDate)
+
+      .set('branch', branch);
+
+    return this.httpClient.get<any[]>(`${this.apiUrl}Finance/GetTDSReport`, { params })
+
+      .pipe(catchError(this.errorHandle));
+
+  }
+
 }
 

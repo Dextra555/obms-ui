@@ -274,6 +274,8 @@ import { GeneralLedgerReportComponent } from 'src/app/modules/report/accounting/
 
 import { ClientComplianceReportComponent } from 'src/app/modules/report/payroll/client-compliance-report/client-compliance-report.component';
 
+import { TdsReportComponent } from 'src/app/modules/report/finance/tds-report/tds-report.component';
+
 import { EsiStatementReportComponent } from 'src/app/modules/report/payroll/esi-statement-report/esi-statement-report.component';
 
 import { SearchUtilityBillsComponent } from 'src/app/modules/inventory/utility-bills/search-utility-bills/search-utility-bills.component';
@@ -692,6 +694,8 @@ const routes: Routes = [
 
   { path: 'report/finance/receipt-voucher-report', component: ReceiptVoucherReportComponent, canActivate: [AuthGuard] },
 
+  { path: 'report/finance/tds-report', component: TdsReportComponent, canActivate: [AuthGuard] },
+
 
 
   //Accounting report module
@@ -736,3 +740,4 @@ export class AdminLayoutRoutingModule {
 
 }
 
+  

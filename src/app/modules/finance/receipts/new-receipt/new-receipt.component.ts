@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { SearchReceiptsComponent } from '../search-receipts/search-receipts.component';
@@ -64,7 +64,8 @@ export class NewReceiptComponent implements OnInit {
 
   constructor(private fb: FormBuilder, public dialog: MatDialog, private service: FinanceService,
     private route: Router, private _activatedRoute: ActivatedRoute, private _financeService: FinanceService,
-    private _dataService: DatasharingService, private _masterService: MastermoduleService
+    private _dataService: DatasharingService, private _masterService: MastermoduleService,
+    private cdr: ChangeDetectorRef
   ) {
     this.userAccessModel = {
       readAccess: false,
@@ -194,16 +195,22 @@ export class NewReceiptComponent implements OnInit {
         //this.clientChange(data.receipt.client);
 
         if (Array.isArray(data.receipt.details) && data.receipt.details.length > 0) {
-          this.showInvoiceTable = true;
+          this.showInvoiceTable = false;
           this.rows.clear();
           this.rowCheckedState = [];
+          this.invoiceList = [];
           data.receipt.details.forEach((d: IInvoiceAmount) => {
             d['InvoiceDate'] = this.returnDate(d['InvoiceDate']);
             d['Balance'] = Number(d['InvoiceAmount']) - Number(d['PaidAmount'])
             this.invoiceList.push(d);
             this.updateBranchAmount(d);
-            this.calculation();
           });
+          setTimeout(() => {
+            this.showInvoiceTable = true;
+            this.calculation();
+            this.branchAmountTable();
+            this.cdr.detectChanges();
+          }, 0);
         }
       },
       error: (err) => {
@@ -437,7 +444,7 @@ export class NewReceiptComponent implements OnInit {
     let total = 0;
     for (let i = 0; i < this.invoiceList.length; i++) {
       if (this.rowCheckedState[i]) {
-        total += Number(this.invoiceList[i]['Balance']);
+        total += Number(this.invoiceList[i]['InvoiceAmount']);
       }
     }
     this.frm.get("total_invoice_amount")?.setValue(total.toFixed(2));
@@ -458,7 +465,7 @@ export class NewReceiptComponent implements OnInit {
       cash = cashAmount ? cashAmount : 0;
     }
     this.frm.get("ReceiptAmount")?.setValue(cash);
-    const balanceAmount = (total - cash).toFixed(2);
+    const balanceAmount = (cash - total).toFixed(2);
     this.frm.get("balance_amount")?.setValue(balanceAmount);
 
     // let TaxAmount = Number(this.frm.get("TaxPercentage")?.value) * Number(this.frm.get("ChequeAmount")?.value / (100+ Number(this.frm.get("TaxPercentage")?.value),10));

@@ -207,6 +207,7 @@ import { ReceiptVoucherReportComponent } from './finance/receipts/receipt-vouche
 import { EmployeeHistoryComponent } from './master/employee-history/employee-history.component';
 import { DepartmentMasterComponent } from './master/department-master/department-master.component';
 import { DesignationMasterComponent } from './master/designation-master/designation-master.component';
+import { TdsReportComponent } from './report/finance/tds-report/tds-report.component';
 
 
 
@@ -370,7 +371,8 @@ import { DesignationMasterComponent } from './master/designation-master/designat
     EmployeeImportDialogComponent,
     DepartmentMasterComponent,
     DesignationMasterComponent,
-    VoucherFilterReportComponent
+    VoucherFilterReportComponent,
+    TdsReportComponent
 
   ],
   imports: [
