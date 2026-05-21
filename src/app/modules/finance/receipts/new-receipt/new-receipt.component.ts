@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
@@ -127,13 +127,8 @@ export class NewReceiptComponent implements OnInit {
 
 
   constructor(private fb: FormBuilder, public dialog: MatDialog, private service: FinanceService,
-
     private route: Router, private _activatedRoute: ActivatedRoute, private _financeService: FinanceService,
-
-    private _dataService: DatasharingService, private _masterService: MastermoduleService,
-
-    private cdr: ChangeDetectorRef
-
+    private _dataService: DatasharingService, private _masterService: MastermoduleService
   ) {
 
     this.userAccessModel = {
@@ -390,40 +385,16 @@ export class NewReceiptComponent implements OnInit {
 
 
 
-        if (Array.isArray(data.receipt.details) && data.receipt.details.length > 0) {
-
-          this.showInvoiceTable = false;
-
+        if (Array.isArray(data.receipt.details)) {
           this.rows.clear();
-
           this.rowCheckedState = [];
-
-          this.invoiceList = [];
-
           data.receipt.details.forEach((d: IInvoiceAmount) => {
-
             d['InvoiceDate'] = this.returnDate(d['InvoiceDate']);
-
             d['Balance'] = Number(d['InvoiceAmount']) - Number(d['PaidAmount'])
-
             this.invoiceList.push(d);
-
             this.updateBranchAmount(d);
-
-          });
-
-          setTimeout(() => {
-
-            this.showInvoiceTable = true;
-
             this.calculation();
-
-            this.branchAmountTable();
-
-            this.cdr.detectChanges();
-
-          }, 0);
-
+          });
         }
 
       },
@@ -883,19 +854,12 @@ export class NewReceiptComponent implements OnInit {
 
 
   calculation() {
-
     let total = 0;
-
     for (let i = 0; i < this.invoiceList.length; i++) {
-
       if (this.rowCheckedState[i]) {
-
-        total += Number(this.invoiceList[i]['InvoiceAmount']);
-
+        total += Number(this.invoiceList[i]['Balance']);
       }
-
     }
-
     this.frm.get("total_invoice_amount")?.setValue(total.toFixed(2));
 
 
@@ -931,9 +895,7 @@ export class NewReceiptComponent implements OnInit {
     }
 
     this.frm.get("ReceiptAmount")?.setValue(cash);
-
-    const balanceAmount = (cash - total).toFixed(2);
-
+    const balanceAmount = (total - cash).toFixed(2);
     this.frm.get("balance_amount")?.setValue(balanceAmount);
 
 
@@ -1351,9 +1313,7 @@ export class NewReceiptComponent implements OnInit {
       },
 
       error: (err) => {
-
-        this.showMessage('Error saving receipt', 'error', 'Error Message');
-
+        this.showMessage('Error saving payment', 'error', 'Error Message');
       }
 
     });
