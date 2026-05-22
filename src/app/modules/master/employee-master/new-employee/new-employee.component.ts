@@ -1175,8 +1175,8 @@ export class NewEmployeeComponent implements OnInit {
 
 
     // Initialize deduction-related fields to disabled state (will be enabled based on selections)
-
-    this.frm.get("PANNumber")?.disable({ onlySelf: true });
+    // PANNumber is now always required and enabled
+    this.frm.get("PANNumber")?.enable({ onlySelf: true });
 
     this.frm.get("PFAccountNumber")?.disable({ onlySelf: true });
 
@@ -2803,9 +2803,7 @@ export class NewEmployeeComponent implements OnInit {
 
 
       // Disable related fields
-
-      this.frm.get("PANNumber")?.disable({ onlySelf: true });
-
+      // PANNumber is now always required and enabled
       this.frm.get("PFAccountNumber")?.disable({ onlySelf: true });
 
       this.frm.get("ESINumber")?.disable({ onlySelf: true });
@@ -2833,9 +2831,7 @@ export class NewEmployeeComponent implements OnInit {
 
 
       // Enable related fields
-
-      this.frm.get("PANNumber")?.enable({ onlySelf: true });
-
+      // PANNumber is now always required and enabled
       this.frm.get("PFAccountNumber")?.enable({ onlySelf: true });
 
       this.frm.get("ESINumber")?.enable({ onlySelf: true });
@@ -2861,9 +2857,7 @@ export class NewEmployeeComponent implements OnInit {
 
 
       // Disable related fields
-
-      this.frm.get("PANNumber")?.disable({ onlySelf: true });
-
+      // PANNumber is now always required and enabled
       this.frm.get("PFAccountNumber")?.disable({ onlySelf: true });
 
       this.frm.get("ESINumber")?.disable({ onlySelf: true });
@@ -2883,19 +2877,7 @@ export class NewEmployeeComponent implements OnInit {
   // Individual field change handlers
 
   onIncomeTaxDeductionChange(value: any) {
-
-    if (value === 'Yes') {
-
-      this.frm.get("PANNumber")?.enable({ onlySelf: true });
-
-    } else {
-
-      this.frm.get("PANNumber")?.disable({ onlySelf: true });
-
-      this.frm.get("PANNumber")?.setValue('');
-
-    }
-
+    // PANNumber is now always required and enabled - no conditional logic needed
   }
 
 
