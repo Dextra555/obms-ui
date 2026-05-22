@@ -94,11 +94,7 @@ export interface IInvoiceAmount {
 
 
 
-  Balance: number;
-
-
-
-  BalanceAmount: number;
+  Balance: number
 
 
 
@@ -800,8 +796,7 @@ export class NewReceiptComponent implements OnInit {
 
             d['InvoiceDate'] = this.returnDate(d['InvoiceDate']);
 
-            // Use backend's BalanceAmount which is cumulative across all receipts
-            d['Balance'] = Number(d['BalanceAmount'] ?? 0);
+            d['Balance'] = Number(d['InvoiceAmount']) - Number(d['PaidAmount'])
 
             this.invoiceList.push(d);
 
@@ -1475,8 +1470,11 @@ export class NewReceiptComponent implements OnInit {
 
 
 
-          // Use backend's BalanceAmount which is cumulative across all receipts
-          item['Balance'] = Number(item['BalanceAmount'] ?? 0);
+          item['Balance'] =
+
+
+
+            Number(item['InvoiceAmount']) - Number(item['PaidAmount']);
 
 
 
@@ -1742,22 +1740,22 @@ export class NewReceiptComponent implements OnInit {
 
   calculation() {
 
-    let totalBalance = 0;
-    let totalInvoiceAmount = 0;
+    let total = 0;
 
     for (let i = 0; i < this.invoiceList.length; i++) {
 
       if (this.rowCheckedState[i]) {
 
-        totalBalance += Number(this.invoiceList[i]['Balance']);
-        totalInvoiceAmount += Number(this.invoiceList[i]['InvoiceAmount']);
+        // Edit mode: use InvoiceAmount, New mode: use Balance
+        if (this.receiptID > 0) {
+          total += Number(this.invoiceList[i]['InvoiceAmount']);
+        } else {
+          total += Number(this.invoiceList[i]['Balance']);
+        }
 
       }
 
     }
-
-    // If sum of Balance is 0, use InvoiceAmount; otherwise use Balance
-    let total = totalBalance === 0 ? totalInvoiceAmount : totalBalance;
 
     this.frm.get("total_invoice_amount")?.setValue(total.toFixed(2));
 
