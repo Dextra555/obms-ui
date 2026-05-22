@@ -359,8 +359,7 @@ export class NewReceiptComponent implements OnInit {
 
 
 
-        this.invoiceList = data.receipt.details;
-
+        // invoiceList will be populated in the forEach loop below
         // // Update additional result data if needed
 
         if (data.receipt.ReceiptType === 5) {
@@ -381,13 +380,21 @@ export class NewReceiptComponent implements OnInit {
 
         this.bankSelectionChange(data.receipt.BankID);
 
-        //this.clientChange(data.receipt.client);
+        // In edit mode, set showInvoiceTable to true if adjustment is enabled and details exist
+        if (data.receipt.IsInvoiceAdjustment && Array.isArray(data.receipt.details) && data.receipt.details.length > 0) {
+          this.showInvoiceTable = true;
+        }
+
+        // Don't call clientChange in edit mode - we already have the data
+        // Just set the client value directly
+        this.frm.patchValue({ client: data.receipt.client });
 
 
 
         if (Array.isArray(data.receipt.details)) {
           this.rows.clear();
           this.rowCheckedState = [];
+          this.invoiceList = []; // Clear to avoid duplication
           data.receipt.details.forEach((d: IInvoiceAmount) => {
             d['InvoiceDate'] = this.returnDate(d['InvoiceDate']);
             d['Balance'] = Number(d['InvoiceAmount']) - Number(d['PaidAmount'])
@@ -493,17 +500,17 @@ export class NewReceiptComponent implements OnInit {
 
       InvoiceNo: [d?.InvoiceNo ?? null],
 
-      InvoiceAmount: [d?.InvoiceAmount ?? null],
+      InvoiceAmount: [d?.InvoiceAmount ?? 0],
 
       InvoiceDate: [d?.InvoiceDate ?? null],
 
-      PaidAmount: [d?.PaidAmount ?? null],
+      PaidAmount: [d?.PaidAmount ?? 0],
 
       Branch: [d?.Branch ?? null],
 
       Client: [d?.Client ?? null],
 
-      Balance: [d?.Balance ?? null]
+      Balance: [d?.Balance ?? 0]
 
     });
 
@@ -521,23 +528,23 @@ export class NewReceiptComponent implements OnInit {
 
     const row = this.fb.group({
 
-      ID: [d && d.ID ? d.ID : null],
+      ID: [d?.ID ?? null],
 
-      InvoiceID: [d && d.InvoiceID ? d.InvoiceID : null],
+      InvoiceID: [d?.InvoiceID ?? null],
 
-      InvoiceNo: [d && d.InvoiceNo ? d.InvoiceNo : null],
+      InvoiceNo: [d?.InvoiceNo ?? null],
 
-      InvoiceAmount: [d && d.InvoiceAmount ? d.InvoiceAmount : null],
+      InvoiceAmount: [d?.InvoiceAmount ?? 0],
 
-      InvoiceDate: [d && d.InvoiceDate ? d.InvoiceDate : null],
+      InvoiceDate: [d?.InvoiceDate ?? null],
 
-      PaidAmount: [d && d.PaidAmount ? d.PaidAmount : null],
+      PaidAmount: [d?.PaidAmount ?? 0],
 
-      Branch: [d && d.Branch ? d.Branch : null],
+      Branch: [d?.Branch ?? null],
 
-      Client: [d && d.Client ? d.Client : null],
+      Client: [d?.Client ?? null],
 
-      Balance: [d && d.Balance ? d.Balance : null]
+      Balance: [d?.Balance ?? 0]
 
     });
 
@@ -663,7 +670,15 @@ export class NewReceiptComponent implements OnInit {
 
     }
 
-
+    // In edit mode, don't fetch all invoices - just use the existing invoiceList
+    if (this.receiptID > 0 && this.invoiceList.length > 0) {
+      const client = this.clientList.find((x: any) => x.Code === value);
+      this.frm.patchValue({
+        PaymentFrom: client ? client.Name : ''
+      });
+      this.showInvoiceTable = true;
+      return;
+    }
 
     this.service
 
@@ -857,7 +872,7 @@ export class NewReceiptComponent implements OnInit {
     let total = 0;
     for (let i = 0; i < this.invoiceList.length; i++) {
       if (this.rowCheckedState[i]) {
-        total += Number(this.invoiceList[i]['Balance']);
+        total += Number(this.invoiceList[i]['InvoiceAmount']);
       }
     }
     this.frm.get("total_invoice_amount")?.setValue(total.toFixed(2));
@@ -1162,9 +1177,9 @@ export class NewReceiptComponent implements OnInit {
 
       if (this.rowCheckedState[i]) {
 
-        if (balance >= Number(this.invoiceList[i]['Balance'])) {
+        if (balance >= Number(this.invoiceList[i]['InvoiceAmount'])) {
 
-          if (Number(this.invoiceList[i]['Balance']) == 0) {
+          if (Number(this.invoiceList[i]['InvoiceAmount']) == 0) {
 
             var dAmount = 0;
 
@@ -1232,7 +1247,7 @@ export class NewReceiptComponent implements OnInit {
 
               InvoiceID: this.invoiceList[i]['InvoiceID'],
 
-              Amount: this.invoiceList[i]['Balance'],
+              Amount: this.invoiceList[i]['InvoiceAmount'],
 
               BalanceStatus: this.frm.get("balance_status")?.value,
 
@@ -1240,7 +1255,7 @@ export class NewReceiptComponent implements OnInit {
 
             })
 
-            balance -= Number(this.invoiceList[i]['Balance'])
+            balance -= Number(this.invoiceList[i]['InvoiceAmount'])
 
           }
 

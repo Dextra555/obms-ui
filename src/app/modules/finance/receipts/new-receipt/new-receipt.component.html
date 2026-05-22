@@ -149,7 +149,7 @@
         <ng-container *ngIf="isAdjustment && showInvoiceTable">
           <div class="col-12 col-sm-12" *ngIf="frm.get('client')?.value">
             <div class="table-responsive">
-              <table mat-table [dataSource]="branchAmountTable()" class="wlt-table wlt-new-agreement table-striped"
+              <table mat-table [dataSource]="rows.controls" class="wlt-table wlt-new-agreement table-striped"
                 formArrayName="branchAmount">
                 <ng-container matColumnDef="Action">
                   <th mat-header-cell *matHeaderCellDef> Action</th>
@@ -160,73 +160,28 @@
                 </ng-container>
                 <ng-container matColumnDef="InvoiceNO">
                   <th mat-header-cell *matHeaderCellDef>Invoice NO</th>
-                  <td mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
-                    <input type="text" matInput placeholder="" value="" formControlName="InvoiceNo" readonly />
+                  <td mat-cell *matCellDef="let element; let index = index">
+                    {{ element.value.InvoiceNo }}
                   </td>
                 </ng-container>
                 <ng-container matColumnDef="Amount">
                   <th mat-header-cell *matHeaderCellDef>Amount</th>
-                  <td mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
-                    <input type="text" matInput placeholder="" value="" formControlName="InvoiceAmount" readonly />
+                  <td mat-cell *matCellDef="let element; let index = index">
+                    {{ element.value.InvoiceAmount }}
                   </td>
                 </ng-container>
                 <ng-container matColumnDef="Balance">
                   <th mat-header-cell *matHeaderCellDef>Balance</th>
-                  <td mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
-                    <input type="text" matInput placeholder="" value="" formControlName="Balance" readonly />
+                  <td mat-cell *matCellDef="let element; let index = index">
+                    {{ element.value.Balance }}
                   </td>
                 </ng-container>
                 <ng-container matColumnDef="InvoiceDate">
                   <th mat-header-cell *matHeaderCellDef>Invoice Date</th>
-                  <td mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
-                    <input type="text" matInput placeholder="" value="" formControlName="InvoiceDate" readonly />
+                  <td mat-cell *matCellDef="let element; let index = index">
+                    {{ element.value.InvoiceDate }}
                   </td>
                 </ng-container>
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="border: 1px;"></tr>
-              </table>
-
-            </div>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="isAdjustment">
-          <div class="col-12 col-sm-12" *ngIf="receiptID > 0 && frm.get('client')?.value == ''">
-            <div class="table-responsive">
-              <table mat-table [dataSource]="branchAmountTable()" class="wlt-table wlt-new-agreement table-striped"
-                formArrayName="branchAmount">
-                <ng-container matColumnDef="Action">
-                  <th mat-header-cell *matHeaderCellDef> Action</th>
-                  <td mat-cell *matCellDef="let element; let i = index" class="text-left">
-                    <mat-checkbox [checked]="rowCheckedState[i]" (change)="toggleRowCheckbox(i)"
-                      [disabled]="isCheckboxDisabled()"></mat-checkbox>
-                  </td>
-                </ng-container>
-                <ng-container matColumnDef="InvoiceNO">
-                  <th mat-header-cell *matHeaderCellDef>Invoice NO</th>
-                  <td mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
-                    <input type="text" matInput placeholder="" value="" formControlName="InvoiceNo" readonly />
-                  </td>
-                </ng-container>
-                <ng-container matColumnDef="Amount">
-                  <th mat-header-cell *matHeaderCellDef>Amount</th>
-                  <td mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
-                    <input type="text" matInput placeholder="" value="" formControlName="InvoiceAmount" readonly />
-                  </td>
-                </ng-container>
-                <ng-container matColumnDef="Balance">
-                  <th mat-header-cell *matHeaderCellDef>Balance</th>
-                  <td mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
-                    <input type="text" matInput placeholder="" value="" formControlName="Balance" readonly />
-                  </td>
-                </ng-container>
-                <ng-container matColumnDef="InvoiceDate">
-                  <th mat-header-cell *matHeaderCellDef>Invoice Date</th>
-                  <td mat-cell *matCellDef="let element; let index = index" [formGroupName]="index">
-                    <input type="text" matInput placeholder="" value="" formControlName="InvoiceDate" readonly />
-                  </td>
-                </ng-container>
-
-
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;" style="border: 1px;"></tr>
               </table>
