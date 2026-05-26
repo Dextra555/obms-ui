@@ -56,7 +56,7 @@ export const environment = {
   baseUrl: 'http://localhost:5000/api/',
   baseReportUrl:'http://3.239.5.180:80/'
 
-  // Development Server configuration - Local DEV
+  // Development Server configuration - Live Report
   // baseUrl: 'http://124.217.236.37:5000/api/',
   // baseReportUrl:'http://124.217.236.37:5222/'
 
