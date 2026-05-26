@@ -286,7 +286,7 @@ import { NonComplianceReportComponent } from 'src/app/modules/report/payroll/non
 
 import { PfStatementReportComponent } from 'src/app/modules/report/payroll/pf-statement-report/pf-statement-report.component';
 
-import { IndianGSTReportComponent } from 'src/app/modules/report/finance/indian-gst-report/indian-gst-report.component';
+
 
 import { AccGlDataListComponent } from 'src/app/modules/Accounting/acc-gl-data-list/acc-gl-data-list.component';
 
@@ -695,8 +695,6 @@ const routes: Routes = [
   { path: 'report/finance/receipt-voucher-report', component: ReceiptVoucherReportComponent, canActivate: [AuthGuard] },
 
   { path: 'report/finance/tds-report', component: TdsReportComponent, canActivate: [AuthGuard] },
-
-  { path: 'report/finance/indian-gst-report', component: IndianGSTReportComponent, canActivate: [AuthGuard] },
 
 
 

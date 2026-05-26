@@ -788,21 +788,5 @@ export class FinanceService {
 
   }
 
-  getIndianGSTReport(startDate: string, endDate: string, branch: string): Observable<any> {
-
-    const params = new HttpParams()
-
-      .set('fromDate', startDate)
-
-      .set('toDate', endDate)
-
-      .set('branch', branch);
-
-    return this.httpClient.get<any>(`${this.apiUrl}Finance/GetIndianGSTReport`, { params })
-
-      .pipe(catchError(this.errorHandle));
-
-  }
-
 }
 

@@ -1,5 +1,5 @@
 import { ModuleWithProviders, NgModule } from '@angular/core';
-import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -208,7 +208,6 @@ import { EmployeeHistoryComponent } from './master/employee-history/employee-his
 import { DepartmentMasterComponent } from './master/department-master/department-master.component';
 import { DesignationMasterComponent } from './master/designation-master/designation-master.component';
 import { TdsReportComponent } from './report/finance/tds-report/tds-report.component';
-import { IndianGSTReportComponent } from './report/finance/indian-gst-report/indian-gst-report.component';
 
 
 
@@ -373,8 +372,7 @@ import { IndianGSTReportComponent } from './report/finance/indian-gst-report/ind
     DepartmentMasterComponent,
     DesignationMasterComponent,
     VoucherFilterReportComponent,
-    TdsReportComponent,
-    IndianGSTReportComponent
+    TdsReportComponent
 
   ],
   imports: [
@@ -461,7 +459,6 @@ import { IndianGSTReportComponent } from './report/finance/indian-gst-report/ind
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
     DatePipe,
-    DecimalPipe,
     IndianComplianceService,
     IndianPayrollService,
     IndianGSTService,
