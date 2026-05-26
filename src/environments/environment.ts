@@ -53,12 +53,12 @@ export const environment = {
   ICICI_BNMCode: '9100000',
 
   // //Development Server configuration - Local DEV
-  // baseUrl: 'http://localhost:5000/api/',
-  // baseReportUrl:'http://3.239.5.180:80/'
+  baseUrl: 'http://localhost:5000/api/',
+  baseReportUrl:'http://3.239.5.180:80/'
 
   // Development Server configuration - Local DEV
-  baseUrl: 'http://124.217.236.37:5000/api/',
-  baseReportUrl:'http://124.217.236.37:5222/'
+  // baseUrl: 'http://124.217.236.37:5000/api/',
+  // baseReportUrl:'http://124.217.236.37:5222/'
 
   //Local file access (no server)
   //baseUrl: 'http://localhost:5000/api/',

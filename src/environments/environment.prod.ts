@@ -133,13 +133,13 @@ export const environment = {
 
 
   // //Local DEV Production Server configuration
-  // baseUrl: '/api-dev/',
-  // baseReportUrl: 'http://3.239.5.180:80/'
-
-  //Local DEV Production Server configuration
   baseUrl: '/api-dev/',
+  baseReportUrl: 'http://3.239.5.180:80/'
 
-  baseReportUrl: 'http://124.217.236.37:5222/'
+  // //Local DEV Production Server configuration
+  // baseUrl: '/api-dev/',
+
+  // baseReportUrl: 'http://124.217.236.37:5222/'
 
 
 

@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, finalize, forkJoin, Observable, of, shareReplay, switchMap, take, tap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { DialogConfirmationComponent } from 'src/app/components/dialog-confirmation/dialog-confirmation.component';
 import { AttendanceModel } from 'src/app/model/attendanceModel';
 import { BranchModel } from 'src/app/model/branchModel';
@@ -26,6 +28,7 @@ export class NewAttendanceComponent implements OnInit {
   attendanceForm!: FormGroup;
   showLoadingSpinner: boolean = false;
   attendanceModel: AttendanceModel = new AttendanceModel();
+  apiUrl: string = environment.baseUrl;
   employeeModel!: ClientModel[];
   employeeListModel!: EmployeeAdvanceListModel[];
   normalValues1: (string | number)[] = ['', ...Array.from({ length: 24 }, (_, i) => i + 1)];
@@ -132,7 +135,7 @@ export class NewAttendanceComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private _payrollService: PayrollModuleService, public dialog: MatDialog,
     private _masterService: MastermoduleService, private _dataService: DatasharingService,
-    private _router: Router) {
+    private _router: Router, private httpClient: HttpClient) {
     this.attendanceForm = this.fb.group({
       ID: [0],
       EmployeeID: [''],
@@ -194,7 +197,7 @@ export class NewAttendanceComponent implements OnInit {
     }
     this.userRole = sessionStorage.getItem('userrole')!
     if (this.userRole == 'true') {
-      this.userRole = 'admin'
+      this.userRole = 'admin' 
     } else {
       this.userRole = 'user'
     }
@@ -768,21 +771,26 @@ export class NewAttendanceComponent implements OnInit {
 
   getClients(advanceDate: string, branchCode: string): void {
     console.log('getClients called with:', { advanceDate, branchCode });
-    this._payrollService.getClients(advanceDate, branchCode).subscribe(
-      (data) => {
+    // TEMPORARY: Using GetClientsByBranchOnly to get clients by barcode (branch) without agreement filter
+    this.httpClient.get<any>(this.apiUrl + 'payroll/GetClientsByBranchOnly', {
+      params: { branchCode: branchCode }
+    }).subscribe(
+      (data: any) => {
         console.log('getClients API response:', data);
         // Handle both wrapped (data.Value) and direct array responses
         const clients = data?.Value || data || [];
         console.log('Processed clients:', clients);
         // Prepend an empty option to the list
-        this.employeeModel = [{ Name: '' }, ...clients];
+        this.employeeModel = [{ Name: '' }, ...clients] as any;
         console.log('employeeModel after update:', this.employeeModel);
         setTimeout(() => {
           this.hideloadingSpinner();
         }, 2000);
       },
-      (error) => {
+      (error: any) => {
         console.error('getClients API error:', error);
+        // Set empty array on error to prevent undefined errors in template
+        this.employeeModel = [{ Name: '' }] as any;
         this.handleErrors(error?.message || error?.error || 'Failed to load clients');
       }
     );
