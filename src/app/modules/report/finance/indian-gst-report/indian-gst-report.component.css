@@ -1,0 +1,72 @@
+.summary-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card .summary-label {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-bottom: 5px;
+}
+
+.summary-card .summary-value {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.cgst-card {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.sgst-card {
+  background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+}
+
+.igst-card {
+  background: linear-gradient(135deg, #8e44ad 0%, #c0392b 100%);
+}
+
+.gst-card {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.total-card {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.badge-invoice {
+  background-color: #007bff;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-receipt {
+  background-color: #28a745;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+  
+  .wlt-c-furg-content-header {
+    display: none !important;
+  }
+  
+  mat-card {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
