@@ -568,56 +568,58 @@ export class NewAttendanceComponent implements OnInit {
     formArray.clear();
 
     for (let i = iStartDay - 1; i < iNoOfDays; i++) {
-      const currentDate = new Date();
-      currentDate.setDate(i + 1);
+      const currentDate = new Date(
+        this.attendanceForm.value.AdvanceDate.getFullYear(),
+        this.attendanceForm.value.AdvanceDate.getMonth(),
+        i + 1
+      );
+
+      const matchingRecord = data.find((record: any) => {
+        const recordDate = new Date(record.AttendanceDate);
+        return recordDate.getDate() === currentDate.getDate() &&
+          recordDate.getMonth() === currentDate.getMonth() &&
+          recordDate.getFullYear() === currentDate.getFullYear();
+      });
 
       formArray.push(this.fb.group({
         weekDay: this.getWeekday(currentDate.getDay()),
         dayField: [i + 1],
-        ID: [data[i]?.ID || 0],
-        AttendanceID: [data[i]?.AttendanceID || 0],
-        AttendanceDate: [
-          this.formatDate(
-            new Date(
-              this.attendanceForm.value.AdvanceDate.getFullYear(),
-              this.attendanceForm.value.AdvanceDate.getMonth(),
-              i + 1
-            )
-          ),
-        ],
-        Client: [data[i]?.Client || ''],
-        Type: [this.getWorkType(data[i]?.Type || '')],
-        TimeStart: [data[i]?.TimeStart || null],
-        TimeEnd: [data[i]?.TimeEnd || null],
+        ID: [matchingRecord?.ID || 0],
+        AttendanceID: [matchingRecord?.AttendanceID || 0],
+        AttendanceDate: [this.formatDate(currentDate)],
+        Client: [matchingRecord?.Client || ''],
+        Type: [this.getWorkType(matchingRecord?.Type || '')],
+        TimeStart: [matchingRecord?.TimeStart || null],
+        TimeEnd: [matchingRecord?.TimeEnd || null],
         StartTime: [
-          this.getDayOfWeek(data[i]?.TimeStart) === 0 ? '' : this.getDayOfWeek(data[i]?.TimeStart),
+          this.getDayOfWeek(matchingRecord?.TimeStart) === 0 ? '' : this.getDayOfWeek(matchingRecord?.TimeStart),
         ],
         EndTime: [
-          this.getDayOfWeek(data[i]?.TimeEnd) === 0 ? '' : this.getDayOfWeek(data[i]?.TimeEnd),
+          this.getDayOfWeek(matchingRecord?.TimeEnd) === 0 ? '' : this.getDayOfWeek(matchingRecord?.TimeEnd),
         ],
         Hours: [
-          this.getDayOfHoursEdited(data[i]?.TimeStart, data[i]?.TimeEnd) === 0
+          this.getDayOfHoursEdited(matchingRecord?.TimeStart, matchingRecord?.TimeEnd) === 0
             ? ''
-            : this.getDayOfHoursEdited(data[i]?.TimeStart, data[i]?.TimeEnd),
+            : this.getDayOfHoursEdited(matchingRecord?.TimeStart, matchingRecord?.TimeEnd),
         ],
-        OTClient: [data[i]?.OTClient || ''],
-        OTTimeStart: [data[i]?.OTTimeStart || null],
-        OTTimeEnd: [data[i]?.OTTimeEnd || null],
+        OTClient: [matchingRecord?.OTClient || ''],
+        OTTimeStart: [matchingRecord?.OTTimeStart || null],
+        OTTimeEnd: [matchingRecord?.OTTimeEnd || null],
         StartTimeOT: [
-          this.getDayOfWeek(data[i]?.OTTimeStart) === 0
+          this.getDayOfWeek(matchingRecord?.OTTimeStart) === 0
             ? ''
-            : this.getDayOfWeek(data[i]?.OTTimeStart),
+            : this.getDayOfWeek(matchingRecord?.OTTimeStart),
         ],
         EndTimeOT: [
-          this.getDayOfWeek(data[i]?.OTTimeEnd) === 0 ? '' : this.getDayOfWeek(data[i]?.OTTimeEnd),
+          this.getDayOfWeek(matchingRecord?.OTTimeEnd) === 0 ? '' : this.getDayOfWeek(matchingRecord?.OTTimeEnd),
         ],
         Shift2Hours: [
-          this.getDayOfHoursEdited(data[i]?.OTTimeStart, data[i]?.OTTimeEnd) === 0
+          this.getDayOfHoursEdited(matchingRecord?.OTTimeStart, matchingRecord?.OTTimeEnd) === 0
             ? ''
-            : this.getDayOfHoursEdited(data[i]?.OTTimeStart, data[i]?.OTTimeEnd),
+            : this.getDayOfHoursEdited(matchingRecord?.OTTimeStart, matchingRecord?.OTTimeEnd),
         ],
-        LastUpdate: [this.formatDate(new Date(data[i]?.LastUpdate)) || ''],
-        LastUpdatedBy: [data[i]?.LastUpdatedBy || this.currentUser],
+        LastUpdate: [this.formatDate(new Date(matchingRecord?.LastUpdate)) || ''],
+        LastUpdatedBy: [matchingRecord?.LastUpdatedBy || this.currentUser],
       }));
     }
 
@@ -688,8 +690,11 @@ export class NewAttendanceComponent implements OnInit {
     formArray.clear();
 
     for (let i = iStartDay - 1; i < iNoOfDays; i++) {
-      const currentDate = new Date();
-      currentDate.setDate(i + 1);
+      const currentDate = new Date(
+        this.attendanceForm.value.AdvanceDate.getFullYear(),
+        this.attendanceForm.value.AdvanceDate.getMonth(),
+        i + 1
+      );
 
       const weekDayIndex = currentDate.getDay(); // 0 = Sunday, 6 = Saturday
       const weekDayName = this.getWeekday(weekDayIndex);
@@ -705,41 +710,38 @@ export class NewAttendanceComponent implements OnInit {
         hours = '4';
       }
 
+      const matchingRecord = data.find((record: any) => {
+        const recordDate = new Date(record.AttendanceDate);
+        return recordDate.getDate() === currentDate.getDate() &&
+          recordDate.getMonth() === currentDate.getMonth() &&
+          recordDate.getFullYear() === currentDate.getFullYear();
+      });
+
       formArray.push(this.fb.group({
         weekDay: this.getWeekday(currentDate.getDay()),
         dayField: [i + 1],
-        ID: [data[i]?.ID || 0],
-        AttendanceID: [data[i]?.AttendanceID || 0],
-        AttendanceDate: [
-          this.formatDate(
-            new Date(
-              this.attendanceForm.value.AdvanceDate.getFullYear(),
-              this.attendanceForm.value.AdvanceDate.getMonth(),
-              i + 1
-            )
-          ),
-        ],
-        Client: [data[i]?.Client || ''],
+        ID: [matchingRecord?.ID || 0],
+        AttendanceID: [matchingRecord?.AttendanceID || 0],
+        AttendanceDate: [this.formatDate(currentDate)],
+        Client: [matchingRecord?.Client || ''],
         Type: [type],
-        TimeStart: [data[i]?.TimeStart || null],
-        TimeEnd: [data[i]?.TimeEnd || null],
+        TimeStart: [matchingRecord?.TimeStart || null],
+        TimeEnd: [matchingRecord?.TimeEnd || null],
         StartTime: [
-          this.getDayOfWeek(data[i]?.TimeStart) === 0 ? '' : this.getDayOfWeek(data[i]?.TimeStart),
+          this.getDayOfWeek(matchingRecord?.TimeStart) === 0 ? '' : this.getDayOfWeek(matchingRecord?.TimeStart),
         ],
         EndTime: [
-          this.getDayOfWeek(data[i]?.TimeEnd) === 0 ? '' : this.getDayOfWeek(data[i]?.TimeEnd),
+          this.getDayOfWeek(matchingRecord?.TimeEnd) === 0 ? '' : this.getDayOfWeek(matchingRecord?.TimeEnd),
         ],
-        Hours: [
-          hours
-        ],
+        Hours: [hours],
         OTClient: [''],
         OTTimeStart: [null],
         OTTimeEnd: [null],
         StartTimeOT: [''],
         EndTimeOT: [''],
         Shift2Hours: [''],
-        LastUpdate: [this.formatDate(new Date(data[i]?.LastUpdate)) || ''],
-        LastUpdatedBy: [data[i]?.LastUpdatedBy || this.currentUser],
+        LastUpdate: [this.formatDate(new Date(matchingRecord?.LastUpdate)) || ''],
+        LastUpdatedBy: [matchingRecord?.LastUpdatedBy || this.currentUser],
       }));
       this.hoursTimeChange(i, hours)
     }
