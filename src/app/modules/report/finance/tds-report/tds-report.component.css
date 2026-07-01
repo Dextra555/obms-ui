@@ -1,0 +1,77 @@
+.s-no-column {
+  width: 50px;
+  text-align: center;
+}
+
+.summary-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.summary-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #343a40;
+}
+
+.tds-card {
+  background: #fff3cd;
+  border-color: #ffc107;
+}
+
+.tds-card .summary-value {
+  color: #856404;
+}
+
+.hq-card {
+  background: #d1ecf1;
+  border-color: #17a2b8;
+}
+
+.hq-card .summary-value {
+  color: #0c5460;
+}
+
+.branch-card {
+  background: #d4edda;
+  border-color: #28a745;
+}
+
+.branch-card .summary-value {
+  color: #155724;
+}
+
+.tds-highlight {
+  color: #856404;
+  font-weight: 600;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+
+  mat-card {
+    box-shadow: none !important;
+  }
+
+  .btn-group {
+    display: none !important;
+  }
+}

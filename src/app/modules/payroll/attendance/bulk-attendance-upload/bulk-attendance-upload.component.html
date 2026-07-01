@@ -1,0 +1,787 @@
+<div class="wlt-c-furg-content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <h1 class="mb-1">Bulk Attendance Upload</h1>
+      </div>
+      <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
+        <ol class="breadcrumb float-md-right">
+          <li class="breadcrumb-item"><a routerLink="/dashboard">Master</a></li>
+          <li class="breadcrumb-item"><a routerLink="/payroll/new-attendance">Payroll</a></li>
+          <li class="breadcrumb-item active">Bulk Attendance Upload</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Attendance Codes Reference Card -->
+<mat-card class="codes-reference-card">
+  <mat-card-content>
+    <h3>Attendance Codes Reference</h3>
+    <div class="codes-grid">
+      <div class="code-item" *ngFor="let code of attendanceCodes">
+        <span class="code-badge" [ngClass]="'color-' + getAttendanceCodeColor(code)">{{ code }}</span>
+        <span class="code-description">{{ getAttendanceCodeDescription(code) }}</span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-content>
+    <form [formGroup]="uploadForm">
+      <!-- General Messages Section (Success & Errors) -->
+      <div class="messages-section" *ngIf="generalErrors.length > 0 || successMessage">
+        <!-- Success Messages -->
+        <div *ngIf="successMessage" class="alert alert-success">
+          <div class="alert-header">
+            <mat-icon>check_circle</mat-icon>
+            <strong>Success</strong>
+            <button mat-icon-button (click)="clearGeneralErrors()" class="close-btn">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <div class="alert-body">{{ successMessage }}</div>
+        </div>
+
+        <!-- Error Messages -->
+        <div *ngIf="generalErrors.length > 0" class="alert alert-danger">
+          <div class="alert-header">
+            <mat-icon>error</mat-icon>
+            <strong>Validation Errors ({{ generalErrors.length }})</strong>
+            <button mat-icon-button (click)="clearGeneralErrors()" class="close-btn">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <div class="alert-body">
+            <ul class="error-list">
+              <li *ngFor="let error of generalErrors" class="error-item">
+                {{ error }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Period and Branch Selection -->
+      <div class="row mb-4">
+        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Attendance Period</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="period">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-hint>Select month/year for attendance</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <div class="col-12 col-sm-12 col-md-6 col-lg-3">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Branch</mat-label>
+            <mat-select formControlName="branchCode">
+              <mat-option value="">Select Branch</mat-option>
+              <mat-option *ngFor="let branch of branches" [value]="branch.Code">
+                {{ branch.Name }}
+              </mat-option>
+            </mat-select>
+            <mat-hint>Select branch for attendance</mat-hint>
+          </mat-form-field>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+          <div class="action-buttons">
+            <button mat-raised-button color="primary" (click)="downloadTemplate()" [disabled]="uploadForm.invalid">
+              <mat-icon>download</mat-icon>
+              Download Template
+            </button>
+
+            <button mat-raised-button color="accent" (click)="showInstructions()">
+              <mat-icon>help_outline</mat-icon>
+              Instructions & Help
+            </button>
+
+            <button mat-raised-button (click)="clearForm()">
+              <mat-icon>refresh</mat-icon>
+              Clear
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Upload Section -->
+      <div class="file-upload-section">
+        <mat-card class="upload-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>cloud_upload</mat-icon>
+              Upload Attendance File
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="file-drop-area" (click)="triggerFileInput()">
+              <mat-icon class="upload-icon">cloud_upload</mat-icon>
+              <h3>Click to browse or drop Excel file here</h3>
+              <p>Supported format: .xlsx (Max size: 5MB)</p>
+              <p class="info-text">File must be generated from the template</p>
+              <input type="file" id="fileInput" class="file-input" accept=".xlsx" (change)="onFileSelected($event)">
+            </div>
+
+            <div *ngIf="selectedFile" class="selected-file">
+              <mat-icon>description</mat-icon>
+              <div class="file-info">
+                <span class="file-name">{{ selectedFile.name }}</span>
+                <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+              </div>
+              <button mat-icon-button (click)="clearForm()" class="clear-btn" color="warn">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+
+            <div class="upload-actions">
+              <button mat-raised-button color="primary" (click)="uploadFile()" 
+                [disabled]="!selectedFile || isUploading" class="upload-btn">
+                <mat-icon *ngIf="!isUploading">upload</mat-icon>
+                <mat-progress-spinner *ngIf="isUploading" diameter="20" mode="indeterminate"></mat-progress-spinner>
+                {{ isUploading ? 'Processing... This may take a moment' : 'Upload File' }}
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Results Section -->
+      <div *ngIf="uploadResult" class="results-section mt-4">
+        <mat-card class="results-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon [color]="uploadResult.success ? 'primary' : 'warn'">
+                {{ uploadResult.success ? 'check_circle' : 'warning' }}
+              </mat-icon>
+              Upload Results Summary
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <!-- Summary Stats -->
+            <div class="summary-section">
+              <div class="summary-card total">
+                <div class="stat-value">{{ uploadResult.totalRecords }}</div>
+                <div class="stat-label">Total Records</div>
+              </div>
+              <div class="summary-card success">
+                <div class="stat-value">{{ uploadResult.successfulRecords }}</div>
+                <div class="stat-label">Successful</div>
+              </div>
+              <div class="summary-card error" *ngIf="uploadResult.failedRecords > 0">
+                <div class="stat-value">{{ uploadResult.failedRecords }}</div>
+                <div class="stat-label">Failed</div>
+              </div>
+              <div class="summary-card info">
+                <div class="stat-value">{{ (uploadResult.successfulRecords / uploadResult.totalRecords * 100) | number:'1.0-0' }}%</div>
+                <div class="stat-label">Success Rate</div>
+              </div>
+            </div>
+
+            <!-- Message -->
+            <div class="result-message">
+              <mat-icon [color]="uploadResult.success ? 'primary' : 'warn'">
+                {{ uploadResult.success ? 'info' : 'warning' }}
+              </mat-icon>
+              <span>{{ uploadResult.message }}</span>
+            </div>
+
+            <!-- Failed Records Table -->
+            <div *ngIf="uploadResult.failedRecords > 0" class="failed-records mt-4">
+              <div class="table-header">
+                <h4>Failed Records ({{ uploadResult.failedRecords }})</h4>
+                <button mat-icon-button matTooltip="Export errors to CSV" (click)="exportErrorDetails()" color="primary">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
+
+              <mat-table [dataSource]="uploadResult.errors" class="error-table">
+                <!-- Row Number -->
+                <ng-container matColumnDef="rowNumber">
+                  <mat-header-cell *matHeaderCellDef>Row</mat-header-cell>
+                  <mat-cell *matCellDef="let error">{{ error.rowNumber }}</mat-cell>
+                </ng-container>
+
+                <!-- Employee Code -->
+                <ng-container matColumnDef="employeeCode">
+                  <mat-header-cell *matHeaderCellDef>Employee Code</mat-header-cell>
+                  <mat-cell *matCellDef="let error">{{ error.employeeCode }}</mat-cell>
+                </ng-container>
+
+                <!-- Employee Name -->
+                <ng-container matColumnDef="employeeName">
+                  <mat-header-cell *matHeaderCellDef>Employee Name</mat-header-cell>
+                  <mat-cell *matCellDef="let error">{{ error.employeeName }}</mat-cell>
+                </ng-container>
+
+                <!-- Field Name -->
+                <ng-container matColumnDef="fieldName">
+                  <mat-header-cell *matHeaderCellDef>Field</mat-header-cell>
+                  <mat-cell *matCellDef="let error">
+                    <span class="field-badge" *ngIf="error.fieldName">{{ error.fieldName }}</span>
+                    <span class="field-badge general" *ngIf="!error.fieldName">General</span>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Error Message -->
+                <ng-container matColumnDef="errorMessage">
+                  <mat-header-cell *matHeaderCellDef>Error Message</mat-header-cell>
+                  <mat-cell *matCellDef="let error" class="error-message-cell">
+                    <div class="error-message-text">{{ error.errorMessage }}</div>
+                    <div class="error-type-badge" *ngIf="error.errorType" [ngClass]="'type-' + error.errorType">
+                      {{ error.errorType }}
+                    </div>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Expand Details -->
+                <ng-container matColumnDef="expandDetails">
+                  <mat-header-cell *matHeaderCellDef>Details</mat-header-cell>
+                  <mat-cell *matCellDef="let error">
+                    <button mat-icon-button (click)="toggleErrorDetails(error)" *ngIf="error.details"
+                      matTooltip="View detailed error information">
+                      <mat-icon>{{ isErrorExpanded(error) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                    </button>
+                  </mat-cell>
+                </ng-container>
+
+                <!-- Table Rows -->
+                <mat-header-row *matHeaderRowDef="errorDisplayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: errorDisplayedColumns;" 
+                  [class.expanded]="isErrorExpanded(row)"></mat-row>
+
+                <!-- Expanded Details Row -->
+                <tr mat-row *ngIf="expandedErrorRow" class="details-row" [@expandCollapse]>
+                  <td colspan="7">
+                    <div class="error-details-content">
+                      <h5>Error Details</h5>
+                      <div class="details-grid">
+                        <div class="detail-item">
+                          <span class="detail-label">Row Number:</span>
+                          <span class="detail-value">{{ expandedErrorRow.rowNumber }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Employee Code:</span>
+                          <span class="detail-value">{{ expandedErrorRow.employeeCode }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Employee Name:</span>
+                          <span class="detail-value">{{ expandedErrorRow.employeeName }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Field Name:</span>
+                          <span class="detail-value">{{ expandedErrorRow.fieldName || 'General' }}</span>
+                        </div>
+                        <div class="detail-item">
+                          <span class="detail-label">Error Type:</span>
+                          <span class="detail-value" [ngClass]="'type-' + (expandedErrorRow.errorType || 'unknown')">
+                            {{ expandedErrorRow.errorType || 'Unknown' }}
+                          </span>
+                        </div>
+                        <div class="detail-item full-width">
+                          <span class="detail-label">Error Message:</span>
+                          <div class="detail-value message">{{ expandedErrorRow.errorMessage }}</div>
+                        </div>
+                        <div class="detail-item full-width" *ngIf="expandedErrorRow.details">
+                          <span class="detail-label">Additional Details:</span>
+                          <pre class="detail-value details">{{ expandedErrorRow.details }}</pre>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </mat-table>
+            </div>
+
+            <!-- Successful Records Table -->
+            <div *ngIf="uploadResult.successfulRecords > 0" class="successful-records mt-4">
+              <div class="table-header">
+                <h4>Successfully Uploaded ({{ uploadResult.successfulRecords }})</h4>
+                <button mat-icon-button matTooltip="Export success records to CSV" (click)="exportSuccessDetails()" color="primary">
+                  <mat-icon>download</mat-icon>
+                </button>
+              </div>
+
+              <mat-table [dataSource]="uploadResult.successRecords" class="success-table">
+                <ng-container matColumnDef="rowNumber">
+                  <mat-header-cell *matHeaderCellDef>Row</mat-header-cell>
+                  <mat-cell *matCellDef="let record">{{ record.rowNumber }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="employeeCode">
+                  <mat-header-cell *matHeaderCellDef>Employee Code</mat-header-cell>
+                  <mat-cell *matCellDef="let record">{{ record.employeeCode }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="employeeName">
+                  <mat-header-cell *matHeaderCellDef>Employee Name</mat-header-cell>
+                  <mat-cell *matCellDef="let record">{{ record.employeeName }}</mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="attendanceID">
+                  <mat-header-cell *matHeaderCellDef>Attendance ID</mat-header-cell>
+                  <mat-cell *matCellDef="let record">
+                    <span class="id-badge">{{ record.attendanceID }}</span>
+                  </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="message">
+                  <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
+                  <mat-cell *matCellDef="let record" class="success-message">
+                    <mat-icon class="status-icon">check_circle</mat-icon>
+                    {{ record.message }}
+                  </mat-cell>
+                </ng-container>
+
+                <mat-header-row *matHeaderRowDef="successDisplayedColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: successDisplayedColumns;"></mat-row>
+              </mat-table>
+            </div>
+
+            <!-- Actions -->
+            <div class="results-actions mt-4">
+              <button mat-raised-button color="primary" (click)="retryUpload()" 
+                *ngIf="uploadResult.failedRecords > 0 && selectedFile">
+                <mat-icon>refresh</mat-icon>
+                Retry Upload
+              </button>
+              <button mat-raised-button (click)="clearForm()">
+                <mat-icon>clear</mat-icon>
+                Start New Upload
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<style>
+/* Messages Section */
+.messages-section {
+  margin-bottom: 24px;
+}
+
+.alert {
+  border-radius: 4px;
+  margin-bottom: 12px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.alert-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  font-weight: 500;
+}
+
+.alert-body {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.alert-success {
+  background-color: #e8f5e9;
+  border-left: 4px solid #4caf50;
+}
+
+.alert-success .alert-header {
+  color: #2e7d32;
+}
+
+.alert-success mat-icon {
+  color: #4caf50;
+}
+
+.alert-danger {
+  background-color: #ffebee;
+  border-left: 4px solid #f44336;
+}
+
+.alert-danger .alert-header {
+  color: #c62828;
+}
+
+.alert-danger mat-icon {
+  color: #f44336;
+}
+
+.close-btn {
+  margin-left: auto;
+  margin-right: -8px;
+}
+
+.error-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.error-item {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.error-item:last-child {
+  border-bottom: none;
+}
+
+/* Summary Section */
+.summary-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  background: #f9f9f9;
+  border-left: 4px solid #ccc;
+}
+
+.summary-card.total {
+  border-left-color: #2196f3;
+  background: #e3f2fd;
+}
+
+.summary-card.success {
+  border-left-color: #4caf50;
+  background: #e8f5e9;
+}
+
+.summary-card.error {
+  border-left-color: #f44336;
+  background: #ffebee;
+}
+
+.summary-card.info {
+  border-left-color: #ff9800;
+  background: #fff3e0;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.summary-card.total .stat-value {
+  color: #2196f3;
+}
+
+.summary-card.success .stat-value {
+  color: #4caf50;
+}
+
+.summary-card.error .stat-value {
+  color: #f44336;
+}
+
+.summary-card.info .stat-value {
+  color: #ff9800;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Result Message */
+.result-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f9f9f9;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  font-weight: 500;
+}
+
+/* Table Styles */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.table-header h4 {
+  margin: 0;
+}
+
+.error-table, .success-table {
+  width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+mat-header-cell {
+  background: #f5f5f5 !important;
+  font-weight: 600 !important;
+  color: #333 !important;
+  padding: 12px !important;
+}
+
+mat-cell {
+  padding: 12px !important;
+}
+
+.error-message-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.error-message-text {
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+.error-type-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.error-type-badge.type-validation {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.error-type-badge.type-processing {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.error-type-badge.type-system {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.field-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #e0e0e0;
+  color: #333;
+}
+
+.field-badge.general {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #4caf50;
+  font-weight: 500;
+}
+
+.status-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.id-badge {
+  background: #e0e0e0;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* Expanded Details */
+.details-row td {
+  padding: 0 !important;
+  background: #f9f9f9;
+}
+
+.error-details-content {
+  padding: 24px;
+  background: #f9f9f9;
+}
+
+.error-details-content h5 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: #333;
+  font-weight: 600;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #666;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.detail-value {
+  color: #333;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.detail-value.message {
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.detail-value.details {
+  font-family: monospace;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.detail-value.type-validation {
+  border-left: 3px solid #1976d2;
+}
+
+.detail-value.type-processing {
+  border-left: 3px solid #f57c00;
+}
+
+.detail-value.type-system {
+  border-left: 3px solid #c62828;
+}
+
+/* File Upload */
+.file-drop-area {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-drop-area:hover {
+  border-color: #2196f3;
+  background: #f0f8ff;
+}
+
+.upload-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: #999;
+  margin-bottom: 12px;
+}
+
+.file-input {
+  display: none;
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #e8f5e9;
+  border-radius: 4px;
+  margin: 12px 0;
+}
+
+.file-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-name {
+  font-weight: 500;
+  color: #2e7d32;
+}
+
+.file-size {
+  font-size: 12px;
+  color: #666;
+}
+
+.upload-actions {
+  text-align: center;
+  padding: 12px 0;
+}
+
+.upload-btn {
+  min-width: 150px;
+}
+
+/* Actions */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.results-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .summary-section {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  button {
+    min-width: 100%;
+  }
+}
+</style>

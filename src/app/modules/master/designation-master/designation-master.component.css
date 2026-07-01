@@ -1,0 +1,48 @@
+/* Designation Master Styles */
+.mat-form-field {
+  width: 100%;
+}
+
+.table-responsive {
+  margin-top: 20px;
+}
+
+.badge-success {
+  background-color: #28a745;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
+
+mat-slide-toggle {
+  margin-top: 15px;
+}
+
+/* Form styling */
+form .row {
+  margin-bottom: 15px;
+}

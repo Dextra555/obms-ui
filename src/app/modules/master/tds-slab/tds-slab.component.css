@@ -1,0 +1,282 @@
+.currency {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.badge {
+  font-size: 0.8em;
+  padding: 0.4em 0.6em;
+  border-radius: 0.25rem;
+}
+
+.badge-info {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.badge-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.btn-outline-info {
+  color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-outline-info:hover {
+  color: white;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-outline-warning {
+  color: #ffc107;
+  border-color: #ffc107;
+}
+
+.btn-outline-warning:hover {
+  color: #212529;
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
+.btn-outline-danger {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-outline-danger:hover {
+  color: white;
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.table-responsive {
+  border-radius: 0.25rem;
+}
+
+.mat-table {
+  width: 100%;
+  background: white;
+}
+
+.mat-header-cell {
+  font-weight: 600;
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.mat-cell {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.mat-row:hover {
+  background-color: #f8f9fa;
+}
+
+.mat-paginator {
+  border-top: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border-radius: 0.5rem;
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem 1.25rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.alert-warning {
+  border-left: 4px solid #ffc107;
+  background-color: #fff3cd;
+  border-color: #ffc107;
+  color: #856404;
+}
+
+.text-center {
+  text-align: center;
+  padding: 2rem;
+}
+
+.form-control {
+  border-radius: 0.25rem;
+  border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.input-group-text {
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  color: #495057;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn-group .btn {
+    margin-bottom: 0.25rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .badge {
+    font-size: 0.7em;
+  }
+}
+
+/* Loading Spinner Styles */
+.mat-spinner {
+  margin: 0 auto;
+  width: 40px;
+  height: 40px;
+}
+
+/* Table Hover Effects */
+.mat-row:hover .btn-group {
+  opacity: 1;
+}
+
+.btn-group {
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* Status Badge Styles */
+.badge-success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.badge-secondary {
+  background: linear-gradient(135deg, #6c757d, #5a6268);
+}
+
+.badge-primary {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.badge-info {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+}
+
+.badge-warning {
+  background: linear-gradient(135deg, #ffc107, #e0a800);
+}
+
+/* Action Button Group Styles */
+.btn-group-sm {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-group-sm .btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Search Input Styles */
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.input-group .form-control {
+  border-right: none;
+}
+
+.input-group-text {
+  border-left: none;
+  background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+}
+
+/* Footer Stats Styles */
+.text-right {
+  text-align: right;
+}
+
+.small {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+
+/* Card Tools Styles */
+.card-tools {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-sm {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.25rem;
+}
+
+.btn-success {
+  color: #fff;
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-info {
+  color: #fff;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}

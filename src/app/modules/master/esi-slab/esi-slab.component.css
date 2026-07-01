@@ -1,0 +1,73 @@
+.container-fluid {
+  padding: 20px;
+}
+
+.card {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem;
+}
+
+.card-title {
+  color: #495057;
+  font-weight: 600;
+  margin: 0;
+}
+
+.table-responsive {
+  margin-top: 1rem;
+}
+
+.mat-table {
+  width: 100%;
+}
+
+.mat-column-grossSalaryLimit {
+  width: 15%;
+}
+
+.mat-column-employeeRate,
+.mat-column-employerRate {
+  width: 12%;
+}
+
+.mat-column-effectiveDate {
+  width: 15%;
+}
+
+.mat-column-isActive {
+  width: 10%;
+}
+
+.mat-column-action {
+  width: 15%;
+}
+
+.mat-chip {
+  font-size: 12px;
+}
+
+.alert {
+  margin-bottom: 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mb-3 {
+  margin-bottom: 1rem;
+}
+
+.mt-3 {
+  margin-top: 1rem;
+}
+
+.w-100 {
+  width: 100%;
+}

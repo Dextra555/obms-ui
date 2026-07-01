@@ -1,0 +1,17 @@
+.badge {
+  padding: 0.5em 0.8em;
+  border-radius: 4px;
+}
+
+.fs-6 { font-size: 1rem; }
+.fs-5 { font-size: 1.25rem; }
+
+mat-dialog-content {
+  min-width: 450px;
+  overflow-x: hidden;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}

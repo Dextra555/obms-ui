@@ -1,0 +1,162 @@
+<div class="wlt-c-furg-content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+        <h1 class="mb-1">Report/Statutory Compliance Report</h1>
+      </div>
+      <div class="col-12 col-sm-12 col-md-8 col-lg-8 my-1">
+        <ol class="breadcrumb float-md-right">
+          <li class="breadcrumb-item"><a href="#">Report</a></li>
+          <li class="breadcrumb-item active">Statutory Compliance Report</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<mat-card>
+  <mat-card-content>
+    <!-- Loading Spinner -->
+    <div [style.display]="showLoadingSpinner ? 'block' : 'none'" 
+         style="margin-top: -10.5rem; display: block; margin-left: -6.5rem;">
+      <div class="d-flex justify-content-center">
+        <span class="loader"></span>
+      </div>
+    </div>
+
+    <!-- Warning Message -->
+    <div *ngIf="warningMessage !== ''">
+      <mat-label style="color:red" [innerHTML]="warningMessage"></mat-label>
+    </div>
+    <div *ngIf="errorMessage !== ''">
+      <mat-label style="color:red" [innerHTML]="errorMessage"></mat-label>
+    </div>
+
+    <!-- Report Form -->
+    <form [formGroup]="statutoryComplianceForm" *ngIf="warningMessage === ''">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Compliance Type</mat-label>
+            <mat-select formControlName="ComplianceType" (selectionChange)="onComplianceTypeChange($event)">
+              <mat-option value="">Select Compliance Type</mat-option>
+              <mat-option *ngFor="let type of complianceTypes" [value]="type.value">{{ type.label }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Branch</mat-label>
+            <mat-select formControlName="BranchCode" (selectionChange)="onBranchSelectionChange($event)">
+              <mat-option value="">Select Branch</mat-option>
+              <mat-option *ngFor="let branch of branchModel" [value]="branch.Code">
+                {{ branch.Name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-4 col-lg-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Client</mat-label>
+            <mat-select formControlName="ClientCode">
+              <mat-option value="">All Clients</mat-option>
+              <mat-option *ngFor="let client of clientModel" [value]="client.Code">
+                {{ client.Name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-3 col-lg-2">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Month</mat-label>
+            <mat-select formControlName="Month">
+              <mat-option [value]="1">January</mat-option>
+              <mat-option [value]="2">February</mat-option>
+              <mat-option [value]="3">March</mat-option>
+              <mat-option [value]="4">April</mat-option>
+              <mat-option [value]="5">May</mat-option>
+              <mat-option [value]="6">June</mat-option>
+              <mat-option [value]="7">July</mat-option>
+              <mat-option [value]="8">August</mat-option>
+              <mat-option [value]="9">September</mat-option>
+              <mat-option [value]="10">October</mat-option>
+              <mat-option [value]="11">November</mat-option>
+              <mat-option [value]="12">December</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-2">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Year</mat-label>
+            <mat-select formControlName="Year">
+              <mat-option [value]="2024">2024</mat-option>
+              <mat-option [value]="2025">2025</mat-option>
+              <mat-option [value]="2026">2026</mat-option>
+              <mat-option [value]="2027">2027</mat-option>
+              <mat-option [value]="2028">2028</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-2">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Report Type</mat-label>
+            <mat-select formControlName="ReportType">
+              <mat-option value="">Select Report Type</mat-option>
+              <mat-option value="summary">Summary Report</mat-option>
+              <mat-option value="detailed">Detailed Report</mat-option>
+              <mat-option value="dashboard">Dashboard View</mat-option>
+              <mat-option value="trends">Trends Analysis</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-2">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="Status">
+              <mat-option value="">All Status</mat-option>
+              <mat-option value="Compliant">Compliant</mat-option>
+              <mat-option value="Non-Compliant">Non-Compliant</mat-option>
+              <mat-option value="Pending">Pending</mat-option>
+              <mat-option value="Overdue">Overdue</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-12 col-sm-12 col-md-3 col-lg-4">
+          <mat-checkbox formControlName="IncludePenalties" class="mr-3">
+            Include Penalties
+          </mat-checkbox>
+          <mat-checkbox formControlName="IncludeCharts">
+            Include Charts
+          </mat-checkbox>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="row">
+        <div class="col-12 text-left">
+          <button class="btn wlt-c-furg-btn-primary m-1" (click)="generateStatutoryComplianceReport()" [disabled]="statutoryComplianceForm.invalid">
+            Generate Report
+          </button>
+          <button class="btn wlt-c-furg-btn-secondary m-1" (click)="exportToExcel()" [disabled]="complianceData.length === 0">
+            Export to Excel
+          </button>
+          <button class="btn wlt-c-furg-btn-secondary m-1" (click)="exportToPDF()" [disabled]="complianceData.length === 0">
+            Export to PDF
+          </button>
+          <button class="btn wlt-c-furg-btn-secondary m-1" (click)="statutoryComplianceForm.reset()">
+            Reset
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Report Display -->
+    <div *ngIf="currentReportHtml" class="report-container mt-4">
+      <div [innerHTML]="currentReportHtml" class="statutory-compliance-report-display"></div>
+    </div>
+
+  </mat-card-content>
+</mat-card>

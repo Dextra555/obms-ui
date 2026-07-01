@@ -1,0 +1,11 @@
+/* This component now uses global system styles from styles.css */
+/* Only minimal component-specific overrides are included here */
+
+/* Ensure proper spacing for the new layout */
+.my-1 {
+  margin-top: 0.25rem;
+}
+
+.pt-2 {
+  padding-top: 0.5rem;
+}

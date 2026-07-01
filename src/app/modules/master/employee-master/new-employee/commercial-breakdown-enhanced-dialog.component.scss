@@ -1,0 +1,182 @@
+// Enhanced Commercial Breakdown Dialog Styles
+::ng-deep .mat-dialog-container {
+  max-width: 95vw;
+  width: 1200px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.card {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+// Form field styling
+::ng-deep .mat-form-field-appearance-outline {
+  .mat-form-field-outline {
+    border-radius: 6px;
+  }
+
+  .mat-form-field-label {
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  &.mat-form-field-disabled {
+    .mat-form-field-outline {
+      background-color: #f5f5f5;
+    }
+  }
+
+  // Enhanced hint styling for Employer PF contribution
+  .mat-hint {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+    
+    &.mt-2 {
+      margin-top: 0.5rem !important;
+    }
+  }
+}
+
+// Alert styling
+.alert {
+  border-radius: 6px;
+  border: none;
+
+  &.alert-info {
+    background-color: #e3f2fd;
+    color: #1565c0;
+    
+    a {
+      color: #0d47a1;
+      text-decoration: none;
+      font-weight: 600;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// Button styling
+::ng-deep .mat-dialog-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  background-color: #fafafa;
+
+  .mat-button {
+    margin-right: 0.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+
+    .mat-icon {
+      font-size: 1.1rem;
+      height: 1.1rem;
+      width: 1.1rem;
+      margin-right: 0.25rem;
+    }
+
+    span.ml-1 {
+      margin-left: 0.25rem;
+    }
+  }
+
+  .mat-raised-button {
+    border-radius: 6px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+
+    .mat-icon {
+      font-size: 1.1rem;
+      height: 1.1rem;
+      width: 1.1rem;
+      margin-right: 0.25rem;
+    }
+
+    span.ml-1 {
+      margin-left: 0.25rem;
+    }
+
+    &:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+// Summary value styling
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1976d2;
+
+  .currency-symbol {
+    font-size: 1.2rem;
+    margin-right: 0.25rem;
+  }
+
+  .amount {
+    font-size: 1.5rem;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  ::ng-deep .mat-dialog-container {
+    width: 95vw;
+    max-width: 95vw;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .row {
+    .col-md-4,
+    .col-md-6 {
+      margin-bottom: 1rem;
+    }
+  }
+}
+
+// Icon styling
+.fas {
+  &.mr-1 {
+    margin-right: 0.25rem;
+  }
+
+  &.mr-2 {
+    margin-right: 0.5rem;
+  }
+}
+
+// Input validation
+::ng-deep .mat-form-field-invalid {
+  .mat-form-field-outline-thick {
+    color: #f44336 !important;
+  }
+}

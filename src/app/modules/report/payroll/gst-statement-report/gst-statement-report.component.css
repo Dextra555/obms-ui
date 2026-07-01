@@ -1,0 +1,137 @@
+.s-no-column {
+  width: 50px;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #4CAF50;
+}
+
+.summary-card {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.summary-label {
+  font-size: 12px;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.summary-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #343a40;
+}
+
+.summary-sub {
+  font-size: 11px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.rate-card {
+  background: #e8f5e9;
+  border-color: #4CAF50;
+}
+
+.total-card {
+  background: #f8f9fa;
+  border-color: #6c757d;
+}
+
+.cgst-card {
+  background: #d4edda;
+  border-color: #28a745;
+}
+
+.cgst-card .summary-value {
+  color: #155724;
+}
+
+.sgst-card {
+  background: #d1ecf1;
+  border-color: #17a2b8;
+}
+
+.sgst-card .summary-value {
+  color: #0c5460;
+}
+
+.igst-card {
+  background: #fff3cd;
+  border-color: #ffc107;
+}
+
+.igst-card .summary-value {
+  color: #856404;
+}
+
+.gst-total-card {
+  background: #f8d7da;
+  border-color: #dc3545;
+}
+
+.gst-total-card .summary-value {
+  color: #721c24;
+}
+
+.grand-total-card {
+  background: #cce5ff;
+  border-color: #007bff;
+}
+
+.grand-total-card .summary-value {
+  color: #004085;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-center {
+  text-align: center !important;
+}
+
+.intra-badge {
+  background-color: #28a745;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.inter-badge {
+  background-color: #007bff;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+
+  mat-card {
+    box-shadow: none !important;
+  }
+
+  .btn-group {
+    display: none !important;
+  }
+}

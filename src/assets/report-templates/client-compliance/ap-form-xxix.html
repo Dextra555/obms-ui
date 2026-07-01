@@ -1,0 +1,22 @@
+<style>
+  body { font-family: Arial, sans-serif; font-size: 10px; }
+  .wage-slip-card {
+    border: 1px solid #000;
+    padding: 14px 16px;
+    margin-bottom: 28px;
+    page-break-inside: avoid;
+    max-width: 600px;
+  }
+  .ws-title { text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+  .ws-rule  { text-align: center; font-size: 9px; margin-bottom: 10px; }
+  .ws-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  .ws-table td { border: 1px solid #000; padding: 4px 6px; vertical-align: top; }
+  .ws-table .label { background-color: #f5f5f5; font-weight: bold; width: 52%; }
+  .ws-table .value { width: 48%; }
+  .ws-table .section-header td { background-color: #d9d9d9; font-weight: bold; text-align: center; }
+  .ws-sig { display: flex; justify-content: space-between; margin-top: 20px; font-size: 9px; }
+  @media print { .wage-slip-card { margin-bottom: 16px; } }
+</style>
+
+<div style="text-align: center; font-size: 16px; font-weight: bold; margin-bottom: 10px;">FreightWatch G Security Services India Pvt. Ltd</div>
+{{DataRows}}

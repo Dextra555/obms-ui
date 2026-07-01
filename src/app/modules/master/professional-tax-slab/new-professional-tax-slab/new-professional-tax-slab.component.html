@@ -1,0 +1,107 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      {{ isEditMode ? 'Edit Professional Tax Slab' : 'Add Professional Tax Slab' }}
+    </h2>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <form [formGroup]="professionalTaxForm" (ngSubmit)="onSubmit()">
+    <mat-dialog-content class="dialog-content">
+      <div class="row">
+        <div class="col-md-12">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>State *</mat-label>
+            <mat-select formControlName="state">
+              <mat-option value="">Select State</mat-option>
+              <mat-option *ngFor="let state of states" [value]="state">
+                {{ state }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="professionalTaxForm.get('state')?.invalid && 
+                          professionalTaxForm.get('state')?.touched">
+              {{ getErrorMessage('state') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Minimum Salary *</mat-label>
+            <input matInput type="number" formControlName="minSalary" 
+                   placeholder="Enter minimum salary">
+            <mat-icon matSuffix>currency_rupee</mat-icon>
+            <mat-error *ngIf="professionalTaxForm.get('minSalary')?.invalid && 
+                          professionalTaxForm.get('minSalary')?.touched">
+              {{ getErrorMessage('minSalary') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Maximum Salary</mat-label>
+            <input matInput type="number" formControlName="maxSalary" 
+                   placeholder="Enter maximum salary (optional)">
+            <mat-icon matSuffix>currency_rupee</mat-icon>
+            <mat-error *ngIf="professionalTaxForm.get('maxSalary')?.invalid && 
+                          professionalTaxForm.get('maxSalary')?.touched">
+              {{ getErrorMessage('maxSalary') }}
+            </mat-error>
+            <mat-hint>Leave empty for no upper limit</mat-hint>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Tax Amount *</mat-label>
+            <input matInput type="number" formControlName="taxAmount" 
+                   placeholder="Enter tax amount">
+            <mat-icon matSuffix>currency_rupee</mat-icon>
+            <mat-error *ngIf="professionalTaxForm.get('taxAmount')?.invalid && 
+                          professionalTaxForm.get('taxAmount')?.touched">
+              {{ getErrorMessage('taxAmount') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Effective Date *</mat-label>
+            <input matInput type="date" formControlName="effectiveDate">
+            <mat-error *ngIf="professionalTaxForm.get('effectiveDate')?.invalid && 
+                          professionalTaxForm.get('effectiveDate')?.touched">
+              {{ getErrorMessage('effectiveDate') }}
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <mat-checkbox formControlName="isActive" class="mb-3">
+            Active
+          </mat-checkbox>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end" class="dialog-actions">
+      <button mat-button type="button" (click)="onCancel()">Cancel</button>
+      <button mat-raised-button color="primary" type="submit" 
+              [disabled]="professionalTaxForm.invalid || showLoadingSpinner">
+        <span *ngIf="!showLoadingSpinner">
+          {{ isEditMode ? 'Update' : 'Save' }}
+        </span>
+        <span *ngIf="showLoadingSpinner">
+          <mat-spinner diameter="20"></mat-spinner>
+          {{ isEditMode ? 'Updating...' : 'Saving...' }}
+        </span>
+      </button>
+    </mat-dialog-actions>
+  </form>
+</div>
