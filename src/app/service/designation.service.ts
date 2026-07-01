@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+<<<<<<< HEAD
 import { environment } from 'src/environments/environment';
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
 
 export interface Designation {
   DesignationId: number;
@@ -21,7 +24,11 @@ export interface Designation {
   providedIn: 'root'
 })
 export class DesignationService {
+<<<<<<< HEAD
   private baseUrl = environment.baseUrl + 'Designation';
+=======
+  private baseUrl = '/api/Designation';
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
 
   constructor(private http: HttpClient) { }
 

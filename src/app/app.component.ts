@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Component } from '@angular/core';
 
 @Component({
@@ -8,3 +9,15 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'OBMS';
 }
+=======
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'OBMS';
+}
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87

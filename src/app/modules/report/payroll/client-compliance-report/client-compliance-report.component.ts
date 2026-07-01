@@ -32,6 +32,7 @@ export class ClientComplianceReportComponent implements OnInit {
   reportTemplates: { [key: string]: string } = {};
   userAccessModel!: UserAccessModel;
   selectedReportType: string = 'wage-register';
+<<<<<<< HEAD
   complianceClients: any[] = [];
   complianceClientModel: any[] = [];
   complianceDisplayedColumns: string[] = ['sno', 'code', 'name', 'state', 'gstin', 'complianceStatus'];
@@ -44,6 +45,8 @@ export class ClientComplianceReportComponent implements OnInit {
     const s = element.ClientComplianceStatus || 'non_compliance_client';
     return s === 'compliance_client' ? 'Compliance Client' : 'Non-Compliance Client';
   }
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
 
   // Indian compliance form types
   complianceFormTypes = [
@@ -81,7 +84,10 @@ export class ClientComplianceReportComponent implements OnInit {
       PrincipalEmployer: [''],
       ContractorName: [''],
       WorkSite: [''],
+<<<<<<< HEAD
       WorkSiteadresss: [''],
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
       ShowIndividualSlips: [false]
     });
 
@@ -156,6 +162,7 @@ export class ClientComplianceReportComponent implements OnInit {
     }
   }
 
+<<<<<<< HEAD
   loadComplianceClients(branchCode: string) {
     this._masterService.getClientMsterListByBranch(branchCode).subscribe(
       (data: ClientModel[]) => {
@@ -168,12 +175,17 @@ export class ClientComplianceReportComponent implements OnInit {
     );
   }
 
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
   getClientListByBranch(branchCode: string) {
     this._masterService.getClientMsterListByBranch(branchCode).subscribe(
       (data: ClientModel[]) => {
         this.clientModel = data;
+<<<<<<< HEAD
         this.complianceClients = data;
         this.complianceClientModel = data.filter(c => c.ClientComplianceStatus === 'compliance_client');
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
       },
       (error: any) => {
         this.handleErrors(error);
@@ -248,7 +260,10 @@ export class ClientComplianceReportComponent implements OnInit {
     this.url += `&PrincipalEmployer=${encodeURIComponent(formValues.PrincipalEmployer || '')}`;
     this.url += `&ContractorName=${encodeURIComponent(formValues.ContractorName || '')}`;
     this.url += `&WorkSite=${encodeURIComponent(formValues.WorkSite || '')}`;
+<<<<<<< HEAD
     this.url += `&WorkSiteadresss=${encodeURIComponent(formValues.WorkSiteadresss || '')}`;
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
   }
 
   private generateFormXXVIReport(period: string, formValues: any) {
@@ -410,7 +425,10 @@ export class ClientComplianceReportComponent implements OnInit {
       principalEmployer: formValues.PrincipalEmployer || '',
       contractorName: formValues.ContractorName || '',
       workSite: formValues.WorkSite || '',
+<<<<<<< HEAD
       workSiteadresss: formValues.WorkSiteadresss || '',
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
       showIndividualSlips: formValues.ShowIndividualSlips
     };
 
@@ -449,7 +467,10 @@ export class ClientComplianceReportComponent implements OnInit {
           PrincipalEmployer: formValues.PrincipalEmployer || apiMeta['PrincipalEmployer'] || (isAP ? 'Principal Employer (AP)' : resolvedClientName),
           ContractorName: formValues.ContractorName || apiMeta['ContractorName'] || companyName,
           WorkSite: formValues.WorkSite || apiMeta['WorkSite'] || (isAP ? 'Work Site (AP)' : resolvedClientName),
+<<<<<<< HEAD
           WorkSiteadresss: formValues.WorkSiteadresss || apiMeta['WorkSiteadresss'] || '',
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
           UnitName: formValues.UnitName || apiMeta['UnitName'] || '',
           Establishment: establishment,
           // Overtime template needs these combined fields
@@ -764,11 +785,20 @@ export class ClientComplianceReportComponent implements OnInit {
         }).join('');
         return `<tr><td>${row.sno || index + 1}</td><td class="left-text">${row.name || ''} (${row.empId || ''})</td><td>${row.age || ''}/${row.sex || ''}</td><td class="left-text">${row.designation || ''}</td><td class="left-text">${row.fatherName || ''}</td>${dayCells}<td>${row.daysWorked || row.attendance || 0}</td><td>${row.workerSignature || ''}</td><td>${row.reportDate || ''}</td><td>${row.submissionDate || ''}</td><td>${row.terminationDate || ''}</td><td>${row.inchargeSignature || ''}</td></tr>`;
       case 'form-xxvii':
+<<<<<<< HEAD
         // 21-column structure: removed UAN No, ESI No, Basic+DA columns
+=======
+        // Complete 23-column structure for Form XXVII Register of Wages with Commercial Breakdown data
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
         return `<tr>
           <td>${row.sno || index + 1}</td>
           <td class="left-text">${row.name || ''}</td>
           <td>${row.sex || ''}</td>
+<<<<<<< HEAD
+=======
+          <td>${row.uan || ''}</td>
+          <td>${row.esiNo || ''}</td>
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
           <td class="left-text">${row.designation || ''}</td>
           <td>${row.payType || 'Monthly'}</td>
           <td>${row.wagePeriod || ''}</td>
@@ -781,6 +811,10 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.others || 0}</td>
           <td>${row.advanceBonus || row.bonus || 0}</td>
           <td>${row.leaveWages || 0}</td>
+<<<<<<< HEAD
+=======
+          <td>${row.basicDA || 0}</td>
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
           <td>${row.gross || 0}</td>
           <!-- Deductions from Commercial Breakdown -->
           <td>${row.pf || 0}</td>
@@ -789,7 +823,11 @@ export class ClientComplianceReportComponent implements OnInit {
           <td>${row.advance || 0}</td>
           <td>${row.fines || 0}</td>
           <td>${row.net || 0}</td>
+<<<<<<< HEAD
           <td></td>
+=======
+          <td>${row.signature || ''}</td>
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
         </tr>`;
       case 'form-xxviii':
         // This is handled separately in normalizeFormXXVIIIRows

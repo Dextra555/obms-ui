@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+<<<<<<< HEAD
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+=======
+import { AbstractControl, FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -48,11 +52,20 @@ export class NewEmployeeLoanComponent implements OnInit {
   StartPeriod!: string;
   EndPeriod!: string;
 
+<<<<<<< HEAD
   branchSearchSubject = new Subject<string>();
 
   branchSearchString: string = '';
 
   employeeSearchCtrl = new FormControl();
+=======
+  employeeSearchSubject = new Subject<string>();
+  branchSearchSubject = new Subject<string>();
+
+  employeeSearchString: string = '';
+  branchSearchString: string = '';
+
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
   filteredEmployeeList: any[] = [];
   filteredBranchList: any[] = [];
 
@@ -115,6 +128,15 @@ export class NewEmployeeLoanComponent implements OnInit {
   }
 
   ngOnInit(): void {
+<<<<<<< HEAD
+=======
+    // Employee search debounce
+    this.employeeSearchSubject.pipe(debounceTime(3000)).subscribe(() => {
+      this.employeeSearchString = '';
+      this.employeeListModel = [...this.filteredEmployeeList]; // reset list
+    });
+
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
     // Branch search debounce
     this.branchSearchSubject.pipe(debounceTime(3000)).subscribe(() => {
       this.branchSearchString = '';
@@ -328,8 +350,11 @@ export class NewEmployeeLoanComponent implements OnInit {
             this.employeeLoanForm.patchValue({
               EmployeeID: currentEmpId
             });
+<<<<<<< HEAD
             const emp = this.employeeListModel.find((e: any) => e.ID === currentEmpId);
             if (emp) this.employeeSearchCtrl.setValue(emp.EMP_NAME);
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
           }
           this.employeeNameMap = Object.fromEntries(
             this.employeeListModel.map((e: any) => [e.ID, e.EMP_NAME])
@@ -632,6 +657,7 @@ export class NewEmployeeLoanComponent implements OnInit {
     return list.filter(item => item[key].toLowerCase().includes(searchString.toLowerCase()));
   }
 
+<<<<<<< HEAD
   onEmployeeSearchInput(event: any) {
     const value = event.target.value.trim().toLowerCase();
     if (!value) {
@@ -672,6 +698,13 @@ export class NewEmployeeLoanComponent implements OnInit {
     searchStringProp: 'branchSearchString',
     listProp: 'branchModel',
     filteredListProp: 'filteredBranchList',
+=======
+  onKeyDropdown(
+    event: KeyboardEvent,
+    searchStringProp: 'employeeSearchString' | 'branchSearchString',
+    listProp: 'employeeListModel' | 'branchModel',
+    filteredListProp: 'filteredEmployeeList' | 'filteredBranchList',
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
     keyName: string,
     subject: Subject<string>
   ) {

@@ -11,7 +11,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+<<<<<<< HEAD
 import { MatTableModule } from '@angular/material/table';
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
 import { TitleCasePipe } from '@angular/common';
 
 @NgModule({
@@ -29,8 +32,12 @@ import { TitleCasePipe } from '@angular/common';
     MatButtonModule,
     MatCardModule,
     MatIconModule,
+<<<<<<< HEAD
     MatProgressSpinnerModule,
     MatTableModule
+=======
+    MatProgressSpinnerModule
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
   ],
   providers: [
     TitleCasePipe

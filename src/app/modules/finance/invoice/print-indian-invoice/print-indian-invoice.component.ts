@@ -134,7 +134,11 @@ export class PrintIndianInvoiceComponent implements OnInit {
         dataRowsHtml += `
         <tr>
             <td class="text-center">${sno}</td>
+<<<<<<< HEAD
             <td class="col-particulars">${description}</td>
+=======
+            <td>${description}</td>
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
             <td class="text-center">${hsnCode}</td>
             <td class="text-center">${duties}</td>
             <td class="text-center">${qty}</td>
@@ -175,10 +179,16 @@ export class PrintIndianInvoiceComponent implements OnInit {
       .replace(/{{InvoiceDate}}/g, this.escapeHtml(invoice.invoiceDate || 'N/A'))
       .replace(/{{ServicePeriod}}/g, this.escapeHtml(invoice.servicePeriod || ''))
       .replace(/{{PlaceOfSupply}}/g, this.escapeHtml(invoice.placeOfSupply || client.billingState || ''))
+<<<<<<< HEAD
       // Work Order Bar - only show if work order number exists
       .replace(/{{WorkOrderBar}}/g, (invoice.workOrderNoFormatted && invoice.workOrderNoFormatted.trim() !== '')
         ? `<div class="work-order-full-bar">WORK ORDER NO: ${this.escapeHtml(invoice.workOrderNoFormatted)} &nbsp;|&nbsp; WORK ORDER DATE: ${this.escapeHtml(invoice.workOrderDate || '')}</div>`
         : '')
+=======
+      // Work Order Details
+      .replace(/{{WorkOrderNo}}/g, this.escapeHtml(invoice.workOrderNoFormatted || 'N/A'))
+      .replace(/{{WorkOrderDate}}/g, this.escapeHtml(invoice.workOrderDate || 'N/A'))
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
       .replace(/{{SACCode}}/g, this.escapeHtml(invoice.sacCode || ''))
       .replace(/{{SupplyType}}/g, this.escapeHtml(invoice.supplyType || 'Goods'))
       .replace(/{{ReverseCharge}}/g, this.escapeHtml(invoice.reverseCharge || 'No'))

@@ -40,6 +40,7 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
   empId: number = 0;
   dtAdvanceDate!: string;
   clientList: any;
+<<<<<<< HEAD
   employeeNameFilter: string = '';
 
   get filteredFormArray(): any[] {
@@ -64,6 +65,8 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
     return name.includes(filter) || code.includes(filter);
   }
 
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
   branchSearchString: string = '';
   clientSearchString: string = '';
   filteredBranchList: any[] = [];
@@ -204,7 +207,10 @@ export class NewEmployeeMonthlyAdvanceComponent implements OnInit {
       formArray.push(this.fb.group({
         ID: [data[i].ID],
         EMP_ID: [data[i].EMP_ID],
+<<<<<<< HEAD
         EMP_CODE: [data[i].EMP_CODE],
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
         EMP_NAME: [data[i].EMP_NAME],
         EMP_IC_NEW: [data[i].EMP_IC_NEW + data[i].EMP_PASSPORT_NO],
         EMP_IC_OLD: [data[i].EMP_IC_OLD],

@@ -123,11 +123,14 @@ export class RbiBankSalaryProcessComponent implements OnInit {
     );
   }
 
+<<<<<<< HEAD
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
+=======
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
   onSearchClick() {
     const period = new Date(this.rbiBankSalaryForm.get('Period')?.value);
     this.dtPeriod = this.formatDate(

@@ -76,7 +76,11 @@ export class BulkAttendanceUploadComponent implements OnInit, AfterViewInit {
     'P': 'Present - Regular working day',
     'W/O': 'Weekly Off - Non-working day',
     'H': 'Holiday - Public holiday',
+<<<<<<< HEAD
     'L': 'Absent - No pay deduction',
+=======
+    'L': 'Leave - Any type of leave',
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
     'NH': 'National Holiday - National festival holiday'
   };
 
@@ -648,7 +652,11 @@ export class BulkAttendanceUploadComponent implements OnInit, AfterViewInit {
                 <tr><td><strong>P</strong></td><td>Present</td><td>8 hours</td></tr>
                 <tr><td><strong>W/O</strong></td><td>Weekly Off</td><td>0 hours</td></tr>
                 <tr><td><strong>H</strong></td><td>Holiday</td><td>0 hours</td></tr>
+<<<<<<< HEAD
                 <tr><td><strong>L</strong></td><td>Absent</td><td>0 hours (no pay)</td></tr>
+=======
+                <tr><td><strong>L</strong></td><td>Leave</td><td>8 hours</td></tr>
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
                 <tr><td><strong>NH</strong></td><td>National Holiday</td><td>0 hours</td></tr>
               </table>
 

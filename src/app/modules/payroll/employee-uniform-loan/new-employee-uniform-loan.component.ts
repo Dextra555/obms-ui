@@ -1,6 +1,10 @@
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { Component, OnInit } from '@angular/core';
+<<<<<<< HEAD
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+=======
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 import { MatDialog } from '@angular/material/dialog';
 import { Sort } from '@angular/material/sort';
@@ -59,9 +63,16 @@ export class NewEmployeeUniformLoanComponent implements OnInit {
   btnPrint: boolean = false;
   btnDelete: boolean = false;
 
+<<<<<<< HEAD
   branchSearchSubject = new Subject<string>();
   branchSearchString: string = '';
   employeeSearchCtrl = new FormControl();
+=======
+  employeeSearchSubject = new Subject<string>();
+  branchSearchSubject = new Subject<string>();
+  employeeSearchString: string = '';
+  branchSearchString: string = '';
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
   filteredEmployeeList: any[] = [];
   filteredBranchList: any[] = [];
 
@@ -153,6 +164,15 @@ export class NewEmployeeUniformLoanComponent implements OnInit {
   }
 
   ngOnInit(): void {
+<<<<<<< HEAD
+=======
+    // Employee search debounce
+    this.employeeSearchSubject.pipe(debounceTime(3000)).subscribe(() => {
+      this.employeeSearchString = '';
+      this.employeeListModel = [...this.filteredEmployeeList]; // reset list
+    });
+
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
     // Branch search debounce
     this.branchSearchSubject.pipe(debounceTime(3000)).subscribe(() => {
       this.branchSearchString = '';
@@ -529,12 +549,19 @@ export class NewEmployeeUniformLoanComponent implements OnInit {
         if (this.isEdit && this.employeeUniformLoanForm.value.EmployeeID) {
           const empId = Number(this.employeeUniformLoanForm.value.EmployeeID);
 
+<<<<<<< HEAD
           const emp = this.employeeListModel.find(e => e.EMP_ID === empId);
           if (emp) {
             this.employeeUniformLoanForm.patchValue({
               EmployeeID: empId
             });
             this.employeeSearchCtrl.setValue(emp.EMP_NAME);
+=======
+          if (this.employeeListModel.some(e => e.EMP_ID === empId)) {
+            this.employeeUniformLoanForm.patchValue({
+              EmployeeID: empId
+            });
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
             this.EmployeeID = empId;
             this.selectedId = empId;
           }
@@ -791,6 +818,7 @@ export class NewEmployeeUniformLoanComponent implements OnInit {
     return list.filter(item => item[key].toLowerCase().includes(searchString.toLowerCase()));
   }
 
+<<<<<<< HEAD
   onEmployeeSearchInput(event: any) {
     const value = event.target.value.trim().toLowerCase();
     if (!value) {
@@ -830,6 +858,13 @@ export class NewEmployeeUniformLoanComponent implements OnInit {
     searchStringProp: 'branchSearchString',
     listProp: 'branchModel',
     filteredListProp: 'filteredBranchList',
+=======
+  onKeyDropdown(
+    event: KeyboardEvent,
+    searchStringProp: 'employeeSearchString' | 'branchSearchString',
+    listProp: 'employeeListModel' | 'branchModel',
+    filteredListProp: 'filteredEmployeeList' | 'filteredBranchList',
+>>>>>>> 5207b82f409ea4dcb09404b90ab7324a99cbff87
     keyName: string,
     subject: Subject<string>
   ) {
